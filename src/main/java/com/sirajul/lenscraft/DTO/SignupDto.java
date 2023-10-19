@@ -3,12 +3,18 @@ package com.sirajul.lenscraft.DTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
+@Service
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
+@Builder
 public record SignupDto(
 
-        UUID userId,
         @NotNull
         String firstName,
 
@@ -19,6 +25,8 @@ public record SignupDto(
 
         @NotNull
         @Email
-        String emailId
+        String emailId,
+
+        String phone
 ) {
 }

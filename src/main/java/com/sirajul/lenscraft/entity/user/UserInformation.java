@@ -11,11 +11,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -61,6 +65,18 @@ public class UserInformation implements UserDetails {
     @Enumerated(EnumType.STRING)
     Role role;
 
+    @Column(
+            name = "user_created",
+            nullable = false
+    )
+    @CreationTimestamp
+    LocalDateTime userCreated;
+
+    @Column(
+            name = "active"
+    )
+    Boolean isActive = false;
+
     String profilePic;
 
     @Column(
@@ -72,7 +88,8 @@ public class UserInformation implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+
+        return List.of(new SimpleGrantedAuthority(getRole().name()));
     }
 
     @Override
