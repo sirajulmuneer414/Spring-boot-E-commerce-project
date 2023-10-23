@@ -7,26 +7,35 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor(force = true)
 @Builder
-public record SignupDto(
+public class SignupDto{
 
         @NotNull
-        String firstName,
+        String firstName;
 
-        String lastName,
+        String lastName;
 
         @Valid
-        String password,
+        String password;
 
         @NotNull
         @Email
-        String emailId,
+        String emailId;
 
-        String phone
-) {
+        String phone;
+
+        Integer otp;
+
+        @DateTimeFormat
+        LocalDateTime otpGeneratedTime;
+
 }
