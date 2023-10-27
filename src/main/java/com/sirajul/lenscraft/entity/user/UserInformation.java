@@ -1,6 +1,7 @@
 package com.sirajul.lenscraft.entity.user;
 
 import com.sirajul.lenscraft.entity.user.enums.Role;
+import com.sirajul.lenscraft.entity.user.enums.UserStatus;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -12,16 +13,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.validator.constraints.Range;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
+@Component
 @Entity
 @Data
 @NoArgsConstructor
@@ -30,7 +27,7 @@ import java.util.UUID;
 @Table(
         name = "user_info"
 )
-public class UserInformation implements UserDetails {
+public class UserInformation{
     @Id
     @GeneratedValue(
             strategy = GenerationType.UUID
@@ -63,7 +60,7 @@ public class UserInformation implements UserDetails {
             nullable = false
     )
     @Enumerated(EnumType.STRING)
-    Role role;
+    Role role = Role.USER;
 
     @Column(
             name = "user_created",
@@ -73,9 +70,10 @@ public class UserInformation implements UserDetails {
     LocalDateTime userCreated;
 
     @Column(
-            name = "active"
+            name = "user_status"
     )
-    Boolean isActive = false;
+    @Enumerated(EnumType.STRING)
+    UserStatus userStatus = UserStatus.ACTIVE;
 
     String profilePic;
 
@@ -85,35 +83,4 @@ public class UserInformation implements UserDetails {
     )
     String phone;
 
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        return List.of(new SimpleGrantedAuthority(getRole().name()));
-    }
-
-    @Override
-    public String getUsername() {
-        return emailId;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

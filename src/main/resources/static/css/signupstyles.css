@@ -1,7 +1,48 @@
 .navDiv {
     background-color: #b43e8f;
+    display: flex;
+       justify-content: center;
+       align-items: center;
 }
 
-* {
+nav {
+    background-color: #b43e8f;
+    height: 80px;
+}
+
+.navlogo {
+    height: 100%;
+    width: 100%;
+}
+
+.formMain {
+
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.formBox{
+margin-top: 20px;
+}
+
+.formPart{
+background-color: #d9d9d9;
+    padding: 10px;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #b43e9f;
+    border-radius: 5px;
+}
+.formPart Div{
+    margin-top: 5px;
+}
+.formPart button{
+    margin-top: 5px;
+}
+.btn{
     background-color: #b43e8f;
 }

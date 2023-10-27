@@ -37,4 +37,10 @@ public class Product {
     )
     String productName;
 
+    @ManyToOne
+    Brand brand;
+
+    @ManyToOne
+    Category category;
+
 }

@@ -5,6 +5,7 @@ import com.sirajul.lenscraft.Service.UserServiceImp;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.exception.InvalidOtpException;
+import com.sirajul.lenscraft.utils.FileUploadUtil;
 import com.sirajul.lenscraft.utils.OtpUtil;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Controller
@@ -27,11 +30,7 @@ public class MainController {
 
     @Autowired
     OtpUtil otpUtil;
-     @GetMapping("/Register")
-     @ResponseStatus(
-             code = HttpStatus.OK,
-             reason = "OK"
-     )
+     @GetMapping("/register")
         public String getRegister(Model model){
 
          SignupDto signupDto = new SignupDto();
@@ -39,8 +38,8 @@ public class MainController {
 
          return "signup";
         }
-     @PostMapping("/Register")
-        public String registerUser(@ModelAttribute("user") SignupDto signupDto, @RequestParam("file")MultipartFile file, HttpSession httpSession, RedirectAttributes redirectAttributes){
+     @PostMapping("/register")
+        public String registerUser(@ModelAttribute("user") SignupDto signupDto, @RequestParam("file")MultipartFile file, HttpSession httpSession, RedirectAttributes redirectAttributes) throws IOException {
 
         boolean userExists = userService.userExistsByEmail(signupDto.getEmailId());
 
@@ -49,6 +48,16 @@ public class MainController {
             redirectAttributes.addFlashAttribute("EmailError",errorMessage);
 
             return "redirect:/register";
+        }
+
+        if(!file.isEmpty()){
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            signupDto.setProfilePic(fileName);
+
+            String upload = "profilePic/" + signupDto.getEmailId();
+
+            FileUploadUtil.saveFile(upload, fileName, file);
+
         }
 
         String otp = otpUtil.generateOtp();

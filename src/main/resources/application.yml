@@ -21,3 +21,16 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: team.lenscraft@gmail.com
+    password: fivo zrkw jkfw usty
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enabled: true
+            required: true
