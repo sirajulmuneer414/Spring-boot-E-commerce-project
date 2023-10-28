@@ -1,14 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
 .navDiv {
     background-color: #b43e8f;
+}
+
+.navBox {
     display: flex;
-       justify-content: center;
-       align-items: center;
+    justify-content: space-between;
 }
 
 nav {
     background-color: #b43e8f;
     height: 80px;
 }
+
+/* .navBtn {
+    background-color: #fff;
+    border-radius: 5px;
+    color: #b43e8f;
+}
+
+.navBtn:hover {
+    border: 2px solid #fff;
+    color: #fff;
+    background-color: #b43e8f;
+} */
 
 .navlogo {
     height: 100%;
@@ -23,26 +46,35 @@ nav {
     align-items: center;
 }
 
-.formBox{
-margin-top: 20px;
+.formBox {
+    margin-top: 20px;
 }
 
-.formPart{
-background-color: #d9d9d9;
+.formPart {
+    background-color: #d9d9d9;
     padding: 10px;
-    display:flex;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     border: 2px solid #b43e9f;
     border-radius: 5px;
 }
-.formPart Div{
+
+.formPart Div {
     margin-top: 5px;
 }
-.formPart button{
+
+.formPart button {
     margin-top: 5px;
 }
-.btn{
+
+.submitBtn {
+    background-color: #b43e8f;
+}
+
+.submitBtn:hover {
+    border: 2px solid #b43e8f;
+    color: #b43e8f;
     background-color: #b43e8f;
 }

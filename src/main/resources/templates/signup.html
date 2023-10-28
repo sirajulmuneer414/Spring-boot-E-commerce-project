@@ -13,9 +13,14 @@
 
 <body class="container-fluid">
             <nav class="row navDiv">
-            <div class="row container h-auto">
+            <div class="row container h-auto navBox">
                 <div class="col-3 navLogo">
                     <img th:src="@{/images/Mainlogo.png}" class="w-100 h-100">
+                </div>
+                <div class="col-3 d-flex justify-content-center align-items-center">
+
+                    <button class="btn navBtn" th:href="@{/login}">LOG IN</button>
+
                 </div>
             </div>
         </nav>

@@ -8,6 +8,7 @@ import com.sirajul.lenscraft.exception.InvalidOtpException;
 import com.sirajul.lenscraft.utils.FileUploadUtil;
 import com.sirajul.lenscraft.utils.OtpUtil;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Controller
+@Slf4j
 public class MainController {
 
     @Autowired
@@ -67,7 +69,7 @@ public class MainController {
         otpUtil.sendOtpEmail(signupDto.getEmailId(),otp);
         httpSession.setAttribute("Non-verifiedUser",signupDto);
 
-
+            log.info(signupDto.toString());
          return "redirect:/verification";
      }
 
@@ -79,9 +81,14 @@ public class MainController {
      @PostMapping("/verification")
     public  String verification(@RequestParam("otp") String otp, HttpSession httpSession,
                                Model model){
+         log.info("inside verification posting");
             SignupDto user = (SignupDto) httpSession.getAttribute("Non-verifiedUser");
+         System.out.println(user);
+         log.info("got user");
+
         try {
             if (userService.verifyOtpAndSave(user, otp)) {
+                log.info("went inside try");
                 return "redirect:/login?message=success";
             }
         }catch (InvalidOtpException e){

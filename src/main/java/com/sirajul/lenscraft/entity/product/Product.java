@@ -2,6 +2,7 @@ package com.sirajul.lenscraft.entity.product;
 
 import com.sirajul.lenscraft.entity.product.enums.StockStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Product {
@@ -19,7 +20,7 @@ public class Product {
     @Column(
             name = "product_id"
     )
-    Integer productId;
+    Long productId;
 
     @Column(
             name = "stock_status"
@@ -27,15 +28,17 @@ public class Product {
     @Enumerated(EnumType.STRING)
     StockStatus stockStatus;
 
-    @Column(
-            name = "brand_id"
-    )
-    Long brandId;
 
     @Column(
             name = "product_name"
     )
     String productName;
+
+    @NotNull
+    @Column(
+            name = "product_price"
+    )
+    Integer price;
 
     @ManyToOne
     Brand brand;

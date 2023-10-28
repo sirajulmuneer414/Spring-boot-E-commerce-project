@@ -11,6 +11,7 @@ import com.sirajul.lenscraft.exception.InvalidOtpException;
 import com.sirajul.lenscraft.mapping.UserInformationMapping;
 import com.sirajul.lenscraft.utils.OtpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,8 @@ public class UserServiceImp implements UserService {
 
     @Autowired
     OtpUtil otpUtil;
+
+    @Autowired private PasswordEncoder passwordEncoder;
 
     @Autowired
     UserInformationMapping userInformationMapping;
@@ -41,6 +44,12 @@ public class UserServiceImp implements UserService {
         if(signupDto != null && otpUtil.isOtpValid(signupDto, otp)){
 
             UserInformation user = mapping.signupDtoMapping(signupDto);
+
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            if(userRepository.count() == 0)
+                user.setRole(Role.ADMIN);
+            else user.setRole(Role.USER);
 
             userRepository.save(user);
             otpUtil.sendEmail(signupDto.getEmailId());

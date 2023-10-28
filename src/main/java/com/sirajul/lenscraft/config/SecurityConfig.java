@@ -1,9 +1,12 @@
 package com.sirajul.lenscraft.config;
 
+import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -14,20 +17,21 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
 
+    @Autowired UserDetailsService userDetailsService;
     @Autowired
     SuccessHandler successHandler;
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
     @Bean
     public WebSecurityCustomizer ignoreWebSecurity(){
-        return (web -> web.ignoring().requestMatchers("/images/**","/css/**"));
+        return (web -> web.ignoring().requestMatchers("/images/**","/css/**","/profilePic/**"));
     }
 
     @Bean
@@ -70,5 +74,17 @@ public class SecurityConfig {
         tokenBasedRememberMeServices.setAlwaysRemember(true);
 
         return tokenBasedRememberMeServices;
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider(UserInformation user){
+
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+
+        return authenticationProvider;
+
     }
 }

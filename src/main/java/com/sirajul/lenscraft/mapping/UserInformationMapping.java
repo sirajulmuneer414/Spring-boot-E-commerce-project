@@ -20,8 +20,7 @@ public class UserInformationMapping {
 
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder;
+
 
     public UserInformation signupDtoMapping(SignupDto signupDto){
         UserInformation user = new UserInformation();
@@ -29,13 +28,10 @@ public class UserInformationMapping {
         user.setEmailId(signupDto.getEmailId());
         user.setFirstName(signupDto.getFirstName());
         user.setLastName(signupDto.getLastName());
-        user.setPassword(passwordEncoder.encode(signupDto.getPassword()));
+        user.setPassword(signupDto.getPassword());
         user.setProfilePic(signupDto.getProfilePic());
         user.setUserCreated(LocalDateTime.now());
         user.setUserStatus(UserStatus.ACTIVE);
-        if(userRepository.count() == 0)
-        user.setRole(Role.ADMIN);
-        else user.setRole(Role.USER);
 
         return user;
     }

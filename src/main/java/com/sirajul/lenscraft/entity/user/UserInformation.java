@@ -39,7 +39,8 @@ public class UserInformation{
     @Email
     @Column(
             unique = true,
-            name = "email_id"
+            name = "email_id",
+            columnDefinition = "VARCHAR(100)"
     )
     String emailId;
 
@@ -52,7 +53,7 @@ public class UserInformation{
 
     @NotNull
     @Column(
-            columnDefinition = "VARCHAR(30)"
+            columnDefinition = "VARCHAR(100)"
     )
     String password;
 
@@ -76,11 +77,5 @@ public class UserInformation{
     UserStatus userStatus = UserStatus.ACTIVE;
 
     String profilePic;
-
-    @Column(
-            name = "phone_number",
-            columnDefinition = "VARCHAR(10)"
-    )
-    String phone;
 
 }
