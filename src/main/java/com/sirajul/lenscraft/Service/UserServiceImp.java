@@ -10,6 +10,7 @@ import com.sirajul.lenscraft.entity.user.enums.UserStatus;
 import com.sirajul.lenscraft.exception.InvalidOtpException;
 import com.sirajul.lenscraft.mapping.UserInformationMapping;
 import com.sirajul.lenscraft.utils.OtpUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class UserServiceImp implements UserService {
     @Autowired
     UserRepository userRepository;
@@ -40,10 +42,10 @@ public class UserServiceImp implements UserService {
     @Override
     public boolean verifyOtpAndSave(SignupDto signupDto, String otp) {
 
-        UserInformationMapping mapping = new UserInformationMapping();
+
         if(signupDto != null && otpUtil.isOtpValid(signupDto, otp)){
 
-            UserInformation user = mapping.signupDtoMapping(signupDto);
+            UserInformation user = userInformationMapping.signupDtoMapping(signupDto);
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -62,7 +64,8 @@ public class UserServiceImp implements UserService {
 
     @Override
     public List<UserInformationDto> findAllUsers() {
-        List<UserInformation> users = userRepository.findByRole(Role.USER.name());
+        List<UserInformation> users = userRepository.findByRole(Role.USER);
+        System.out.println(users.isEmpty());
         return userInformationMapping.listMapping(users);
     }
 
@@ -80,7 +83,13 @@ public class UserServiceImp implements UserService {
     public void updateUserById(UserInformationDto userDto) {
         UserInformation user = userRepository.findById(userDto.getId()).get();
 
+        if(user != null){
+            log.info("user is found from the repository");
+        }
+
         user = userInformationMapping.adminToRepoUpdateMapping(userDto,user);
+
+        System.out.println(user.getLastName());
 
         userRepository.save(user);
     }
@@ -98,6 +107,16 @@ public class UserServiceImp implements UserService {
     @Override
     public List<UserInformationDto> findAllUsersContaining(String keyword) {
         return null;
+    }
+
+    @Override
+    public void unBlockUserById(UUID id) {
+        UserInformation user = userRepository.findById(id).get();
+
+        user.setUserStatus(UserStatus.ACTIVE);
+
+        userRepository.save(user);
+
     }
 
 }

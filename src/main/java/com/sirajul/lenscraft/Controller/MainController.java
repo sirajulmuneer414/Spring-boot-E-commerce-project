@@ -4,15 +4,21 @@ import com.sirajul.lenscraft.DTO.SignupDto;
 import com.sirajul.lenscraft.Service.UserServiceImp;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
 import com.sirajul.lenscraft.entity.user.UserInformation;
+import com.sirajul.lenscraft.entity.user.enums.Role;
 import com.sirajul.lenscraft.exception.InvalidOtpException;
 import com.sirajul.lenscraft.utils.FileUploadUtil;
 import com.sirajul.lenscraft.utils.OtpUtil;
+import jakarta.mail.search.SearchTerm;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -22,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Controller
 @Slf4j
@@ -56,7 +63,7 @@ public class MainController {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
             signupDto.setProfilePic(fileName);
 
-            String upload = "profilePic/" + signupDto.getEmailId();
+            String upload = "lenscraft/src/main/resources/static/profilePic/" + signupDto.getEmailId();
 
             FileUploadUtil.saveFile(upload, fileName, file);
 
@@ -111,11 +118,40 @@ public class MainController {
          redirectAttributes.addFlashAttribute("resent","New OTP has been send to your mail");
          return "redirect:/verification";
      }
-
      @GetMapping("/login")
-    public String getLogin(){
-
+     public String getLogin(){
          return "login";
      }
+
+//     @GetMapping("/signup")
+//    public String loginProcessing(){
+//         Authentication securityAuthentication = SecurityContextHolder.getContext().getAuthentication();
+//         Set<String> roles = AuthorityUtils.authorityListToSet(securityAuthentication.getAuthorities());
+//         if(!(securityAuthentication instanceof AnonymousAuthenticationToken)) {
+//             if (roles.contains(Role.ADMIN.name())) {
+//                 return "redirect:/admin/dashboard";
+//             }
+//             }
+//                 return "redirect:/shop";
+//         }
+
+
+//     @GetMapping("/signup")
+//    public String Login(){
+//         Authentication securityAuthentication = SecurityContextHolder.getContext().getAuthentication();
+//         Set<String> roles = AuthorityUtils.authorityListToSet(securityAuthentication.getAuthorities());
+//
+//         System.out.println(roles);
+//
+//         if(!(securityAuthentication instanceof AnonymousAuthenticationToken)){
+//             if(roles.contains(Role.ADMIN.name())){
+//                 return "redirect:/admin/dashboard";
+//             }
+//             else{
+//                 return "redirect:/shop";
+//             }
+//         }
+//         return "redirect:/login";
+//     }
 
 }

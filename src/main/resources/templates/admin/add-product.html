@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenscraft-Admin add product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+
+</head>
+<body>
+<div th:replace="fragment::navBarAdmin"></div>
+<div th:style="height: 70px"></div>
+
+<div class="row d-block text-center">
+<h1 class="">Add Product</h1>
+</div>
+
+<div class="row w-100 d-flex justify-content-center align-items-center">
+<form class="d-flex flex-column" th:action="@{/admin/products/add}" th:object="${productDto}" method="post" enctype="multipart/form-data">
+    <label class="ms-5" for="productName">Product Name:</label>
+    <input type="text" id="productName" th:field="*{productName}" required="required" />
+
+    <label class="ms-5" for="description">Description:</label>
+    <input type="text" id="description" th:field="*{description}" required="required" />
+
+    <label class="ms-5" for="price">Price:</label>
+    <input type="text" id="price" th:field="*{price}" required="required" />
+
+    <label class="ms-5" for="model">Model No:</label>
+    <input type="text" id="model" th:field="*{modelNo}" required="required" />
+
+    <label class="ms-5" for="frameSize">Frame Size:</label>
+    <select id="frameSize" th:field="*{frameSize}">
+        <option value="" >Select a Size</option>
+        <option value="SMALL" >SMALL</option>
+        <option value="MEDIUM" >MEDIUM</option>
+        <option value="LARGE" >LARGE</option>
+    </select>
+
+        <label class="ms-5" for="Stockstatus">Stock Status:</label>
+        <select id="Stockstatus" th:field="*{stockStatus}">
+            <option value="" >Select Status</option>
+            <option value="IN_STOCK" >IN STOCK</option>
+            <option value="LOW_STOCK" >LOW STOCK</option>
+            <option value="OUT_OF_STOCK" >OUT OF STOCK</option>
+
+    </select>
+
+
+    <br />
+    <div class="ms-5">
+    <label  for="brand">Brand:</label>
+    <select id="brand" name="brandId">
+        <option value="">Select a Brand</option>
+        <th:block th:each="brand : ${brands}">
+            <option th:value="${brand.brandId}" th:text="${brand.brandName}"></option>
+        </th:block>
+    </select>
+        <div class="d-flex justify-content-center">
+            <a type="button" class="btn btn-primary ms-5" th:href="@{add-brand}">Add brand</a>
+        </div>
+    </div>
+
+
+    <br/>
+    <div class="ms-5">
+        <label for="category">Category:</label>
+        <select id="category" name="categoryId">
+            <option value="">Select a Category</option>
+            <th:block th:each="cat : ${categories}">
+                <option th:value="${cat.categoryId}" th:text="${cat.categoryName}"></option>
+            </th:block>
+        </select>
+        <div class="d-flex justify-content-end">
+            <a type="button" class="btn btn-primary" th:href="@{add-category}">Add Category</a>
+        </div>
+    </div>
+    <br />
+    <div class="mx-5 mt-5 p-5">
+        <h3>Select Variant</h3>
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary" onclick="addVariant()">Add Variant</button>
+        </div>
+        <div id="variables">
+            <!-- This is where we will dynamically add variants -->
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Continue</button>
+    </div>
+
+
+    <script>
+        function addVariant() {
+            var variableDiv = document.createElement('div');
+            variableDiv.className = 'mb-3';
+
+            variableDiv.innerHTML = `
+            <div class="form-group">
+                <label for="color">Frame Color:</label>
+                <input type="text" name="variable.frameColor" required="required">
+            </div>
+            <div class="form-group">
+                <label for="image1">Image 1:</label>
+                <input type="file" name="variable.image1" id="image1" required="required">
+            </div>
+            <div class="form-group">
+                <label for="image2">Image 2:</label>
+                <input type="file" name="variable.image2" id="image2">
+            </div>
+            <div class="form-group">
+                <label for="image3">Image 3:</label>
+                <input type="file" name="variable.image3" id="image3">
+            </div>
+            <div class="form-group">
+                <label for="variantQuantity">Quantity:</label>
+                <input type="text" name="variable.quantity" required="required">
+            </div>
+            `;
+
+            document.getElementById('variables').appendChild(variableDiv);
+        }
+    </script>
+</form>
+</div>
+</body>
+</html>

@@ -6,6 +6,7 @@ import com.sirajul.lenscraft.Repository.UserRepository;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.Role;
 import com.sirajul.lenscraft.entity.user.enums.UserStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class UserInformationMapping {
 
     @Autowired
@@ -43,6 +45,10 @@ public class UserInformationMapping {
         dto.setEmailId(user.getEmailId());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
+
+        System.out.println("the user profile pic name is "+user.getProfilePic());
+
+        dto.setProfilePic(user.getProfilePic());
         dto.setUserStatus(user.getUserStatus().name());
         dto.setRole(user.getRole().name());
 
@@ -50,6 +56,8 @@ public class UserInformationMapping {
     }
 
     public UserInformation adminToRepoUpdateMapping(UserInformationDto userDto,UserInformation user){
+
+        log.info("Inside the mapping for dto to userInformation class");
 
 
         if(Objects.nonNull(userDto.getFirstName()) && !"".equalsIgnoreCase(userDto.getFirstName())){
@@ -93,6 +101,7 @@ public class UserInformationMapping {
             dto.setEmailId(user.getEmailId());
             dto.setFirstName(user.getFirstName());
             dto.setLastName(user.getLastName());
+            dto.setProfilePic(user.getProfilePic());
             dto.setUserStatus(user.getUserStatus().name());
             dto.setRole(user.getRole().name());
 

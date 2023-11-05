@@ -23,6 +23,8 @@ public class UserInformationDto {
 
     String lastName;
 
+    String profilePic;
+
     String role;
 
     String userStatus;

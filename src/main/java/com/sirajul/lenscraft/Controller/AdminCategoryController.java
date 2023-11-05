@@ -52,7 +52,7 @@ public class AdminCategoryController {
         categoryService.addCategory(category);
 
 
-        return "redirect:/admin/category";
+        return "redirect:/admin/category/";
     }
 
 

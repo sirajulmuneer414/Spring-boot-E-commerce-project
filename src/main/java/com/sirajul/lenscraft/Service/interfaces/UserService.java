@@ -26,4 +26,5 @@ public interface UserService {
 
     List<UserInformationDto> findAllUsersContaining(String keyword);
 
+    void unBlockUserById(UUID id);
 }

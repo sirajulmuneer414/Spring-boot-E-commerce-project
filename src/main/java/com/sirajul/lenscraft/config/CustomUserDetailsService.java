@@ -1,38 +1,47 @@
 package com.sirajul.lenscraft.config;
 
 import com.sirajul.lenscraft.entity.user.UserInformation;
+import com.sirajul.lenscraft.entity.user.enums.UserStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 
-@Configuration
+@Service
+@Slf4j
 public class CustomUserDetailsService implements UserDetails {
+
     @Autowired
     UserInformation user;
-    public CustomUserDetailsService(UserInformation user){
+     public CustomUserDetailsService(UserInformation user){
+         log.info("Inside customerUserDetailservice constructor ");
         this.user = user;
+         System.out.println(user.getPassword());
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-
-        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        log.info("insude");
+        List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        return simpleGrantedAuthorities;
     }
 
     @Override
     public String getPassword() {
+        log.info("on password");
+
         return user.getPassword();
     }
 
     @Override
     public String getUsername() {
+        log.info("on username");
         return user.getEmailId();
     }
 
@@ -53,6 +62,9 @@ public class CustomUserDetailsService implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+         if(user.getUserStatus().equals(UserStatus.BLOCKED)){
+             return false;
+         }
+        return true;
     }
 }

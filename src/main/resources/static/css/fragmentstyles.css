@@ -19,6 +19,7 @@
 nav {
     background-color: #b43e8f;
     height: 80px;
+    position: fixed;
 }
 
 .navBtn {
@@ -34,6 +35,6 @@ nav {
 }
 
 .navlogo {
-    height: 100%;
+    height: auto;
     width: 100%;
 }

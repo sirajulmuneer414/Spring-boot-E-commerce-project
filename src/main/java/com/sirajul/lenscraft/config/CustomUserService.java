@@ -4,27 +4,34 @@ import com.sirajul.lenscraft.Repository.UserRepository;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.UserStatus;
 import com.sirajul.lenscraft.exception.BlockedUserFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-@Configuration
+@Service
+@Slf4j
 public class CustomUserService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
+
+    log.info("inside load userrname");
         UserInformation user = userRepository.findByEmailId(username);
+        System.out.println(user.getEmailId());
 
         if(user == null){
+            log.info("username not found exception");
             throw new UsernameNotFoundException(username);
         }
         else if(user.getUserStatus().equals(UserStatus.BLOCKED)){
             throw new BlockedUserFoundException("The user " + username + " is Blocked");
         }
+        log.info("no issue in load");
         return new CustomUserDetailsService(user);
     }
 }

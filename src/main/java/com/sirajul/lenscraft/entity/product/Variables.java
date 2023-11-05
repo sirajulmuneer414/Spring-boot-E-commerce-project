@@ -15,18 +15,28 @@ import lombok.NoArgsConstructor;
 public class Variables {
 
 @Id
-Long product_id;
-
-@Column(
-        name = "model_no"
+@SequenceGenerator(
+        name = "variable_id",
+        sequenceName = "variable_id",
+        allocationSize = 1
 )
-String modelNo;
-
-@Column(
-        name = "frame_size"
+@GeneratedValue(
+        strategy = GenerationType.IDENTITY,
+        generator = "variable_id"
 )
-@Enumerated(EnumType.STRING)
-FrameSize frameSize;
+Long variableId;
 
+String image1;
+
+String image2;
+
+String image3;
+
+String frameColor;
+
+Long quantity;
+
+@ManyToOne
+Product product;
 
 }

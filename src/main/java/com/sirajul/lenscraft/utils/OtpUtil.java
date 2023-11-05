@@ -26,8 +26,8 @@ public class OtpUtil {
             message.setTo(recipientEmail);
 
             message.setSubject("Registration Successful");
-            message.setText("Thank you registering with Lenscraft" +
-                    "Your account has been successfully registered.Welcome to our family" +
+            message.setText("Thank you registering with Lenscraft /n /n" +
+                    "Your account has been successfully registered.Welcome to our family /n" +
                     "Best regards from team.lenscraft@gmail.com");
 
             javaMailSender.send(message);

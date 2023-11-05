@@ -21,7 +21,7 @@ nav {
     height: 80px;
 }
 
-/* .navBtn {
+ .navBtn {
     background-color: #fff;
     border-radius: 5px;
     color: #b43e8f;
@@ -31,10 +31,10 @@ nav {
     border: 2px solid #fff;
     color: #fff;
     background-color: #b43e8f;
-} */
+}
 
 .navlogo {
-    height: 100%;
+    height: auto;
     width: 100%;
 }
 

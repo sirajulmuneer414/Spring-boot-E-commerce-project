@@ -2,9 +2,36 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categories</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
-<body>
-This is for admin category control
+</head>
+<body class="container-fluid">
+<nav th:replace="fragment::navBarAdmin"></nav>
+<div class="row d-flex justify-content-center align-items-center" th:style="'height: 100vh;'">
+    <table class="table text-center">
+        <thead class="thead-dark bg-secondary text-white">
+        <tr>
+            <th>Category Name</th>
+            <th>Number of Products</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cat : ${categories}">
+            <td th:text="${cat.categoryName}"></td>
+            <td><span th:text="${#lists.size(cat.products)}"></span></td>
+            <td><a th:href="@{/admin/category/edit/{id}(id=${cat.categoryId})}" class="btn btn-warning">EDIT</a></td>
+            <td th:if="${#lists.size(cat.products)}==0"><a th:href="@{/admin/category/delete/{id}(id=${cat.categoryId})}" class="btn btn-danger">DELETE</a> </td>
+        </tr>
+        </tbody>
+    </table>
+    <div>
+        <a th:href="@{add}" class="btn btn-primary">ADD CATEGORY</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>

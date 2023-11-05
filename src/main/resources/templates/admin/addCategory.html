@@ -2,10 +2,27 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Category</title>
 </head>
 <body>
 
-This is to add category
+<div class="row formMain container-fluid">
+
+    <div class="col-sm-8 col-md-5 col-lg-4 col-xl-4 formBox">
+        <form th:action="@{/admin/category/add}" method="post" th:object="${categoryToAdd}" class="formPart">
+
+            <div class="form-group">
+                <label for="categoryName">Category Name</label>
+                <input type="text" class="form-control" id="categoryName" placeholder="Enter Category Name"
+                       th:field="*{categoryName}">
+            </div>
+
+
+            <button type="submit" class="btn">Submit</button>
+
+        </form>
+    </div>
+    </div>
 </body>
 </html>

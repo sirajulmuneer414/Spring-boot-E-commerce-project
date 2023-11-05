@@ -2,6 +2,7 @@ package com.sirajul.lenscraft.config;
 
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.Role;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig {
 
 
@@ -29,13 +31,11 @@ public class SecurityConfig {
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-    @Bean
-    public WebSecurityCustomizer ignoreWebSecurity(){
-        return (web -> web.ignoring().requestMatchers("/images/**","/css/**","/profilePic/**"));
-    }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
+        log.info("inside security filter chain");
         http.authorizeHttpRequests(
                 auth ->
                         auth.requestMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
@@ -45,7 +45,7 @@ public class SecurityConfig {
         )
                 .formLogin(
                         form ->
-                                form.loginPage("/login").permitAll()
+                                form.loginPage("/login")
                                         .successHandler(successHandler)
                                         .permitAll()
                 )
@@ -53,7 +53,7 @@ public class SecurityConfig {
                         logout ->
                                 logout
                                         .logoutUrl("/logout")
-                                        .logoutSuccessUrl("/shop")
+                                        .logoutSuccessUrl("/")
                                         .invalidateHttpSession(true)
                                         .deleteCookies("JSESSIONID")
                 )
@@ -65,7 +65,10 @@ public class SecurityConfig {
                 );
         return http.build();
     }
-
+    @Bean
+    public WebSecurityCustomizer ignoreWebSecurity(){
+        return (web -> web.ignoring().requestMatchers("/images/**","/css/**","/profilePic/**"));
+    }
     @Bean
     public RememberMeServices rememberMeServices(UserDetailsService userDetailsService){
         TokenBasedRememberMeServices tokenBasedRememberMeServices =
@@ -78,6 +81,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider(UserInformation user){
+        log.info("inside dao authentication provider");
 
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
 
