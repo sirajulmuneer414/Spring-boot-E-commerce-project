@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Lenscraft-Product View</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+  * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+  }
+  li{
+  margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+<body class="container-fluid">
+<div th:replace="~{fragment::navBarHome}"></div>
+<div class="row" style="margin-top: 100px; margin-bottom: 50px ">
+    <div class="col-6 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6 d-flex justify-content-center">
+
+        <div id="carouselExampleRide" class="carousel slide" data-bs-ride="true" style="height: 400px; width: 400px">
+            <div class="carousel-inner h-100">
+                <div class="carousel-item active">
+                    <img th:src="@{${'/productImages/'+product.productId+'/'+targetVariable.image1}}" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img th:src="@{${'/productImages/'+product.productId+'/'+targetVariable.image2}}" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img th:src="@{${'/productImages/'+product.productId+'/'+targetVariable.image2}}" class="d-block w-100" alt="...">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+    <div class="col-6 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6">
+        <ul class="list-unstyled">
+            <li>
+                <h4 th:text="${product.brand.brandName}" style="color: #d9d9d9"></h4>
+            </li>
+            <li>
+                <h2 th:text="${product.productName}" style="color: black"></h2>
+            </li>
+            <li>
+                <h6 th:text="${product.description}"></h6>
+            </li>
+            <li>
+                <h6 th:text="${'Size : '+product.frameSize.name()}" class="text-muted"></h6>
+            </li>
+            <li th:if="${product.discountedPrice == null && product.category.offer.offerPercentage == 0}">
+                <h3 th:text="${'&#8377;'+product.price}" style="color: #b43e8f"></h3>
+            </li>
+            <li th:unless="${product.discountedPrice == null}">
+                <h3 th:text="${'&#8377;'+product.price}" class="text-muted" style="text-decoration: line-through"></h3>
+                <h3 th:text="${'&#8377;'+product.discountedPrice}" style="color: #b43e8f"></h3>
+            </li>
+            <li th:if="${product.category.offer.offerPercentage != 0 && product.discountPrice == 0}">
+                <h3 th:text="${'&#8377;'+product.price}" class="text-muted" style="text-decoration: line-through"></h3>
+                <h3 th:text="${'&#8377;'+product.discountedPrice}" style="color: #b43e8f"></h3>
+            </li>
+            <li class="d-flex align-items-center">
+                <a th:href="@{/shop/productView/{id}/{variableId}(id=${product.productId},variableId=${targetVariable.variableId})}"><div th:style="| height: 30px; width: 30px;padding: 5px; border: 1px solid #000000; background-color: ${targetVariable.frameColor}"></div></a>
+                <div th:each="variable : ${variables}" class="d-flex">
+
+                    <a th:unless="${variable eq targetVariable}" th:href="@{/shop/productView/{id}/{variableId}(id=${product.productId},variableId=${variable.variableId})}"><div th:style="| height: 30px; width: 30px; background-color: ${variable.frameColor}"></div></a>
+
+                </div>
+            </li>
+            <li class="d-flex align-items-center">
+                <div>
+                    <form th:action="@{/user/wishlist/add/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:unless="${wishlisted}">
+                        <input type="hidden" name="username" th:value="${username}">
+                <button type="submit" class="btn" style="border-radius: 10px; background-color: #d9d9d9; color: #b43e8f">ADD TO WISHLIST</button>
+                    </form>
+                    <form th:action="@{/user/wishlist/remove/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:if="${wishlisted}">
+                        <input type="hidden" name="username" th:value="${username}">
+                        <input type="hidden" name="fromProduct" th:value="yes">
+                <button type="submit" class="btn" style="border-radius: 10px; background-color: #d9d9d9; color: #b43e8f">REMOVE FROM WISHLIST</button>
+                    </form>
+                </div>
+                <div>
+                    <form th:action="@{/user/cart/add/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:unless="${carted}">
+                        <input type="hidden" name="username" th:value="${username}">
+                <button type="submit" class="btn" style="border-radius: 10px; background-color: #b43e8f; color: #fff">ADD TO CART</button>
+                    </form>
+                    <form th:action="@{/user/cart/remove/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:if="${carted}">
+                        <input type="hidden" name="userId" th:value="${userId}">
+                        <input type="hidden" name="cartedItemId" th:value="${cartedItemId}">
+                        <input type="hidden" name="fromProduct" th:value="yes">
+                <button type="submit" class="btn" style="border-radius: 10px; background-color: #b43e8f; color: #fff">REMOVE FROM CART</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6 d-flex justify-content-center">
+        <ul class="list-unstyled">
+            <li>
+                <h5 th:text="${'Product Id   :  '+product.productId}" class="text-muted"></h5>
+            </li>
+            <li>
+                <h5 th:text="${'Model No     :  '+product.modelNo}" class="text-muted"></h5>
+            </li>
+            <li>
+                <h5 th:text="${'Frame Size   :  '+product.frameSize.name()}" class="text-muted"></h5>
+            </li>
+            <li>
+                <h5 th:text="${'Frame Length :  '+product.frameSize.frameLength}" class="text-muted"></h5>
+            </li>
+        </ul>
+
+    </div>
+</div>
+
+
+</body>
+</html>

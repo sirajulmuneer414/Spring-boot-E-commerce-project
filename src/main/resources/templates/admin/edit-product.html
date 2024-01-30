@@ -6,6 +6,7 @@
     <title>Lenscraft-Admin edit product</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link th:href="@{/css/formStyles.css}" type="text/css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
@@ -15,35 +16,106 @@
       box-sizing: border-box;
       font-family: 'Poppins', sans-serif;
   }
+.sideBar {
+position: fixed;
+top: 70px;
+right: 0;
+background-color: #d9d9d9;
+height: fit-content;
+width: 100vw;
+padding: 10px 10px;
+z-index: 2;
+}
+
+
+.sideBarContent a {
+color: #b43e8f;
+text-decoration: none;
+}
+
+.sideBarContent {
+margin-right : 10px;
+list-style-type: none;
+}
     </style>
-
 </head>
-<body>
-<div></div>
-<h1 class="m-5">Edit Product</h1>
+<body class="container-fluid">
+<div th:replace="~{fragment::navBarAdmin}"></div>
+<div class="row" th:style="'height: 70px;'"></div>
+<nav class="sideBar position-fixed d-flex justify-content-around align-items-center">
+    <ul class="d-flex flex-row justify-content-between align-items-center">
 
+        <li class="sideBarContent">
+            <a th:href="@{/admin/order}"><h4>ORDERS</h4></a>
+
+        </li>
+        <div class="sideBarContent">
+            <a th:href="@{/admin/products/}"><h4>PRODUCTS</h4></a>
+
+        </div>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/customers}"><h4>CUSTOMERS</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/coupon}"><h4>COUPONS</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/category/}"><h4>CATEGORIES</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/brand/}"><h4>BRANDS</h4></a>
+
+        </li>
+        <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-center align-items-center">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
+            </form>
+        </li>
+    </ul>
+</nav>
+<div class="row formMain" style="height: calc(100vh - 0px); margin-top: 70px; width: 100vw">
+    <div class="col-sm-8 col-md-5 col-lg-4 col-xl-4 formBox">
+
+        <div class="d-flex justify-content-center">
+<h1 class="">Edit Product</h1>
+        </div>
+        <div class="w-100 d-flex justify-content-center align-items-center formPart">
 <form class="ms-5 pe-5 d-flex flex-column" th:action="@{/admin/products/edit/{id}(id=${productDto.productId})}" th:object="${productDto}" method="post">
+    <div class="form-group ">
     <label class="ms-5" for="productName">Product Name:</label>
     <input type="text" id="productName" th:field="*{productName}" th:value="${productDto.productName}" required="required" />
+    </div>
 
+    <div class="form-group ">
     <label class="ms-5" for="description">Description:</label>
     <input type="text" id="description" th:field="*{description}" th:value="${productDto.description}" required="required" />
+    </div>
 
-    <label class="ms-5" for="price">Price:</label>
+    <div class="form-group ">
+    <label class="" for="price">Price:</label>
     <input type="text" id="price" th:field="*{price}" th:value="${productDto.price}" required="required" />
+    </div>
 
-    <label class="ms-5" for="model">Model No:</label>
+    <div class="form-group ">
+    <label class="" for="model">Model No:</label>
     <input type="text" id="model" th:field="*{modelNo}" th:value="${productDto.modelNo}" required="required" />
+    </div>
 
-    <label class="ms-5" for="frameSize">Frame Size:</label>
+    <div class="form-group ">
+    <label class="" for="frameSize">Frame Size:</label>
     <select id="frameSize" th:field="*{frameSize}">
         <option th:value="${productDto.frameSize}" th:text="${productDto.frameSize}" ></option>
         <option th:unless="*{frameSize}=='SMALL'" value="SMALL" >SMALL</option>
         <option th:unless="*{frameSize}=='MEDIUM'" value="MEDIUM" >MEDIUM</option>
         <option th:unless="*{frameSize}=='LARGE'" value="LARGE" >LARGE</option>
     </select>
+    </div>
 
-    <label class="ms-5" for="Stockstatus">Stock Status:</label>
+    <div class="form-group ">
+    <label class="" for="Stockstatus">Stock Status:</label>
     <select id="Stockstatus" th:field="*{stockStatus}">
         <option th:value="${productDto.stockStatus}" th:text="${productDto.stockStatus}" ></option>
         <option th:unless="*{stockStatus} =='IN_STOCK'" value="IN_STOCK" >IN STOCK</option>
@@ -51,10 +123,10 @@
         <option th:unless="*{stockStatus} =='OUT_OF_STOCK'" value="OUT_OF_STOCK" >OUT OF STOCK</option>
 
     </select>
+    </div>
 
 
-    <br />
-    <div class="ms-5">
+    <div class="form-group ">
         <label  for="brand">Brand:</label>
         <select id="brand" name="brandId">
             <option th:value="${productBrand.brandId}" th:text="${productBrand.brandName}"></option>
@@ -62,14 +134,15 @@
                 <option th:unless="${brand.brandId} == ${productBrand.brandId}" th:value="${brand.brandId}" th:text="${brand.brandName}"></option>
             </th:block>
         </select>
-        <div class="d-flex justify-content-center">
-            <a type="button" class="btn btn-primary ms-5" th:href="@{add-brand}">Add brand</a>
+        <div class="d-flex justify-content-end">
+            <a type="button" class="btn btn-primary ms-5" th:href="@{/admin/products/add-brand}">Add brand</a>
         </div>
     </div>
 
 
-    <br/>
-    <div class="ms-5">
+
+
+    <div class="form-group ">
         <label for="category">Category:</label>
         <select id="category" name="categoryId">
             <option th:value="${productCategory.categoryId}" th:text="${productCategory.categoryName}">Select a Category</option>
@@ -77,41 +150,22 @@
                 <option th:value="${cat.categoryId}" th:text="${cat.categoryName}"></option>
             </th:block>
         </select>
-        <div class="d-flex justify-content-center">
-            <a type="button" class="btn btn-primary ms-5" th:href="@{add-category}">Add Category</a>
+        <div class="d-flex justify-content-end">
+            <a type="button" class="btn btn-primary ms-5" th:href="@{/admin/products/add-category}">Add Category</a>
         </div>
     </div>
 
 
 
 
-    <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-primary ms-5 form-">Continue</button>
+    <div class="d-flex justify-content-start">
+        <button type="submit" class="btn submitBtn">Continue</button>
     </div>
 
 </form>
-<table>
-    <thead>
-    <tr>
-        <th>
-            Variable Color
-        </th>
-        <th>
-            Quantity
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="variable : ${variables}">
-        <td><div th:style="' width: 5px; height: 5px; background-color: ' + ${variable.frameColor}"></div></td>
-        <td th:text="${variable.quantity}"></td>
-        <td><a th:href="@{/delete-variable/{variableId}(variableId=${variable.variableId})}" class="btn btn-danger">DELETE</a></td>
-
-
-    </tr>
-    </tbody>
-</table>
-
+</div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>

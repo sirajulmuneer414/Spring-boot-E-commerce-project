@@ -7,6 +7,7 @@
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
@@ -18,19 +19,46 @@
         }
      .sideBar {
         position: fixed;
+        top: 70px;
+        right: 0;
         background-color: #d9d9d9;
-        height: 100vh;
-        width: fit-content;
-        padding: 20px 20px;}
+        height: fit-content;
+        width: 100vw;
+        padding: 10px 10px;
+        z-index: 2;
+        }
 
 
-     .sideBarContent a{
+     .sideBarContent a {
         color: #b43e8f;
         text-decoration: none;
-     }
-     .sideBarContent{
-        margin-bottom: 40px;
-     }
+        }
+
+     .sideBarContent {
+        margin-right : 10px;
+        list-style-type: none;
+        }
+     .box {
+        background-color: #fff; /* White background */
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        border: 1px solid #eee; /* Light gray border */
+        border-radius: 5px; /* Rounded corners */
+    }
+
+     .shadow-box {
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    }
+
+/* Optional: Style the headings and paragraphs within the boxes */
+.white-box h3 {
+    color: #333; /* Dark text color for headings */
+}
+
+.white-box p {
+    color: #b438f; /* Slightly lighter text color for paragraphs */
+}
 
     </style>
 </head>
@@ -38,32 +66,65 @@
 
 <div th:replace="~{fragment::navBarAdmin}"></div>
 <div class="row" th:style="'height: 70px;'"></div>
-<div class="sideBar row d-flex flex-column justify-content-center align-items-center overflow-auto">
+<nav class="sideBar position-fixed d-flex justify-content-around align-items-center">
+    <ul class="d-flex flex-row justify-content-between align-items-center">
 
-    <div class="sideBarContent">
-        <a th:href="@{/admin/dashboard}"><h4>DASHBOARD</h4></a>
+    <li class="sideBarContent">
+        <a th:href="@{/admin/order}"><h4>ORDERS</h4></a>
 
-    </div>
+    </li>
     <div class="sideBarContent">
         <a th:href="@{/admin/products/}"><h4>PRODUCTS</h4></a>
 
     </div>
-    <div class="sideBarContent">
+    <li class="sideBarContent">
         <a th:href="@{/admin/customers}"><h4>CUSTOMERS</h4></a>
 
-    </div>
-    <div class="sideBarContent">
+    </li>
+     <li class="sideBarContent">
+        <a th:href="@{/admin/coupon}"><h4>COUPONS</h4></a>
+
+    </li>
+    <li class="sideBarContent">
         <a th:href="@{/admin/category/}"><h4>CATEGORIES</h4></a>
 
-    </div>
-    <div class="sideBarContent">
+    </li>
+    <li class="sideBarContent">
         <a th:href="@{/admin/brand/}"><h4>BRANDS</h4></a>
 
+    </li>
+    <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-center align-items-center">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
+        </form>
+    </li>
+</ul>
+</nav>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Three responsive boxes with icons -->
+        <div class="col-md-4 mt-5">
+            <div class="box white-box shadow-box">
+                <i class="fas fa-chart-bar fa-2x"></i>
+                <h3>Total Sales</h3>
+                <p th:text="'₹'+${totalSales}" style="color: #b43e8f"><strong></strong></p>
+            </div>
+        </div>
+        <div class="col-md-4 mt-5">
+            <div class="box white-box shadow-box">
+                <i class="fas fa-cube fa-2x"></i>
+                <h3>Sold Products</h3>
+                <p th:text="${soldProducts}" style="color: #b43e8f"><strong></strong></p>
+            </div>
+        </div>
+        <div class="col-md-4 mt-5">
+            <div class="box white-box shadow-box">
+                <i class="fas fa-users fa-2x"></i>
+                <h3>Total Customers</h3>
+                <p th:text="${totalCustomers}" style="color: #b43e8f"><strong></strong></p>
+            </div>
+        </div>
     </div>
-    <div class="logoutBtn d-flex justify-content-center align-items-center">
-        <a th:href="@{/logout}" class="btn btn-danger"><h4>LOG OUT</h4></a>
-    </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

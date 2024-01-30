@@ -52,8 +52,15 @@ public class AdminProductController {
 
 
     @GetMapping("/")
-    public String getProductPage(Model model) {
-        List<Product> productsIn = productService.findAllProducts();
+    public String getProductPage(Model model,@RequestParam(name = "keyword",required = false)String keyword) {
+        List<Product> productsIn = new ArrayList<>();
+
+        if(keyword!=null){
+            productsIn = productService.findAllProductsContaining(keyword);
+        }
+        else {
+            productsIn = productService.findAllProducts();
+        }
 
         List<ProductDto> products = new ArrayList<>();
         for (Product product : productsIn) {
@@ -85,8 +92,8 @@ public class AdminProductController {
                              @RequestParam("brandId") Integer brandId,
                              @RequestParam("categoryId") Long categoryId,
                              @RequestParam("variable.image1") List<MultipartFile> image1,
-                             @RequestParam("variable.image2") List<MultipartFile> image2,
-                             @RequestParam("variable.image3") List<MultipartFile> image3,
+                             @RequestParam(name = "variable.image2",required = false) List<MultipartFile> image2,
+                             @RequestParam(name = "variable.image3",required = false) List<MultipartFile> image3,
                              @RequestParam("variable.frameColor") List<String> frameColor,
                              @RequestParam("variable.quantity") List<Long> quantity
     ) {
@@ -267,48 +274,50 @@ public class AdminProductController {
 
     @PostMapping("/add-variables/{id}")
     public String addVariables(@PathVariable("id") Long productId,
-                               @RequestParam("variable.frameColor") List<String> frameColor,
-                               @RequestParam("variable.image1") List<MultipartFile> image1,
-                               @RequestParam("variable.image2") List<MultipartFile> image2,
-                               @RequestParam("variable.image3") List<MultipartFile> image3,
-                               @RequestParam("variable.quantity") List<Long> quantity) {
+                               @RequestParam(name = "variable.frameColor",required = false) List<String> frameColor,
+                               @RequestParam(name = "variable.image1", required = false) List<MultipartFile> image1,
+                               @RequestParam(name = "variable.image2",required = false) List<MultipartFile> image2,
+                               @RequestParam(name = "variable.image3",required = false) List<MultipartFile> image3,
+                               @RequestParam(name = "variable.quantity",required = false) List<Long> quantity) {
         Product product = productService.findProductById(productId);
 
         List<Variables> variablesList = new ArrayList<>();
-        for (int i = 0; i < frameColor.size(); i++) {
-            Variables variable = new Variables();
+        if(frameColor!=null) {
+            for (int i = 0; i < frameColor.size(); i++) {
+                Variables variable = new Variables();
 
-            variable.setFrameColor(frameColor.get(i));
-            variable.setQuantity(quantity.get(i));
+                variable.setFrameColor(frameColor.get(i));
+                variable.setQuantity(quantity.get(i));
 
-            if (!image1.get(i).isEmpty()) {
-                String fileName = StringUtils.cleanPath(image1.get(i).getOriginalFilename());
-                variable.setImage1(fileName);
+                if (!image1.get(i).isEmpty()) {
+                    String fileName = StringUtils.cleanPath(image1.get(i).getOriginalFilename());
+                    variable.setImage1(fileName);
+                }
+                if (!image2.get(i).isEmpty()) {
+                    String fileName = StringUtils.cleanPath(image2.get(i).getOriginalFilename());
+                    variable.setImage2(fileName);
+                }
+                if (!image3.get(i).isEmpty()) {
+                    String fileName = StringUtils.cleanPath(image3.get(i).getOriginalFilename());
+                    variable.setImage3(fileName);
+                }
+
+                variable.setProduct(product);
+                variableService.saveVariable(variable);
+
+                variablesList.add(variable);
+
             }
-            if (!image2.get(i).isEmpty()) {
-                String fileName = StringUtils.cleanPath(image2.get(i).getOriginalFilename());
-                variable.setImage2(fileName);
-            }
-            if (!image3.get(i).isEmpty()) {
-                String fileName = StringUtils.cleanPath(image3.get(i).getOriginalFilename());
-                variable.setImage3(fileName);
-            }
 
-            variable.setProduct(product);
-            variableService.saveVariable(variable);
+            product.getVariables().addAll(variablesList);
 
-            variablesList.add(variable);
 
+            String uploadDir = "lenscraft/src/main/resources/static/productImages/" + product.getProductId();
+
+            variableService.saveNewVariablesFilesForProduct(uploadDir, image1, image2, image3);
+
+            productService.save(product);
         }
-
-        product.getVariables().addAll(variablesList);
-
-
-    String uploadDir = "lenscraft/src/main/resources/static/productImages/" + product.getProductId();
-
-        variableService.saveNewVariablesFilesForProduct(uploadDir,image1,image2,image3);
-
-        productService.save(product);
 
         return "redirect:/admin/products/get-variables/"+productId;
     }

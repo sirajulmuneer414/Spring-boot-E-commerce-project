@@ -46,5 +46,9 @@ public class AdminBrandController {
         return "admin/edit-brand";
     }
 
+    @GetMapping("/check")
+    public boolean existBrandName(@RequestParam("brandName")String brandName){
+        return brandService.existByBrandName(brandName);
+    }
 
 }

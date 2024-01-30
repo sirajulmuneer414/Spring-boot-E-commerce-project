@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.navDiv {
+    background-color: #b43e8f;
+}
+
+.navBox {
+    display: flex;
+    justify-content: space-between;
+}
+
+nav {
+    background-color: #b43e8f;
+    height: 80px;
+}
+
+ .navBtn {
+    background-color: #fff;
+    border-radius: 5px;
+    color: #b43e8f;
+}
+
+.navBtn:hover {
+    border: 2px solid #fff;
+    color: #fff;
+    background-color: #b43e8f;
+}
+
+.navlogo {
+    height: auto;
+    width: 100%;
+}
+
+.formMain {
+
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 70px);
+}
+
+.formBox {
+    margin-top: 20px;
+}
+
+.formPart {
+    background-color: #f5f3f0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #1f0119;
+    border-radius: 5px;
+}
+
+.formPart Div {
+    margin-top: 5px;
+}
+
+.formPart button {
+    margin-top: 5px;
+}
+
+.submitBtn {
+    background-color: #b43e8f;
+}
+
+.submitBtn:hover {
+    border: 2px solid #b43e8f;
+    color: #b43e8f;
+    background-color: #ffff;
+}

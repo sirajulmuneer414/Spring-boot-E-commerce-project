@@ -27,4 +27,10 @@ public interface UserService {
     List<UserInformationDto> findAllUsersContaining(String keyword);
 
     void unBlockUserById(UUID id);
+
+    UserInformation findByEmailId(String name);
+
+    void save(UserInformation user);
+
+    Long countOfUsers();
 }

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Lenscraft-Cart</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+padding: 0;
+margin: 0;
+box-sizing: border-box;
+font-family: 'Poppins', sans-serif;
+}
+* a{
+text-decoration: none;
+}
+      .sideBar {
+        position: fixed;
+        background-color: #d9d9d9;
+        height: 100vh;
+        width: fit-content;
+        padding: 20px 10px;}
+
+
+     .sideBarContent a{
+        color: #b43e8f;
+        text-decoration: none;
+     }
+     .sideBarContent{
+        margin-bottom: 40px;
+     }
+  </style>
+</head>
+<body class="container-fluid">
+<div th:replace="~{fragment::navBarHome}"></div>
+<div class="row sideBar position-fixed d-flex flex-column justify-content-center align-items-center overflow-auto">
+    <ul style="padding-left: 0;">
+        <li class="sideBarContent">
+            <a th:href="@{/shop/}"><h4>SHOP</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <form th:action="@{/order}">
+                <input type="hidden" name="username" th:value="${username}">
+                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: #b43e8f"><h4>MY ORDERS</h4></button>
+            </form>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/shop/brands/}"><h4>BRANDS</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/user/wishlist}"><h4>WISHLIST</h4></a>
+
+        </li>
+
+        <li class="sideBarContent">
+            <a th:href="@{/user/cart}"><h4>CART</h4></a>
+
+        </li>
+        <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-start align-items-center">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit"  class="btn text-danger" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
+            </form>
+        </li>
+    </ul>
+</div>
+<div class="row container-fluid d-flex flex-column justify-content-start" style=" margin-left: 200px; overflow: scroll; margin-top: 70px; max-width: calc(100vw - 200px)">
+    <div class="d-flex justify-content-start">
+        <h2>SHOPPING CART</h2>
+    </div>
+    <hr>
+    <div th:if="${cartedItems.isEmpty()}" class="d-flex flex-column justify-content-center align-items-center">
+
+        <h3>Your Cart Is Empty</h3>
+        <div>
+        <a th:href="@{/shop/}" CLASS="btn" style="border: none; border-radius: 10px; background-color: #b43e8f; color: white">ADD PRODUCT</a>
+        </div>
+    </div>
+    <div th:unless="${cartedItems.isEmpty()}" th:each="item : ${cartedItems}" class="col-11 container">
+        <div style="border: 1px solid black; border-radius: 5px" class="d-flex justify-content-between">
+            <div style="height: 100px; width: 100px">
+                <img th:src="@{${'/productImages/'+item.product.productId+'/'+item.variable.image1}}" style="height: 100%; width: 100%">
+            </div>
+            <div class="d-flex justify-content-center align-items-center">
+                <h6 th:text="${item.product.productName}"></h6>
+            </div>
+            <div class="d-flex justify-content-center align-item-center">
+                <form th:action="@{/user/cart/quantity/sub/{cartItemId}(cartItemId=${item.cartedItemId})}" style="margin-left: 3px">
+                    <input type="hidden" name="username" th:value="${username}">
+                    <button type="submit" style="border: none">-</button>
+                </form>
+                <span th:text="${item.quantity}"></span>
+                <form th:action="@{/user/cart/quantity/add/{cartItemId}(cartItemId=${item.cartedItemId})}" style="margin-right: 3px">
+                    <input type="hidden" name="username" th:value="${username}">
+                    <button type="submit" style="border: none">+</button>
+                </form>
+            </div>
+              <div th:if="${item.product.discountedPrice == null}">
+                    <h3 th:text="${'&#8377;'+item.product.price}" style="color: #b43e8f"></h3>
+                </div>
+            <div th:unless="${item.product.discountedPrice == null}">
+                    <h3 th:text="${'&#8377;'+item.product.discountedPrice}" style="color: #b43e8f"></h3>
+                </div>
+            <div>
+                <form th:action="@{/user/cart/remove/{productId}/{variableId}(productId=${item.product.productId},variableId=${item.variable.variableId})}" method="get">
+                    <input type="hidden" name="userId" th:value="${userId}">
+                    <input type="hidden" name="cartedItemId" th:value="${item.cartedItemId}">
+
+                    <button type="submit" class="btn" style="background-color: #b43e8f; color: white; border-radius: 5px; border: none">REMOVE FROM CART</button>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div th:unless="${cartedItems.isEmpty()}">
+        <a th:href="@{/user/cart/buy/{userId}(userId=${userId})}" class="btn" style="color: white; background-color: #b43e8f; border: none; border-radius: 10px">BUY</a>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,7 +1,10 @@
 package com.sirajul.lenscraft.Controller;
 
 import com.sirajul.lenscraft.DTO.UserInformationDto;
+import com.sirajul.lenscraft.Service.interfaces.OrderService;
+import com.sirajul.lenscraft.Service.interfaces.OrderedItemsService;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
+import com.sirajul.lenscraft.entity.user.Order;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.Role;
 import com.sirajul.lenscraft.entity.user.enums.UserStatus;
@@ -25,6 +28,12 @@ public class AdminController {
     UserService userService;
     @Autowired
     UserInformationMapping userInfoMapping;
+
+    @Autowired
+    OrderService orderService;
+
+    @Autowired
+    OrderedItemsService orderedItemsService;
     @GetMapping("/")
     public String getDashboard(){
 
@@ -32,12 +41,31 @@ public class AdminController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(){
+    public String dashboard(
+            Model model
+    ){
+        Long countOfUsers = userService.countOfUsers();
+        model.addAttribute("totalCustomers",countOfUsers);
+
+        List<Order> orders = orderService.findAllInOrder();
+
+        Long totalSales = 0L;
+
+        for(Order order : orders){
+            totalSales += order.getTotalAmount();
+        }
+
+        model.addAttribute("totalSales",totalSales);
+
+        Long items = orderedItemsService.countOfItems();
+
+        model.addAttribute("soldProducts",items);
+
         return "admin/dashboard";
     }
 
     @GetMapping("/customers")
-    public String getCustomers(Model model, @RequestParam(name = "search" ,required = false) String keyword){
+    public String getCustomers(Model model, @RequestParam(name = "keyword" ,required = false) String keyword){
         List<UserInformationDto> users;
 
         if(keyword==null) {

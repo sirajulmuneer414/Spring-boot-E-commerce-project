@@ -1,24 +1,16 @@
 package com.sirajul.lenscraft.Controller;
 
 import com.sirajul.lenscraft.DTO.SignupDto;
-import com.sirajul.lenscraft.Service.UserServiceImp;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
-import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.Role;
 import com.sirajul.lenscraft.exception.InvalidOtpException;
 import com.sirajul.lenscraft.utils.FileUploadUtil;
 import com.sirajul.lenscraft.utils.OtpUtil;
-import jakarta.mail.search.SearchTerm;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -28,7 +20,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Controller
 @Slf4j
@@ -47,33 +38,49 @@ public class MainController {
 
          return "signup";
         }
+
      @PostMapping("/register")
-        public String registerUser(@ModelAttribute("user") SignupDto signupDto, @RequestParam("file")MultipartFile file, HttpSession httpSession, RedirectAttributes redirectAttributes) throws IOException {
+        public String registerUser(@ModelAttribute("user") SignupDto signupDto,
+                                   HttpSession httpSession,
+                                   RedirectAttributes redirectAttributes,
+                                   @RequestParam(name="adminPassword",required = false)String adminPassword,
+                                   @RequestParam(name="refer",required = false)String referralCode,
+                                   @RequestParam("image") MultipartFile file
+                                   ) throws IOException {
 
         boolean userExists = userService.userExistsByEmail(signupDto.getEmailId());
+
+        log.info(adminPassword);
 
         if(userExists){
             String errorMessage = "The Email Id you have entered already exists";
             redirectAttributes.addFlashAttribute("EmailError",errorMessage);
 
             return "redirect:/register";
-        }
-
-        if(!file.isEmpty()){
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            signupDto.setProfilePic(fileName);
-
-            String upload = "lenscraft/src/main/resources/static/profilePic/" + signupDto.getEmailId();
-
-            FileUploadUtil.saveFile(upload, fileName, file);
 
         }
+         if (!file.isEmpty()) {
+             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+             log.info("inside profile picture uploading");
+
+             String upload = "lenscraft/src/main/resources/static/profilePic/"+signupDto.getEmailId();
+
+             FileUploadUtil.saveFile(upload, fileName, file);
+             signupDto.setProfilePic(fileName);
+
+
+         }
+
 
         String otp = otpUtil.generateOtp();
         signupDto.setOtp(otp);
         signupDto.setOtpGeneratedTime(LocalDateTime.now());
 
         otpUtil.sendOtpEmail(signupDto.getEmailId(),otp);
+
+        if(adminPassword.matches("LNSCRFT2001F80")){
+            signupDto.setRole(Role.ADMIN.name());
+        }
         httpSession.setAttribute("Non-verifiedUser",signupDto);
 
             log.info(signupDto.toString());
@@ -102,6 +109,16 @@ public class MainController {
             model.addAttribute("otpError",e.getMessage()+", Please Try Again");
         }
             return "verification";
+     }
+
+     @GetMapping("/register/cancel")
+     public String cancelRegistration(
+             HttpSession session
+     ){
+         session.removeAttribute("Non-verifiedUser");
+
+         return "redirect:/register";
+
      }
 
      @GetMapping("/resend-otp")

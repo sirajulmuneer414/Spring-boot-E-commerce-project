@@ -2,6 +2,7 @@ package com.sirajul.lenscraft.Service.interfaces;
 
 import com.sirajul.lenscraft.DTO.Product.ProductDto;
 import com.sirajul.lenscraft.entity.product.Product;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -22,4 +23,11 @@ public interface ProductService {
     void save(Product product);
 
 
+    List<Product> findAllProductsContaining(String keyword);
+
+    Page<Product> findAllProductsInPageable(int pageNo, int pageSize);
+
+    Page<Product> findAllProductsContaining(String keyword, int pageNo, int pageSize);
+
+    int totalPagesCount(int pageSize);
 }

@@ -1,6 +1,7 @@
 package com.sirajul.lenscraft.utils;
 
 import com.sirajul.lenscraft.DTO.SignupDto;
+import com.sirajul.lenscraft.DTO.password.PasswordChangerDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,8 +16,15 @@ public class OtpUtil {
     JavaMailSender javaMailSender;
     public String generateOtp(){
         Random random = new Random();
-        Integer otp = 100000 + random.nextInt(999999);
-        return String.valueOf(otp);
+        Integer otp = 0;
+        String otpToString = null;
+        do {
+            otp = 100000 + random.nextInt(999999);
+            otpToString = String.valueOf(otp);
+        }
+        while(otpToString.length() != 6);
+
+        return otpToString;
     }
 
     public void sendEmail(String recipientEmail){
@@ -53,6 +61,25 @@ public class OtpUtil {
 
     }
 
+    public void sendOtpEmailForPasswordChanging(String recipientEmail, String otp){
+
+       try {
+           SimpleMailMessage message = new SimpleMailMessage();
+
+
+           message.setTo(recipientEmail);
+
+           message.setSubject("OTP for changing password");
+
+           message.setText("Your OTP for changing password is :" + otp);
+
+           javaMailSender.send(message);
+       }
+       catch (Exception e){
+           e.printStackTrace();
+       }
+    }
+
     public void resendOtpEmail(String recipientEmail, String otp){
         try{
             SimpleMailMessage message = new SimpleMailMessage();
@@ -69,6 +96,24 @@ public class OtpUtil {
         }
 
     }
+    public void resendOtpEmailForPasswordChanging(String recipientEmail, String otp){
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+
+
+            message.setTo(recipientEmail);
+
+            message.setSubject("OTP for changing password");
+
+            message.setText("Your new OTP for changing password is :" + otp);
+
+            javaMailSender.send(message);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public boolean isOtpValid(SignupDto signupDto, String otp){
 
@@ -78,4 +123,14 @@ public class OtpUtil {
 
         return signupDto.getOtp().equals(otp) && currentTimeStamp.isBefore(otpGeneratedTime.plusMinutes(2));
     }
+    public boolean isOtpValidForChangingPassword(PasswordChangerDto signupDto, String otp){
+
+        LocalDateTime otpGeneratedTime = signupDto.getOtpGeneratedTime();
+
+        LocalDateTime currentTimeStamp = LocalDateTime.now();
+
+        return signupDto.getOtp().equals(otp) && currentTimeStamp.isBefore(otpGeneratedTime.plusMinutes(2));
+    }
+
+
 }

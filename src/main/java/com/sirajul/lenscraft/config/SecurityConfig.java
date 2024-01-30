@@ -39,7 +39,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 auth ->
                         auth.requestMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
-                                .requestMatchers("/user/**").hasAnyAuthority(Role.ADMIN.name(),Role.USER.name(),Role.SELLER.name())
+                                .requestMatchers("/user/**","/order/**").hasAnyAuthority(Role.ADMIN.name(),Role.USER.name(),Role.SELLER.name())
                                 .requestMatchers("/**","/register","/verification").permitAll()
                                 .anyRequest().authenticated()
         )

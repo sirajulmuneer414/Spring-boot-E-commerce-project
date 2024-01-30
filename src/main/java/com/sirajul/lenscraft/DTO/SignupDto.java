@@ -34,6 +34,8 @@ public class SignupDto{
 
         String profilePic;
 
+        String Role;
+
         @DateTimeFormat
         LocalDateTime otpGeneratedTime;
 

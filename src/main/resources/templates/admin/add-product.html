@@ -9,124 +9,207 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link th:href="@{/css/formStyles.css}" rel="stylesheet" type="text/css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  }
+  .sideBar {
+position: fixed;
+top: 70px;
+right: 0;
+background-color: #d9d9d9;
+height: fit-content;
+width: 100vw;
+padding: 10px 10px;
+z-index: 2;
+}
+
+
+.sideBarContent a {
+color: #b43e8f;
+text-decoration: none;
+}
+
+.sideBarContent {
+margin-right : 10px;
+list-style-type: none;
+}
+    </style>
 </head>
-<body>
-<div th:replace="fragment::navBarAdmin"></div>
-<div th:style="height: 70px"></div>
+<body class="container-fluid">
+<div th:replace="~{fragment::navBarAdmin}"></div>
+<div class="row" th:style="'height: 70px;'"></div>
+<nav class="sideBar position-fixed d-flex justify-content-around align-items-center">
+    <ul class="d-flex flex-row justify-content-between align-items-center">
 
-<div class="row d-block text-center">
-<h1 class="">Add Product</h1>
-</div>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/order}"><h4>ORDERS</h4></a>
 
-<div class="row w-100 d-flex justify-content-center align-items-center">
-<form class="d-flex flex-column" th:action="@{/admin/products/add}" th:object="${productDto}" method="post" enctype="multipart/form-data">
-    <label class="ms-5" for="productName">Product Name:</label>
-    <input type="text" id="productName" th:field="*{productName}" required="required" />
+        </li>
+        <div class="sideBarContent">
+            <a th:href="@{/admin/products/}"><h4>PRODUCTS</h4></a>
 
-    <label class="ms-5" for="description">Description:</label>
-    <input type="text" id="description" th:field="*{description}" required="required" />
-
-    <label class="ms-5" for="price">Price:</label>
-    <input type="text" id="price" th:field="*{price}" required="required" />
-
-    <label class="ms-5" for="model">Model No:</label>
-    <input type="text" id="model" th:field="*{modelNo}" required="required" />
-
-    <label class="ms-5" for="frameSize">Frame Size:</label>
-    <select id="frameSize" th:field="*{frameSize}">
-        <option value="" >Select a Size</option>
-        <option value="SMALL" >SMALL</option>
-        <option value="MEDIUM" >MEDIUM</option>
-        <option value="LARGE" >LARGE</option>
-    </select>
-
-        <label class="ms-5" for="Stockstatus">Stock Status:</label>
-        <select id="Stockstatus" th:field="*{stockStatus}">
-            <option value="" >Select Status</option>
-            <option value="IN_STOCK" >IN STOCK</option>
-            <option value="LOW_STOCK" >LOW STOCK</option>
-            <option value="OUT_OF_STOCK" >OUT OF STOCK</option>
-
-    </select>
-
-
-    <br />
-    <div class="ms-5">
-    <label  for="brand">Brand:</label>
-    <select id="brand" name="brandId">
-        <option value="">Select a Brand</option>
-        <th:block th:each="brand : ${brands}">
-            <option th:value="${brand.brandId}" th:text="${brand.brandName}"></option>
-        </th:block>
-    </select>
-        <div class="d-flex justify-content-center">
-            <a type="button" class="btn btn-primary ms-5" th:href="@{add-brand}">Add brand</a>
         </div>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/customers}"><h4>CUSTOMERS</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/coupon}"><h4>COUPONS</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/category/}"><h4>CATEGORIES</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/brand/}"><h4>BRANDS</h4></a>
+
+        </li>
+        <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-center align-items-center">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
+            </form>
+        </li>
+    </ul>
+</nav>
+  <div class="row formMain" style="height: calc(100vh - 0px); margin-top: 70px; width: 100vw">
+      <div class="col-sm-8 col-md-5 col-lg-4 col-xl-4 formBox">
+
+    <div class="d-flex justify-content-center">
+          <h1 class="">Add Product</h1>
     </div>
 
+  <div class="w-100 d-flex justify-content-center align-items-center formPart">
 
-    <br/>
-    <div class="ms-5">
-        <label for="category">Category:</label>
-        <select id="category" name="categoryId">
-            <option value="">Select a Category</option>
-            <th:block th:each="cat : ${categories}">
-                <option th:value="${cat.categoryId}" th:text="${cat.categoryName}"></option>
-            </th:block>
-        </select>
-        <div class="d-flex justify-content-end">
-            <a type="button" class="btn btn-primary" th:href="@{add-category}">Add Category</a>
-        </div>
-    </div>
-    <br />
-    <div class="mx-5 mt-5 p-5">
-        <h3>Select Variant</h3>
-        <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-primary" onclick="addVariant()">Add Variant</button>
-        </div>
-        <div id="variables">
-            <!-- This is where we will dynamically add variants -->
-        </div>
-    </div>
+  <form th:action="@{/admin/products/add}" th:object="${productDto}" method="post" enctype="multipart/form-data">
+      <div class="form-group ">
+      <label class="" for="productName">Product Name:</label>
+      <input type="text" id="productName" class="form-control" th:field="*{productName}" required="required" />
+      </div>
 
-    <div class="d-flex justify-content-end">
-        <button type="submit" class="btn btn-primary">Continue</button>
-    </div>
+      <div class="form-group ">
+      <label class="" for="description">Description:</label>
+      <input type="text" class="form-control" id="description" th:field="*{description}" required="required" />
+      </div>
+
+      <div class="form-group ">
+      <label class="" for="price">Price:</label>
+      <input type="text" id="price" th:field="*{price}" class="form-control" required="required" />
+      </div>
+
+      <div class="form-group ">
+      <label class="" for="model">Model No:</label>
+      <input type="text" class="form-control" id="model" th:field="*{modelNo}" required="required" />
+      </div>
+
+      <div class="form-group ">
+      <label class="" for="frameSize">Frame Size:</label>
+      <select id="frameSize" class="form-control" th:field="*{frameSize}">
+          <option value="" >Select a Size</option>
+          <option value="SMALL" >SMALL</option>
+          <option value="MEDIUM" >MEDIUM</option>
+          <option value="LARGE" >LARGE</option>
+      </select>
+      </div>
+
+      <div class="form-group ">
+          <label class="" for="Stockstatus">Stock Status:</label>
+          <select id="Stockstatus" class="form-control" th:field="*{stockStatus}">
+              <option value="" >Select Status</option>
+              <option value="IN_STOCK" >IN STOCK</option>
+              <option value="LOW_STOCK" >LOW STOCK</option>
+              <option value="OUT_OF_STOCK" >OUT OF STOCK</option>
+
+      </select>
+
+      </div>
+
+      <div class="form-group ">
+      <label  for="brand">Brand:</label>
+      <select id="brand" class="form-control" name="brandId">
+          <option value="">Select a Brand</option>
+          <th:block th:each="brand : ${brands}">
+              <option th:value="${brand.brandId}" th:text="${brand.brandName}"></option>
+          </th:block>
+      </select>
+          <div class="d-flex justify-content-center">
+              <a type="button" class="btn btn-primary " th:href="@{/admin/products/add-brand}">Add brand</a>
+          </div>
+      </div>
 
 
-    <script>
-        function addVariant() {
-            var variableDiv = document.createElement('div');
-            variableDiv.className = 'mb-3';
+      <div class="form-group ">
+          <label for="category">Category:</label>
+          <select id="category" class="form-control" name="categoryId">
+              <option value="">Select a Category</option>
+              <th:block th:each="cat : ${categories}">
+                  <option th:value="${cat.categoryId}" th:text="${cat.categoryName}"></option>
+              </th:block>
+          </select>
+          <div class="d-flex justify-content-end">
+              <a type="button" class="btn btn-primary" th:href="@{/admin/products/add-category}">Add Category</a>
+          </div>
+      </div>
 
-            variableDiv.innerHTML = `
-            <div class="form-group">
-                <label for="color">Frame Color:</label>
-                <input type="text" name="variable.frameColor" required="required">
-            </div>
-            <div class="form-group">
-                <label for="image1">Image 1:</label>
-                <input type="file" name="variable.image1" id="image1" required="required">
-            </div>
-            <div class="form-group">
-                <label for="image2">Image 2:</label>
-                <input type="file" name="variable.image2" id="image2">
-            </div>
-            <div class="form-group">
-                <label for="image3">Image 3:</label>
-                <input type="file" name="variable.image3" id="image3">
-            </div>
-            <div class="form-group">
-                <label for="variantQuantity">Quantity:</label>
-                <input type="text" name="variable.quantity" required="required">
-            </div>
-            `;
+      <div class="form-group ">
+          <h3>Select Variant</h3>
+          <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-primary" onclick="addVariant()">Add Variant</button>
+          </div>
+      </div>
+          <div id="variables">
+              <!-- This is where we will dynamically add variants -->
+          </div>
 
-            document.getElementById('variables').appendChild(variableDiv);
-        }
-    </script>
-</form>
-</div>
-</body>
-</html>
+
+      <div class="d-flex justify-content-start">
+          <button type="submit" class="btn submitBtn">Continue</button>
+      </div>
+
+
+      <script>
+          function addVariant() {
+              var variableDiv = document.createElement('div');
+              variableDiv.className = 'mb-3';
+
+              variableDiv.innerHTML = `
+              <div class="form-group">
+                  <label for="color">Frame Color:</label>
+                  <input type="text" class="form-control" name="variable.frameColor" required="required">
+              </div>
+              <div class="form-group">
+                  <label for="image1">Image 1:</label>
+                  <input type="file" class="form-control" name="variable.image1" id="image1" required="required">
+              </div>
+              <div class="form-group">
+                  <label for="image2">Image 2:</label>
+                  <input type="file" class="form-control" name="variable.image2" id="image2">
+              </div>
+              <div class="form-group">
+                  <label for="image3">Image 3:</label>
+                  <input type="file" class="form-control" name="variable.image3" id="image3">
+              </div>
+              <div class="form-group">
+                  <label for="variantQuantity">Quantity:</label>
+                  <input type="text" class="form-control" name="variable.quantity" required="required">
+              </div>
+              `;
+
+              document.getElementById('variables').appendChild(variableDiv);
+          }
+      </script>
+  </form>
+
+  </div>
+  </div>
+  </div>
+  </body>
+  </html>

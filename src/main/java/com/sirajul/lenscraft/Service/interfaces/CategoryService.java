@@ -1,5 +1,6 @@
 package com.sirajul.lenscraft.Service.interfaces;
 
+import com.sirajul.lenscraft.DTO.shop.CategoryHomeDto;
 import com.sirajul.lenscraft.entity.product.Category;
 
 import java.util.List;
@@ -10,4 +11,8 @@ public interface CategoryService {
     Category findCategoryById(Long categoryId);
 
     void addCategory(Category category);
+
+    List<CategoryHomeDto> findAllCategoriesConvertedToDto();
+
+    Category getCategoryById(Long categoryId);
 }

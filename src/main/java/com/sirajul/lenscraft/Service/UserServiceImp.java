@@ -3,8 +3,10 @@ package com.sirajul.lenscraft.Service;
 import com.sirajul.lenscraft.DTO.SignupDto;
 import com.sirajul.lenscraft.DTO.UserInformationDto;
 import com.sirajul.lenscraft.Repository.UserRepository;
+import com.sirajul.lenscraft.Service.interfaces.CartService;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
-import com.sirajul.lenscraft.entity.user.UserInformation;
+import com.sirajul.lenscraft.Service.interfaces.WishlistService;
+import com.sirajul.lenscraft.entity.user.*;
 import com.sirajul.lenscraft.entity.user.enums.Role;
 import com.sirajul.lenscraft.entity.user.enums.UserStatus;
 import com.sirajul.lenscraft.exception.InvalidOtpException;
@@ -15,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -31,6 +35,12 @@ public class UserServiceImp implements UserService {
 
     @Autowired
     UserInformationMapping userInformationMapping;
+
+    @Autowired
+    WishlistService wishlistService;
+
+    @Autowired
+    CartService cartService;
 
     public boolean userExistsByEmail(String emailId){
 
@@ -49,11 +59,41 @@ public class UserServiceImp implements UserService {
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-            if(userRepository.count() == 0)
+            Random rand = new Random();
+
+            String referralCodeNumPart = String.valueOf(rand.nextInt(999999)+100000);
+
+            String referralFirstPart = user.getFirstName().substring(0,3).toUpperCase();
+
+            user.setReferralCode(referralFirstPart+referralCodeNumPart);
+
+            if(signupDto.getRole()==Role.ADMIN.name())
                 user.setRole(Role.ADMIN);
             else user.setRole(Role.USER);
 
+            user = userRepository.save(user);
+
+            Wishlist wishlist = new Wishlist();
+            wishlist.setProducts(new ArrayList<>());
+            wishlist.setUser(user);
+            wishlistService.save(wishlist);
+
+            user.setWishlist(wishlist);
+
+            Cart cart = new Cart();
+            cart.setCartedItems(new ArrayList<>());
+            cart.setUser(user);
+            cartService.save(cart);
+
+            user.setOrders(new ArrayList<Order>());
+
+            user.setCart(cart);
+
+            user.setAddresses(new ArrayList<Address>());
+
             userRepository.save(user);
+
+
             otpUtil.sendEmail(signupDto.getEmailId());
             return true;
         }else{
@@ -106,7 +146,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     public List<UserInformationDto> findAllUsersContaining(String keyword) {
-        return null;
+        return userRepository.findAllByFirstNameContaining(keyword);
     }
 
     @Override
@@ -116,6 +156,23 @@ public class UserServiceImp implements UserService {
         user.setUserStatus(UserStatus.ACTIVE);
 
         userRepository.save(user);
+
+    }
+
+    @Override
+    public UserInformation findByEmailId(String name) {
+        return userRepository.findByEmailId(name);
+    }
+
+    @Override
+    public void save(UserInformation user) {
+        userRepository.save(user);
+    }
+
+    @Override
+    public Long countOfUsers() {
+
+       return userRepository.countByRole(Role.USER);
 
     }
 

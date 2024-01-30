@@ -1,5 +1,6 @@
 package com.sirajul.lenscraft.DTO.Product;
 
+import com.sirajul.lenscraft.entity.offer.OfferEmbeddable;
 import com.sirajul.lenscraft.entity.product.Variables;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,10 @@ public class ProductDto {
     String description;
 
     Integer price;
+
+    OfferEmbeddable offer;
+
+    Integer discountedPrice;
 
     String modelNo;
 

@@ -11,4 +11,5 @@ public interface BrandService {
 
     Brand findBrandById(Integer brandId);
 
+    boolean existByBrandName(String brandName);
 }

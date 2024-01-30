@@ -5,23 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categories</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-</head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  }
+  .sideBar {
+position: fixed;
+top: 70px;
+right: 0;
+background-color: #d9d9d9;
+height: fit-content;
+width: 100vw;
+padding: 10px 10px;
+z-index: 2;
+}
+
+
+.sideBarContent a {
+color: #b43e8f;
+text-decoration: none;
+}
+
+.sideBarContent {
+margin-right : 10px;
+list-style-type: none;
+}
+    </style>
 </head>
 <body class="container-fluid">
-<nav th:replace="fragment::navBarAdmin"></nav>
+<div th:replace="~{fragment::navBarAdmin}"></div>
+<div class="row" th:style="'height: 70px;'"></div>
+<nav class="sideBar position-fixed d-flex justify-content-around align-items-center">
+    <ul class="d-flex flex-row justify-content-between align-items-center">
+
+        <li class="sideBarContent">
+            <a th:href="@{/admin/order}"><h4>ORDERS</h4></a>
+
+        </li>
+        <div class="sideBarContent">
+            <a th:href="@{/admin/products/}"><h4>PRODUCTS</h4></a>
+
+        </div>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/customers}"><h4>CUSTOMERS</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/coupon}"><h4>COUPONS</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/category/}" style="color: #fff"><h4>CATEGORIES</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/admin/brand/}"><h4>BRANDS</h4></a>
+
+        </li>
+        <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-center align-items-center">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
+            </form>
+        </li>
+    </ul>
+</nav>
 <div class="row d-flex justify-content-center align-items-center" th:style="'height: 100vh;'">
+    <div class="col-11" style="overflow: scroll">
     <table class="table text-center">
         <thead class="thead-dark bg-secondary text-white">
         <tr>
             <th>Category Name</th>
+            <th>Description</th>
             <th>Number of Products</th>
+            <th></th>
+            <th></th>
             <th></th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="cat : ${categories}">
             <td th:text="${cat.categoryName}"></td>
+            <td th:text="${cat.categoryDescription}"></td>
             <td><span th:text="${#lists.size(cat.products)}"></span></td>
+            <td>
+                <a th:if="${cat.categoryStatus.name() == 'ACTIVE'}" th:href="@{/admin/category/block/{id}(id=${cat.categoryId})}" class="btn btn-danger">BLOCK</a>
+                <a th:if="${cat.categoryStatus.name() == 'BLOCKED'}" th:href="@{/admin/category/unBlock/{id}(id=${cat.categoryId})}" class="btn btn-success">ACTIVATE</a>
+            </td>
             <td><a th:href="@{/admin/category/edit/{id}(id=${cat.categoryId})}" class="btn btn-warning">EDIT</a></td>
             <td th:if="${#lists.size(cat.products)}==0"><a th:href="@{/admin/category/delete/{id}(id=${cat.categoryId})}" class="btn btn-danger">DELETE</a> </td>
         </tr>
@@ -30,8 +104,16 @@
     <div>
         <a th:href="@{add}" class="btn btn-primary">ADD CATEGORY</a>
     </div>
-</div>
+        <br>
+        <br>
 
+<div class="row d-flex justify-content-end">
+    <div class="col-3">
+        <a th:href="@{/admin/products/}" class="btn btn-primary">Go To Products</a>
+    </div>
+</div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>

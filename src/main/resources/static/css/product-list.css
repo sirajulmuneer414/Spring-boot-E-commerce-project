@@ -1,8 +1,67 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+.dropdown-menu{
+width:500px;
+height:100px;
+border:none;
 }
+
+.no-arrow::after {
+    content: none;
+}
+#category-dropdown{
+width:1000px;
+height:500px;
+background-color:rgba(250, 246, 246, 1);
+}
+#category-row{
+width:400px;
+}
+#edit-category-dropdown{
+width:600px;
+padding:50px;
+height:300px;
+background-color:rgba(250, 246, 246, 1);
+}
+.variant-container{
+  height: 400px;
+  overflow-x: auto;
+ max-width: 100%; 
+
+}
+.table-variants {
+    width: 100%; 
+}
+#category-image-div{
+    width: 100px;
+    height: 100px;
+}
+.custom-file-input .custom-file-label {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .custom-file-input .plus-button {
+    font-size: 20px;
+    margin-right: 8px;
+  }
+  .custom-file-input:hover .custom-file-label {
+    background-color: #0056b3;
+  }
+  #category-image-div {
+    position: relative;
+    overflow: hidden;
+    width: 200px; /* Set the width as needed */
+    height: 200px; /* Set the height as needed */
+    margin: 0 auto; /* Center the div */
+    border: 2px dashed #ccc; /* Add a dashed border for a standard style */
+    text-align: center; /* Center-align text within the div */
+    line-height: 200px; /* Set line-height to center vertically */
+}
+
+#categoryImageLabel {
+    cursor: pointer;
+}
+

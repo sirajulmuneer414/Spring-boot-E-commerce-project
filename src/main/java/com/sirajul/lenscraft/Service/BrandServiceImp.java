@@ -31,4 +31,9 @@ public class BrandServiceImp implements BrandService {
     public Brand findBrandById(Integer brandId) {
         return brandRepository.findById(brandId).get();
     }
+
+    @Override
+    public boolean existByBrandName(String brandName) {
+       return brandRepository.existsByBrandNameIgnoreCase(brandName);
+    }
 }

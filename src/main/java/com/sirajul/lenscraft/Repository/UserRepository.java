@@ -1,5 +1,6 @@
 package com.sirajul.lenscraft.Repository;
 
+import com.sirajul.lenscraft.DTO.UserInformationDto;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,7 @@ public interface UserRepository extends JpaRepository<UserInformation, UUID> {
 
     List<UserInformation> findByRole(Role role);
 
+    List<UserInformationDto> findAllByFirstNameContaining(String keyword);
+
+    Long countByRole(Role role);
 }

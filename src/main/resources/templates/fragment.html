@@ -1,123 +1,291 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>fragments</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <link th:href="@{css/fragmentstyles.css}" rel="stylesheet" type="text/css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-.navDiv {
-    background-color: #b43e8f;
-}
-
-.navBox {
-    display: flex;
-    justify-content: space-between;
-}
-
-nav {
-    background-color: #b43e8f;
-    height: 80px;
-    position: fixed;
-}
-
-.navBtn {
-    background-color: #fff;
-    border-radius: 5px;
-    color: #b43e8f;
-}
-
-.navBtn:hover {
-    border: 2px solid #fff;
-    color: #fff;
-    background-color: #b43e8f;
-}
-
-.navlogo {
-    height: auto;
-    width: 100%;
-}
-
-    </style>
-
+    <meta charset="UTF-8" />
+    <title>Shoose</title>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"
+    />
+    <link
+            th:rel="stylesheet"
+            th:href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link th:rel="stylesheet" th:href="@{/css/home.css}" />
+    <link th:rel="stylesheet" th:href="@{/css/product-list.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/boxicons/2.0.7/css/boxicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+    ></script>
 </head>
 <body>
-<div th:fragment="navBarAdmin" class="row fixed-top">
-    <nav class="navDiv w-100 container-fluid" th:style="'background-color: #b43e8f; height: 70px;'">
-        <div class="h-100 navBox d-flex justify-content-between align-items-center">
-            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 col-xxl-2 navLogo d-flex justify-content-center align-items-center h-100">
-                <a th:href="@{/admin/dashboard}"><img th:src="@{/images/Mainlogo.png}" class="w-100 h-auto"></a>
+<div th:fragment="navbar">
+    <nav
+            class="navbar bg-body-tertiary p-3"
+            style="border-bottom: 1px solid black"
+    >
+        <div
+                class="container-fluid d-flex justify-content-between align-items-middle"
+                style="background-color: white"
+        >
+            <div class="align-self-start">
+                <a class="navbar-brand" th:href="@{/home}">
+                    <img
+                            th:src="@{/images/Mainlogo.png}"
+                            style="height: auto; width: 150px"
+                            alt=""
+                    />
+                </a>
             </div>
-
-            <div class="col-3 d-flex justify-content-center align-items-center">
-
-                <a class="btn btn-light navBtn" th:href="@{/shop}">SHOP</a>
-
-            </div>
-        </div>
-    </nav>
-</div>
-<div th:fragment="navBarAdminWithSearch" class="row fixed-top">
-    <nav class="navDiv w-100 container-fluid" th:style="'background-color: #b43e8f; height: 70px;'">
-        <div class="h-100 navBox d-flex justify-content-between align-items-center">
-            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 col-xxl-2 navLogo d-flex justify-content-center align-items-center h-100">
-                <a th:href="@{/admin/dashboard}"><img th:src="@{/images/Mainlogo.png}" class="w-100 h-auto"></a>
-            </div>
-            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
-
-                <div class="d-flex justify-content-start align-items-center">
-                    <form method="get">
-                   <label for="navBarSearch"></label>
-                    <input type="search" id="navBarSearch" name="keyword" placeholder="Search Here">
-                    <button type="submit"></button>
-                    </form>
+            <div class="me-5">
+                <div class="d-flex gap-5 align-items-center">
+                    <div>
+                        <a class="text-decoration-none text-dark" th:href="@{/user/cart}">
+                            <i class="fa-solid fa-cart-shopping"></i><span> Cart</span>
+                        </a>
+                    </div>
+                    <div>
+                        <a class="text-decoration-none text-dark" th:href="@{/shop}">
+                            <i class="fa-brands fa-shopify"></i><span> Shop</span>
+                        </a>
+                    </div>
+                    <div>
+                        <a class="text-decoration-none text-dark" th:href="@{/user/profile}">
+                            <i class="fa-solid fa-user"></i><span> Profile</span>
+                        </a>
+                    </div>
+                    <div>
+                        <form
+                                th:if=" ${#authorization.expression('isAuthenticated()')}"
+                                th:method="post"
+                                th:action="@{/logout}"
+                        >
+                            <label for="sign-out"><i class="fa-solid fa-right-from-bracket"></i></label>
+                            <input hidden type="submit" id="sign-out">
+                        </form>
+                        <a   class="btn btn-info"   th:href="@{/login}" th:if="not ${#authorization.expression('isAuthenticated()')}" >Sign in</a>
+                    </div>
                 </div>
-
-            </div>
-            <div class="col-3 d-flex justify-content-center align-items-center">
-
-                <a class="btn btn-light navBtn" th:href="@{/}">SHOP</a>
-
             </div>
         </div>
     </nav>
 </div>
-<div th:fragment="navBarHome" class="row fixed-top">
-    <nav class="navDiv w-100 container-fluid" th:style="'background-color: #b43e8f; height: 70px;'">
-        <div class="h-100 navBox d-flex justify-content-between align-items-center">
-            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 col-xxl-2 navLogo d-flex justify-content-center align-items-center h-100">
-                <a th:href="@{/}"><img th:src="@{/images/Mainlogo.png}" class="w-100 h-auto"></a>
-            </div>
-            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
-
-                <div class="d-flex justify-content-start align-items-center">
-                   <label for="navBarSearchHome"></label>
-                    <input type="search" id="navBarSearchHome" name="keyword" placeholder="Search Here">
-                    <button type="submit"></button>
-
+<div th:fragment="footer">
+    <div class="container-fluid bg-secondary text-light footerText p-5 mt-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="company-info">
+                    <h3>Shoose</h3>
+                    <p>
+                        Robert Robertson, 1234 NW Bobcat Lane,<br />
+                        St. Robert, MO 65584-5678.
+                    </p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
-
             </div>
-            <div class="col-3 d-flex justify-content-center align-items-center">
-
-                <a th:href="@{/login}" class="btn btn-light" style="color: #b43e8f">LOG IN/SIGN UP</a>
-
+            <div class="col-lg-6">
+                <h2>Stay upto date about our new products</h2>
+                <div class="input-group px-5">
+                    <input
+                            type="email"
+                            class="form-control"
+                            placeholder="Enter your email"
+                    />
+                    <div class="input-group-append">
+                        <button class="btn btn-danger">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 pt-5 text-center">
+                <p>Shoose.co © 2000-2023, All Rights Reserved</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:fragment="admin-navbar">
+    <nav
+            class="navbar bg-body-tertiary p-3"
+            style="border-bottom: 1px solid black"
+    >
+        <div
+                class="container-fluid d-flex justify-content-between align-items-middle"
+                style="background-color: white"
+        >
+            <div class="align-self-start">
+                <a class="navbar-brand" href="/homepage">
+                    <img
+                            th:src="@{/img/logo.png}"
+                            style="height: 60px; width: 150px"
+                            alt=""
+                    />
+                </a>
+            </div>
+            <div class="me-5">
+                <div class="d-flex gap-5 align-items-center">
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/home}"
+                        ><b>Dashboard</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/products-list}"
+                        ><b>Products</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/categories}"
+                        ><b>Categories</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/customers-list}"
+                        ><b>Customers</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/orders-list}"
+                        ><b>Orders</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/coupons}"
+                        ><b>Coupons</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/banners}"
+                        ><b>Banners</b></a
+                        >
+                    </div>
+                    <div>
+                        <form th:method="post" th:action="@{/logout}">
+                            <input
+                                    class="btn btn-danger text-white"
+                                    type="submit"
+                                    value="Logout"
+                            />
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
+<div th:fragment="admin-dashboard">
+    <div id="body-pd">
+        <header class="header" id="header">
+
+            <div class="header_toggle d-flex" style="color: black;">
+                <i class='bx bx-menu' id="header-toggle"></i>
+            </div>
+            <!-- <div class="header_img"> <img src="/images/heroimage.png" alt=""> </div> -->
+        </header>
+        <div class="l-navbar" id="nav-bar" style="background-color: white ;    ">
+            <nav class="nav">
+                <div>
+
+
+                    <div class="nav_list">
+                        <a th:href="@{/admin/home}" class="nav_link active">
+                            <i class='bx bx-grid-alt nav_icon'></i>
+                            <span class="nav_name">Dashboard</span>
+                        </a>
+                        <a th:href="@{/admin/products-list}" class="nav_link">
+                            <i class='fa-solid fa-box nav_icon'></i>
+                            <span class="nav_name">Products</span>
+                        </a>
+                        <a th:href="@{/admin/categories}" class="nav_link">
+                            <i class='fa-solid fa-layer-group nav_icon'></i>
+                            <span class="nav_name">Category</span>
+                        </a>
+                        <a th:href="@{/admin/orders-list}" class="nav_link">
+                            <i class="fa-solid fa-tags" ></i>
+                            <span class="nav_name">Orders</span>
+                        </a>
+                        <a th:href="@{/admin/customers-list}" class="nav_link">
+                            <i class='fa-solid fa-user nav_icon'></i>
+                            <span class="nav_name">Users</span>
+                        </a>
+                        <a th:href="@{/admin/coupons}" class="nav_link">
+                            <i class='fa-solid fa-ticket nav_icon'></i>
+                            <span class="nav_name">Coupons</span>
+                        </a>
+                        <a th:href="@{/admin/banners}" class="nav_link">
+                            <i class='fa-regular fa-image nav_icon'></i>
+                            <span class="nav_name">Banner</span>
+                        </a>
+                        <a th:href="@{/admin/home}" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span
+                                class="nav_name">Logout</span> </a>
+
+                    </div>
+                </div>
+        </div>
+
+    </div>
+    </nav>
+</div>
+</div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener("DOMContentLoaded", function (event) {
+
+        const toggleSidebar = () => {
+            const navBar = document.getElementById('nav-bar');
+            const bodyPd = document.getElementById('body-pd');
+            const headerToggle = document.getElementById('header-toggle');
+
+            // show/hide sidebar
+            navBar.classList.toggle('show');
+            // toggle menu icon
+            headerToggle.classList.toggle('bx-x');
+            // toggle body padding
+            bodyPd.classList.toggle('body-pd-sidebar');
+        };
+
+        const links = document.querySelectorAll('.nav_link');
+
+        function activateLink() {
+            links.forEach(link => link.classList.remove('active'));
+            this.classList.add('active');
+        }
+
+        links.forEach(link => link.addEventListener('click', activateLink));
+
+        document.getElementById('header-toggle').addEventListener('click', toggleSidebar);
+    });
+    /*]]>*/
+</script>
+
+
 </body>
 </html>

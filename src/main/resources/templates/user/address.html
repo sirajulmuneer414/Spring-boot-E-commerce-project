@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Lenscraft-Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+  * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+  }
+  * a{
+    text-decoration: none;
+  }
+        .sideBar {
+        position: fixed;
+        background-color: #d9d9d9;
+        height: 100vh;
+        width: fit-content;
+        padding: 20px 10px;}
+
+
+     .sideBarContent a{
+        color: #b43e8f;
+        text-decoration: none;
+     }
+     .sideBarContent{
+        margin-bottom: 40px;
+     }
+    </style>
+
+</head>
+<body class="container-fluid">
+<div th:replace="~{fragment::navBarHome}"></div>
+
+<div class="row sideBar position-fixed d-flex flex-column justify-content-center align-items-center overflow-auto">
+    <ul style="padding-left: 0;">
+        <li class="sideBarContent">
+            <a th:href="@{/shop/}"><h4>SHOP</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <form th:action="@{/order}">
+                <input type="hidden" name="username" th:value="${username}">
+                <button type="submit" style="border: none; padding: 0"><h4>MY ORDERS</h4></button>
+            </form>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/shop/brands/}"><h4>BRANDS</h4></a>
+
+        </li>
+        <li class="sideBarContent">
+            <a th:href="@{/user/wishlist}"><h4>WISHLIST</h4></a>
+
+        </li>
+
+        <li class="sideBarContent">
+            <a th:href="@{/user/cart}"><h4>CART</h4></a>
+
+        </li>
+        <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-center align-items-center">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit"  class="text-danger"><h4>LOG OUT</h4></button>
+            </form>
+        </li>
+    </ul>
+</div>
+<div class="row container-fluid d-flex flex-column justify-content-start" style=" margin-left: 200px; overflow: scroll; margin-top: 70px; max-width: calc(100vw - 200px)">
+    <div class="col-11 d-flex justify-content-start"><h2>ADDRESSES:-</h2></div>
+    <br>
+    <div th:each="address : ${addresses}">
+        <div class="d-flex justify-content-between align-items-center" style="height: auto; width: auto; border: 2px solid black; border-radius: 2px">
+        <div class="d-flex flex-column justify-content-center" >
+            <h5 th:text="${address.buyerName}">
+            </h5>
+            <br>
+            <h5 th:text="${'Address : '+address.houseAddress}"></h5>
+            <span th:text="${address.district+','+address.state}"></span>
+            <br>
+            <h5 th:text="${'Pincode :'+address.pincode}"></h5>
+            <h5 th:text="${'Mobile Number : '+address.mobileNumber}"></h5>
+        </div>
+            <div class="d-flex flex-column justify-content-center" >
+                <div>
+                <form th:action="@{/user/address/delete/{addressId}(addressId=${address.addressId})}">
+                    <input type="hidden" name="username" th:value="${username}">
+                    <button type="submit" class="btn btn-danger">DELETE</button>
+                </form>
+                </div>
+                <div>
+                    <a th:href="@{/user/address/edit/{addressId}(addressId=${address.addressId})}" class="btn btn-info">EDIT</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <div class="d-flex justify-content-end">
+        <a th:href="@{/user/address/add}" class="btn" style="border:none; border-radius: 2px; background-color: #b43e8f; color: white">ADD ADDRESS</a>
+    </div>
+
+</div>
+</body>
+</html>

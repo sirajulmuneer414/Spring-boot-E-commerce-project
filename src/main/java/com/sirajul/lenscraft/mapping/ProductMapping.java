@@ -81,6 +81,8 @@ public class ProductMapping {
         productDto.setFrameLength(product.getFrameSize().getFrameLength());
         productDto.setCategoryId(product.getCategory().getCategoryId());
         productDto.setVariables(product.getVariables());
+        productDto.setOffer(product.getOffer());
+        productDto.setDiscountedPrice(product.getDiscountedPrice());
 
         return productDto;
     }

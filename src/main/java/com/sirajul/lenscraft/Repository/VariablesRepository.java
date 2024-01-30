@@ -19,6 +19,5 @@ public interface VariablesRepository extends JpaRepository<Variables, Long> {
 
     void deleteByProduct(Product productId);
 
-
     List<Variables> findAllByProduct(Product product);
 }

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Lenscraft-Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        * a {
+            text-decoration: none;
+        }
+
+        .sideBar {
+            position: fixed;
+            top: 70px;
+            right: 0;
+            background-color: #d9d9d9;
+            height: fit-content;
+            width: 100vw;
+            padding: 10px 10px;
+            z-index: 2;
+        }
+
+
+        .sideBarContent a {
+            color: #b43e8f;
+            text-decoration: none;
+        }
+
+        .sideBarContent {
+            padding: 5px;
+            margin-right : 10px;
+            list-style-type: none;
+        }
+
+    </style>
+
+</head>
+
+<body class="container-fluid">
+<div class="position-fixed" th:replace="~{fragment::navBarHome}"></div>
+
+<nav class="sideBar position-fixed d-flex justify-content-around align-items-center">
+    <ul class="d-flex flex-row justify-content-between align-items-center">
+        <li class="sideBarContent">
+            <form th:action="@{/user/settings}">
+                <input type="hidden" name="username" th:value="${username}">
+                <button type="submit" style="border: none; padding: 0; background-color: #b43e8f; color: #fff">
+                    <h4>ACCOUNT</h4>
+                </button>
+            </form>
+
+        </li>
+        <li class="sideBarContent" th:if="${#authorization.expression('isAuthenticated()')}">
+            <form th:action="@{/order}">
+                <input type="hidden" name="username" th:value="${username}">
+                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: #b43e8f">
+                    <h4>MY ORDERS</h4>
+                </button>
+            </form>
+
+        </li>
+        <li class="sideBarContent">
+            <form th:action="@{/user/settings/change-password}">
+                <input type="hidden" name="username" th:value="${username}">
+                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: #b43e8f">
+                    <h4>CHANGE PASSWORD</h4>
+                </button>
+            </form>
+
+        </li>
+        <li class="sideBarContent" th:if="${#authorization.expression('isAuthenticated()')}">
+            <a th:href="@{/user/wishlist}">
+                <h4>WISHLIST</h4>
+            </a>
+
+        </li>
+
+        <li class="sideBarContent" th:if="${#authorization.expression('isAuthenticated()')}">
+            <a th:href="@{/user/cart}">
+                <h4>CART</h4>
+            </a>
+
+        </li>
+        <li th:if="${#authorization.expression('isAuthenticated()')}"
+            class="logoutBtn d-flex justify-content-start align-items-center">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: red">
+                    <h4>LOG OUT</h4>
+                </button>
+            </form>
+        </li>
+    </ul>
+</nav>
+<div class="row d-flex flex-column justify-content-center" style="width: 100vw; margin-top: 150px">
+
+    <div class="col-10 col-md-8 col-lg-7 col-xl-7 col-xxl-7 d-flex justify-content-center flex-column">
+
+        <div>
+            <img th:src="@{${'/profilePic/'+username+'/'+user.profilePic}}">
+        </div>
+        <br>
+        <div>
+            <span style="color: #b43e8f">First Name : </span><span th:text="${user.firstName}"></span>
+        </div>
+        <br>
+        <div>
+            <span style="color: #b43e8f">Last Name : </span><span th:text="${user.lastName}"></span>
+        </div>
+        <br>
+        <div>
+            <span style="color: #b43e8f">Email Id : </span><span th:text="${user.emailId}"></span>
+        </div>
+        <br>
+        <div>
+            <button type="submit" id="btnForModal" class="btn" style="color: #fff; background-color: #b43e8f">Edit</button>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
