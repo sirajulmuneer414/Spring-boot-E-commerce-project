@@ -8,6 +8,7 @@ import com.sirajul.lenscraft.entity.product.Category;
 import com.sirajul.lenscraft.entity.product.Product;
 import com.sirajul.lenscraft.entity.product.enums.FrameSize;
 import com.sirajul.lenscraft.entity.product.enums.StockStatus;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class ProductMapping {
         if(productDto.getProductId() != null){
             product.setProductId(productDto.getProductId());
         }
-
+        product.setHavingOffer(false);
         product.setProductName(productDto.getProductName());
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
@@ -63,6 +64,9 @@ public class ProductMapping {
 
         product.setModelNo(productDto.getModelNo());
 
+        product.setDiscountedPrice(productDto.getPrice());
+
+        product.setActiveStatus(ActiveStatus.ACTIVE);
 
         return product;
     }

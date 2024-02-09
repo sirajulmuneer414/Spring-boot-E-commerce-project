@@ -1,52 +1,109 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit-Brand</title>
+    <title>Edit Brand</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.6.1/toastify.css" integrity="sha512-VSD3lcSci0foeRFRHWdYX4FaLvec89irh5+QAGc00j5AOdow2r5MFPhoPEYBUQdyarXwbzyJEO7Iko7+PnPuBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-  * {
-      padding: 0;
-      margin: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-  }
-        f
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+        nav {
+    background-color: #b43e8f;
+    height: 80px;
+    position: fixed;
+}
     </style>
 </head>
 <body class="container-fluid">
-<div th:replace="~{fragment::navBarAdmin}"></div>
-<div class="row d-flex justify-content-center align-items-center">
-
-    <div class="col-10 col-sm-10 col-md-8 col-lg-6 col-xl-6 col-xxl-6 d-flex justify-content-center">
-        <form th:action="@{/admin/brand/edit/{id}(id=${brandToEdit.brandId})}" method="post" th:object="${brandTOEdit}">
+<nav th:replace="~{fragment::admin-navbar}"></nav>
+<div class="row d-flex justify-content-center align-items-center" style="height: calc(100vh - 70px); width: 100vw">
+    <div class="col-sm-8 col-md-5 col-lg-4 col-xl-4 border rounded shadow" style=" border-radius: 5px; padding: 5px">
+        <form action="" method="get" style="d-flex flex-column justify-content-center" id="brandForm" onsubmit="brandAddition(event)">
+            <input type="hidden" id="brandId" th:value="${brand.brandId}">
             <div class="form-group">
                 <label for="brandName">Brand Name</label>
-                <input th:value="*{brandName}" th:text="*{brandName}" th:field="*{brandName}" id="brandName">
+                <input id="brandName" type="text" name="brandName" autofocus required>
             </div>
-        <div class="form-group">
-                <label for="description">Brand Description</label>
-                <input th:value="*{brandDescription}" th:text="*{brandDescription}" th:field="*{brandDescription}" id="description">
-            </div>
+            <br>
 
-            <div class="w-100 d-flex justify-content-center align-items-center">
-                <button type="submit" class="btn btn-primary">SUBMIT</button>
-            </div>
+            <button type="submit" class="btn btn-success">Submit</button>
+
         </form>
-        <div>
-            <a th:href="@{/admin/brand/}" class="btn btn-warning">Go To Brands </a>
+
+
+        <div class="d-flex justify-content-end">
+
+            <a th:href="@{/admin/products}" class="btn btn-dark">Go To Products</a>
         </div>
-
     </div>
-
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.6.1/toastify.js" integrity="sha512-MnKz2SbnWiXJ/e0lSfSzjaz9JjJXQNb2iykcZkEY2WOzgJIWVqJBFIIPidlCjak0iTH2bt2u1fHQ4pvKvBYy6Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    $(document).ready(function () {
+        function brandAddition(e) {
+            e.preventDefault();
+            console.log("inside method")
+            let brandName = document.getElementById("brandName").value;
+            let brandId = document.getElementById("brandId").value;
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
+            if (brandName == null || brandName.trim() === "") {
+                blurt("Invalid Entry", "This brand name is not supported !!");
+                return;
+            }
+
+            $.ajax({
+                url: '/admin/brand/editCheck',
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    brandName: brandName,
+                    brandId: brandId
+                },
+                success: function (response) {
+                    if (!response.check) {
+                        console.log("Inside response")
+                        Toastify({
+                            text: "brand name already exists.",
+                            duration: 1000,
+                            newWindow: true,
+                            close: false,
+                            gravity: "top",
+                            position: "center",
+                            stopOnFocus: true,
+                            style: {
+                                background: "red",
+                            }
+                        }).showToast();
+
+                        brandName.placeholder = "Enter a brand Name";
+
+                        return;
+                    } else {
+                        window.location.href = "http://localhost:8080/admin/brand";
+                    }
+                }
+            });
+        }
+
+        // Call the brandAddition function when the form is submitted
+        $("#brandForm").submit(brandAddition);
+    });
+</script>
+
 </body>
 </html>

@@ -114,13 +114,13 @@
     </style>
 </head>
 <body class="container-fluid">
-<div th:replace="~{fragment::navBarHome}"></div>
-<div class="row container-fluid d-flex flex-column justify-content-center" style=" margin-top: 70px; max-width: 100vw; max-height: 100vh">
-    <div class="col-10">
+<div th:replace="~{fragment::navbar}"></div>
+<div class="row container-fluid d-flex  justify-content-center " style=" margin-top: 70px; max-width: 100vw; max-height: 100vh">
 
-        <table>
-            <thead>
-            <tr>
+
+        <table class="card rounded col-6 container-fluid">
+            <thead class="row border-bottom">
+            <tr class="col-12 d-flex justify-content-between p-3">
                 <th>
                     Si.No:
                 </th>
@@ -141,8 +141,9 @@
                 </th>
             </tr>
             </thead>
-            <tbody>
-                <tr th:each="item,itemStats: ${items}">
+
+            <tbody class="row mt-2">
+                <tr th:each="item,itemStats: ${items}" class="col-12 d-flex justify-content-between">
                     <td th:text="${itemStats.count}">
                     </td>
                     <td th:text="${item.product.productId}">
@@ -159,9 +160,9 @@
             </tbody>
         </table>
 
-    </div>
-    <div class="col-10">
-        <ul class="list-unstyled">
+        <div class="col-6 container-fluid">
+
+        <ul class="list-unstyled card rounded p-3 col-10 ml-3">
 
             <li>
                 <h5 th:text="${'Delivery Charge     :  '+delivery}" class="text-muted"></h5>
@@ -180,21 +181,22 @@
             </li>
         </ul>
 
-    </div>
-    <div class="col-10">
+
+    <div class="col-10 card rounded p-3">
         <h4 th:if="${couponSelected == null}">NO COUPONS APPLIED</h4>
         <div th:unless="${couponSelected == null}">
             <h4 th:text="${couponSelected.couponName}"></h4>
             <h4 th:text="${'&#x25;'+couponSelected.discountPercentage+'OFF'}"></h4>
             <h5 th:text="${'Code : '+couponSelected.couponCode}"></h5>
         </div>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">Add Coupon</button>
+        <button class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#addCouponModal">Add Coupon</button>
 
 
 
     </div>
-    <div class="col-10 d-flex justify-content-between">
-        <a th:href="@{/user/buy/address/change}" style="border: none; border-radius: 5px; background-color: #B43E8F; color: white; padding: 5px">CONTINUE</a>
+        </div>
+    <div class="row col-10 d-flex mt-5 mb-5 justify-content-between">
+        <a th:href="@{/user/buy/address/change}" class="btn btn-warning btn-block btn-lg">CONTINUE</a>
     </div>
 </div>
 <div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog" aria-labelledby="addCouponModalLabel" aria-hidden="true">

@@ -5,105 +5,349 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link th:rel="stylesheet" th:href="@{/css/product-list.css}" />
+    <link th:rel="stylesheet" th:href="@{/css/dashboard.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/boxicons/2.0.7/css/boxicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-     * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
-        }
-     .sideBar {
-        position: fixed;
-        top: 70px;
-        right: 0;
-        background-color: #d9d9d9;
-        height: fit-content;
-        width: 100vw;
-        padding: 10px 10px;
-        z-index: 2;
-        }
+* {
+padding: 0;
+margin: 0;
+box-sizing: border-box;
+font-family: 'Poppins', sans-serif;
+}
+
+nav {
+background-color: #b43e8f;
+height: 80px;
+position: fixed;
+}
+#nav-bar {
+width: 0;
+overflow: hidden;
+}
+
+.body-pd-sidebar {
+padding-left: 250px; /* Adjust the padding based on your sidebar width */
+}
+
+#nav-bar.show {
+width: 250px; /* Adjust the width based on your sidebar width */
+}
+
+svg {
+margin: 10px;
+}
+
+.navbar {
+padding: 15px 10px;
+background: #fff;
+border: none;
+border-radius: 0;
+box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-btn {
+box-shadow: none;
+outline: none !important;
+border: none;
+}
+
+.line {
+width: 100%;
+height: 1px;
+border-bottom: 1px dashed #ddd;
+margin: 40px 0;
+}
+
+/* ---------------------------------------------------
+SIDEBAR STYLE
+----------------------------------------------------- */
+
+.wrapper {
+display: flex;
+width: 100%;
+align-items: stretch;
+}
+
+#sidebar {
+min-width: 250px;
+max-width: 250px;
+background: #844646;
+color: #fff;
+transition: all 0.3s;
+}
+
+#sidebar.active {
+margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+padding: 20px;
+background: #844646;
+display: flex;
+justify-content: center;
+}
+
+#sidebar ul.components {
+padding: 0px 0;
+list-style-type: none;
+}
+
+#sidebar ul p {
+color: #fff;
+padding: 10px;
+}
+
+#sidebar ul li a {
+color: white;
+padding: 10px;
+font-size: 1.1em;
+display: block;
+}
+
+#sidebar ul li a:hover {
+color: #ffffff;
+background: #6a4040;
+}
+
+#sidebar ul li.active > a,
+a[aria-expanded="true"] {
+color: #fff;
+background: #6d7fcc;
+}
+
+a[data-toggle="collapse"] {
+position: relative;
+}
+
+.dropdown-toggle::after {
+display: block;
+position: absolute;
+top: 50%;
+right: 20px;
+transform: translateY(-50%);
+}
+
+ul ul a {
+font-size: 0.9em !important;
+padding-left: 30px !important;
+background: #6d7fcc;
+}
+
+ul.CTAs {
+padding: 20px;
+}
+
+ul.CTAs a {
+text-align: center;
+font-size: 0.9em !important;
+display: block;
+border-radius: 5px;
+margin-bottom: 5px;
+}
 
 
-     .sideBarContent a {
-        color: #b43e8f;
-        text-decoration: none;
-        }
+.wrapper {
+display: flex;
+width: 100%;
+align-items: stretch;
+}
 
-     .sideBarContent {
-        margin-right : 10px;
-        list-style-type: none;
-        }
-     .box {
-        background-color: #fff; /* White background */
-        padding: 20px;
-        text-align: center;
-        margin-bottom: 20px;
-        border: 1px solid #eee; /* Light gray border */
-        border-radius: 5px; /* Rounded corners */
-    }
+.box {
+background-color: #fff; /* White background */
+padding: 20px;
+text-align: center;
+margin-bottom: 20px;
+border: 1px solid #eee; /* Light gray border */
+border-radius: 5px; /* Rounded corners */
+}
 
-     .shadow-box {
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
-    }
+.shadow-box {
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
+}
 
 /* Optional: Style the headings and paragraphs within the boxes */
 .white-box h3 {
-    color: #333; /* Dark text color for headings */
+color: #333; /* Dark text color for headings */
 }
 
 .white-box p {
-    color: #b438f; /* Slightly lighter text color for paragraphs */
+color: #666; /* Slightly lighter text color for paragraphs */
 }
 
+.card {
+border-radius: 10px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+background-color: #f8f9fa;
+border-bottom: none;
+font-weight: bold;
+font-size: 20px;
+}
+
+.card-body {
+padding: 20px;
+}
+
+svg {
+fill: #ffffff;
+margin: 15px;
+}
+
+button {
+padding: 5px 10px;
+background-color: #04609d;
+color: #fff;
+border: none;
+border-radius: 50px;
+margin: 5px;
+}
+
+/* Hover effect */
+button:hover {
+background-color: #2980b9; /* Change the background color on hover */
+}
+
+input[type="date"] {
+appearance: none;
+-webkit-appearance: none;
+-moz-appearance: none;
+border: 1px solid #ddd;
+padding: 10px;
+border-radius: 5px;
+outline: none;
+font-size: 16px;
+box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+background-color: #fff;
+cursor: pointer;
+}
+
+/* Styles for the container */
+.date-container {
+display: inline-block;
+position: relative;
+}
+
+/* Styles for the calendar icon */
+.calendar-icon {
+position: absolute;
+top: 50%;
+right: 10px;
+transform: translateY(-50%);
+pointer-events: none;
+}
+
+.calendar-icon::before {
+content: '\1F4C5'; /* Unicode for the calendar icon */
+font-size: 20px;
+color: #555;
+}
     </style>
 </head>
-<body class="container-fluid">
+<body>
 
-<div th:replace="~{fragment::navBarAdmin}"></div>
-<div class="row" th:style="'height: 70px;'"></div>
-<nav class="sideBar position-fixed d-flex justify-content-around align-items-center">
-    <ul class="d-flex flex-row justify-content-between align-items-center">
+<div th:fragment="admin-navbar">
+    <nav
+            class="navbar bg-body-tertiary p-3"
+            style="border-bottom: 1px solid black"
+    >
+        <div
+                class="container-fluid d-flex justify-content-between align-items-middle"
+                style="background-color: white"
+        >
+            <div class="align-self-start">
+                <a class="navbar-brand" href="/">
+                    <img
+                            th:src="@{/images/Mainlogo.png}"
+                            style="height: 60px; width: 150px"
+                            alt=""
+                    />
+                </a>
+            </div>
+            <div class="me-5">
+                <div class="d-flex gap-5 align-items-center">
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/home}"
+                        ><b>Dashboard</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/products}"
+                        ><b>Products</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/category}"
+                        ><b>Categories</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/customers}"
+                        ><b>Customers</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/order}"
+                        ><b>Orders</b></a
+                        >
+                    </div>
+                    <div>
+                        <a
+                                class="text-decoration-none text-dark"
+                                th:href="@{/admin/coupon}"
+                        ><b>Coupons</b></a
+                        >
+                    </div>
+<!--                    <div>-->
+<!--                        <a-->
+<!--                                class="text-decoration-none text-dark"-->
+<!--                                th:href="@{/admin/banners}"-->
+<!--                        ><b>Banners</b></a-->
+<!--                        >-->
+<!--                    </div>-->
+                    <div>
+                        <form method="post" th:action="@{/logout}">
+                            <input
+                                    class="btn btn-danger text-white"
+                                    type="submit"
+                                    value="Logout"
+                            />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>
 
-    <li class="sideBarContent">
-        <a th:href="@{/admin/order}"><h4>ORDERS</h4></a>
-
-    </li>
-    <div class="sideBarContent">
-        <a th:href="@{/admin/products/}"><h4>PRODUCTS</h4></a>
-
-    </div>
-    <li class="sideBarContent">
-        <a th:href="@{/admin/customers}"><h4>CUSTOMERS</h4></a>
-
-    </li>
-     <li class="sideBarContent">
-        <a th:href="@{/admin/coupon}"><h4>COUPONS</h4></a>
-
-    </li>
-    <li class="sideBarContent">
-        <a th:href="@{/admin/category/}"><h4>CATEGORIES</h4></a>
-
-    </li>
-    <li class="sideBarContent">
-        <a th:href="@{/admin/brand/}"><h4>BRANDS</h4></a>
-
-    </li>
-    <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-center align-items-center">
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
-        </form>
-    </li>
-</ul>
-</nav>
 <div class="container mt-5">
     <div class="row">
         <!-- Three responsive boxes with icons -->
-        <div class="col-md-4 mt-5">
+        <div class="col-md-6 col-lg-4 col-xl-4 col-12 mt-5">
             <div class="box white-box shadow-box">
                 <i class="fas fa-chart-bar fa-2x"></i>
                 <h3>Total Sales</h3>
@@ -117,7 +361,7 @@
                 <p th:text="${soldProducts}" style="color: #b43e8f"><strong></strong></p>
             </div>
         </div>
-        <div class="col-md-4 mt-5">
+        <div class="col-md-6 col-lg-4 col-xl-4 col-12 mt-5">
             <div class="box white-box shadow-box">
                 <i class="fas fa-users fa-2x"></i>
                 <h3>Total Customers</h3>
@@ -126,9 +370,292 @@
         </div>
     </div>
 </div>
+<div class="col-12">
+    <div class="card">
+        <div class="card-body">
+            <button id="dailyBtn">Daily</button>
+            <button id="weeklyBtn">Weekly</button>
+            <button id="monthlyBtn">Monthly</button>
+            <button id="yearlyBtn">Yearly</button>
 
+            <canvas id="combinedChart" width="400" height="100"></canvas>
+
+        </div>
+    </div>
+<!--    -->
+<!--                    <div class="table-responsive">-->
+<!--                        <h4 class="mt-5">Top Selling Products</h4>-->
+<!--                        <table class="table table-bordered table-striped">-->
+<!--                            <thead>-->
+<!--                            <tr>-->
+<!--                                <th>Products</th>-->
+<!--                                <th>Stock</th>-->
+<!--                                <th>Price</th>-->
+<!--                                <th>Status</th>-->
+<!--                            </tr>-->
+<!--                            </thead>-->
+<!--                            <tbody>-->
+<!--                            <tr th:each="product : ${topSellingProducts}">-->
+<!--                                <td th:text="${product.name}"></td>-->
+<!--                                <td th:text="${product.stock}"></td>-->
+<!--                                <td th:text="'₹'+${product.price}"></td>-->
+<!--                                <td>-->
+<!--                                    <span th:if="${product.stock > 25}" class="badge badge-success">In Stock</span>-->
+<!--                                    <span th:unless="${product.stock > 25}" class="badge badge-warning">Low Stock</span>-->
+<!--                                </td>-->
+
+<!--                            </tr>-->
+<!--                            </tbody>-->
+<!--                        </table>-->
+<!--                    </div>-->
+</div>
+</div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById('weeklyBtn').addEventListener('click', () => {
+
+            let jsonWeekObj = /*[[${weeklySales}]]*/ {};
+            let jsonWeekCountObj = /*[[${weeklyCount}]]*/ {};
+
+            let week = JSON.parse(jsonWeekObj);
+            let weekCount = JSON.parse(jsonWeekCountObj);
+
+            let weekValue = Object.values(week);
+            let weekCountValue = Object.values(weekCount);
+
+
+            let data = {
+                labels: ['week1', 'week2', 'week3', 'week4', 'week5', 'week6', 'week7'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: weekValue.reverse(),
+                    fill: true,
+                    borderColor: '#ff6384',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 2,
+                    lineTension: 0.2
+                }, {
+                    label: 'SalesCount',
+                    data: weekCountValue.reverse(),
+                    fill: true,
+                    borderColor: '#ff0000',
+                    backgroundColor: 'rgba(0,0,0,0.2)',
+                    borderWidth: 2,
+                    lineTension: 0.2
+                }]
+            };
+
+            combinedChart.data = data;
+            combinedChart.update();
+        });
+        document.getElementById('dailyBtn').addEventListener('click', () => {
+
+            let jsonDailyObj = /*[[${dailySales}]]*/ {};
+            let jsonDailyCountObj = /*[[${dailyCount}]]*/ {};
+
+            let daily = JSON.parse(jsonDailyObj);
+            let dailyCount = JSON.parse(jsonDailyCountObj);
+            let dates = Object.keys(days);
+            let dailyValue = Object.values(daily);
+            let dailyCountValue = Object.values(dailyCount);
+
+
+            let data = {
+                labels: dates.reverse(),
+                datasets: [{
+                    label: 'Revenue',
+                    data: dailyValue.reverse(),
+                    fill: true,
+                    borderColor: '#ff6384',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 2,
+                    lineTension: 0.2
+                }, {
+                    label: 'SalesCount',
+                    data: dailyCountValue.reverse(),
+                    fill: true,
+                    borderColor: '#ec0808',
+                    backgroundColor: 'rgba(0,0,0,0.2)',
+                    borderWidth: 2,
+                    lineTension: 0.2
+                }]
+            };
+
+            combinedChart.data = data;
+            combinedChart.update();
+        });
+
+        document.getElementById('monthlyBtn').addEventListener('click', () => {
+            let jsonMonthObj = /*[[${monthlySales}]]*/ {};
+            let jsonMonthCountObj = /*[[${monthlySalesCount}]]*/ {};
+            let month = JSON.parse(jsonMonthObj);
+            let monthCount = JSON.parse(jsonMonthCountObj);
+            let monthlySales = Object.values(month);
+            let monthlySalesCount = Object.values(monthCount)
+
+
+            let data = {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: monthlySales,
+                    fill: true,
+                    borderColor: '#ff6384',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 2,
+                    lineTension: 0.2
+                }, {
+                    label: 'SalesCount',
+                    data: monthlySalesCount,
+                    fill: true,
+                    borderColor: '#ff003c',
+                    backgroundColor: 'rgba(0,0,0,0.2)',
+                    borderWidth: 2,
+                    lineTension: 0.2
+                }]
+            };
+
+            combinedChart.data = data;
+            combinedChart.update();
+        });
+
+        document.getElementById('yearlyBtn').addEventListener('click', () => {
+            let jsonYearObj = [[${yearlySales}]];
+            let jsonYearCountObj = [[${yearlySalesCount}]];
+            let years = JSON.parse(jsonYearObj);
+            let yearsCount = JSON.parse(jsonYearCountObj);
+            let yearlySales = Object.values(years);
+            let yearlySalesCount = Object.values(yearsCount);
+
+            let data = {
+                labels: ['2019', '2020', '2021', '2022', '2023'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: yearlySales,
+                    fill: true,
+                    borderColor: '#ff6384',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 2,
+                    lineTension: 0.2
+                }, {
+                    label: 'SalesCount',
+                    data: yearlySalesCount,
+                    fill: true,
+                    borderColor: '#ff6384',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 2,
+                    lineTension: 0.2
+                }]
+            };
+
+            combinedChart.data = data;
+            combinedChart.update();
+        });
+    });
+
+    let jsonDailyObj = [[${dailySales}]];
+    let jsonDailyCountObj = [[${dailyCount}]];
+    let days = JSON.parse(jsonDailyObj);
+    let daysCount = JSON.parse(jsonDailyCountObj);
+
+    let dates = Object.keys(days);
+    let transformedKeys = Object.values(days);
+    let daysCounts = Object.values(daysCount);
+    console.log(transformedKeys);
+
+
+    let data = {
+        labels: dates.reverse(),
+        datasets: [{
+            label: 'Revenue',
+            data: transformedKeys.reverse(),
+            fill: true,
+            borderColor: '#ff6384',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderWidth: 2,
+            lineTension: 0.2
+        }, {
+            label: 'SalesCount',
+            data: daysCounts.reverse(),
+            fill: true,
+            borderColor: '#ff6384',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderWidth: 2,
+            lineTension: 0.2
+        }]
+    };
+
+
+    // Create combined line chart
+    let combinedChart = new Chart(document.getElementById('combinedChart').getContext('2d'), {
+        type: 'line',
+        data: data,
+        options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            size: 14, // Increase the legend font size
+                            weight: 'bold'
+                        }
+                    }
+                },
+            }
+        }
+    });
+    function openModal(){
+    $('#dateSelectionModal').modal('show');
+}
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+
+        const showNavbar = (toggleId, navId, bodyId, headerId) => {
+            const toggle = document.getElementById(toggleId),
+                nav = document.getElementById(navId),
+                bodypd = document.getElementById(bodyId),
+                headerpd = document.getElementById(headerId)
+
+            // Validate that all variables exist
+            if (toggle && nav && bodypd && headerpd) {
+                toggle.addEventListener('click', () => {
+                    // show navbar
+                    nav.classList.toggle('show')
+                    // change icon
+                    toggle.classList.toggle('bx-x')
+                    // add padding to body
+                    bodypd.classList.toggle('body-pd')
+                    // add padding to header
+                    headerpd.classList.toggle('body-pd')
+                })
+            }
+        }
+
+        showNavbar('header-toggle', 'nav-bar', 'body-pd', 'header')
+
+        /*===== LINK ACTIVE =====*/
+        const linkColor = document.querySelectorAll('.nav_link')
+
+        function colorLink() {
+            if (linkColor) {
+                linkColor.forEach(l => l.classList.remove('active'))
+                this.classList.add('active')
+            }
+        }
+        linkColor.forEach(l => l.addEventListener('click', colorLink))
+
+        // Your code to run since DOM is loaded and ready
+    });
+</script>
+
 </body>
 </html>

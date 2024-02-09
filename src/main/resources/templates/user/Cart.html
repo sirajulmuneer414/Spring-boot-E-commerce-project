@@ -4,10 +4,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>Lenscraft-Cart</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-  <style>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+    /> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+             integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+             crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link th:rel="stylesheet" th:href="@{/css/home.css}" />
+    <link th:rel="stylesheet" th:href="@{/css/shop.css}" />
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+    ></script> <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
 * {
@@ -36,96 +47,87 @@ text-decoration: none;
      }
   </style>
 </head>
-<body class="container-fluid">
-<div th:replace="~{fragment::navBarHome}"></div>
-<div class="row sideBar position-fixed d-flex flex-column justify-content-center align-items-center overflow-auto">
-    <ul style="padding-left: 0;">
-        <li class="sideBarContent">
-            <a th:href="@{/shop/}"><h4>SHOP</h4></a>
+<body >
+<div th:replace="~{fragment::navbar}"></div>
 
-        </li>
-        <li class="sideBarContent">
-            <form th:action="@{/order}">
-                <input type="hidden" name="username" th:value="${username}">
-                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: #b43e8f"><h4>MY ORDERS</h4></button>
-            </form>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/shop/brands/}"><h4>BRANDS</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/user/wishlist}"><h4>WISHLIST</h4></a>
-
-        </li>
-
-        <li class="sideBarContent">
-            <a th:href="@{/user/cart}"><h4>CART</h4></a>
-
-        </li>
-        <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-start align-items-center">
-            <form th:action="@{/logout}" method="post">
-                <button type="submit"  class="btn text-danger" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
-            </form>
-        </li>
-    </ul>
-</div>
-<div class="row container-fluid d-flex flex-column justify-content-start" style=" margin-left: 200px; overflow: scroll; margin-top: 70px; max-width: calc(100vw - 200px)">
-    <div class="d-flex justify-content-start">
-        <h2>SHOPPING CART</h2>
+<div class="container-fluid row">
+    <div th:if="${cartedItems.isEmpty()}" class="d-flex justify-content-center align-items-center" style="height : auto">
+      <div class="card" style="width: 18rem; text-align: center; margin-top: 10px; margin-left: 626px;">
+    <div class="card-body">
+        <h5 class="card-title mt-5 text-danger">Your Cart is Empty</h5>
+        <p class="card-text mt-5">Explore our shop and add some amazing products to your cart.</p>
+        <a th:href="@{/shop}" class="btn btn-primary mt-5">Go To Shop</a>
     </div>
-    <hr>
-    <div th:if="${cartedItems.isEmpty()}" class="d-flex flex-column justify-content-center align-items-center">
+      </div>
+    </div>
 
-        <h3>Your Cart Is Empty</h3>
-        <div>
-        <a th:href="@{/shop/}" CLASS="btn" style="border: none; border-radius: 10px; background-color: #b43e8f; color: white">ADD PRODUCT</a>
+    <div th:unless="${cartedItems.isEmpty()}" th:each="item : ${cartedItems}" >
+    <div class="card rounded-3 mb-2" style="width: 100%; height: auto">
+        <div class="card-body p-2 container">
+            <div class="row d-flex justify-content-between align-items-center">
+                <div class="col-md-2 col-lg-2 col-xl-2">
+                    <img
+                            th:src="@{${'/productImages/'+item.product.productId+'/'+item.variable.image1}}"
+                            class="img-fluid rounded-3" alt="Product Image">
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2">
+                    <p class="lead fw-normal mb-2" th:text="${item.product.productName}"></p>
+                    <p><span class="text-muted" th:text="${'Size : '+item.product.frameSize.name()}"> </span></p>
+                </div>
+                <div class="col-md-2 col-lg-2 col-xl-2 ">
+                    <span>Price : </span><p th:text="${item.product.discountedPrice}" style="color: #b43e8f"></p>
+                </div>
+                <div class="col-md-3 col-lg-2 col-xl-2 d-flex">
+                    <form th:action="@{/user/cart/quantity/sub/{cartItemId}(cartItemId=${item.cartedItemId})}"  class="btn btn-link px-2">
+                    <input type="hidden" name="username" th:value="${username}">
+                    <button type="submit" style="border: none"> <i class="fas fa-minus"></i></button>
+                    </form>
+
+                    <input id="form1" min="0" name="quantity" th:value="${item.quantity}" th:max="${item.variable.quantity}" type="number"
+                           class="form-control form-control-sm" />
+
+                    <form th:action="@{/user/cart/quantity/add/{cartItemId}(cartItemId=${item.cartedItemId})}" class="btn btn-link px-2"
+                            >
+                        <input type="hidden" name="username" th:value="${username}">
+                        <button type="submit" style="border: none"><i class="fas fa-plus"></i></button>
+                    </form>
+                </div>
+                <div class="col-md-3 col-lg-2 col-xl-2">
+                    <span>Total Price : </span><p th:text="${item.currentPrice}" style="color: #b43e8f"></p>
+                </div>
+                <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+                    <form th:action="@{/user/cart/remove/{productId}/{variableId}(productId=${item.product.productId},variableId=${item.variable.variableId})}" method="get">
+                        <input type="hidden" name="userId" th:value="${userId}">
+                        <input type="hidden" name="cartedItemId" th:value="${item.cartedItemId}">
+                        <button style="color: red; border: none"><i class="fas fa-trash fa-lg"></i></button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-    <div th:unless="${cartedItems.isEmpty()}" th:each="item : ${cartedItems}" class="col-11 container">
-        <div style="border: 1px solid black; border-radius: 5px" class="d-flex justify-content-between">
-            <div style="height: 100px; width: 100px">
-                <img th:src="@{${'/productImages/'+item.product.productId+'/'+item.variable.image1}}" style="height: 100%; width: 100%">
-            </div>
-            <div class="d-flex justify-content-center align-items-center">
-                <h6 th:text="${item.product.productName}"></h6>
-            </div>
-            <div class="d-flex justify-content-center align-item-center">
-                <form th:action="@{/user/cart/quantity/sub/{cartItemId}(cartItemId=${item.cartedItemId})}" style="margin-left: 3px">
-                    <input type="hidden" name="username" th:value="${username}">
-                    <button type="submit" style="border: none">-</button>
-                </form>
-                <span th:text="${item.quantity}"></span>
-                <form th:action="@{/user/cart/quantity/add/{cartItemId}(cartItemId=${item.cartedItemId})}" style="margin-right: 3px">
-                    <input type="hidden" name="username" th:value="${username}">
-                    <button type="submit" style="border: none">+</button>
-                </form>
-            </div>
-              <div th:if="${item.product.discountedPrice == null}">
-                    <h3 th:text="${'&#8377;'+item.product.price}" style="color: #b43e8f"></h3>
-                </div>
-            <div th:unless="${item.product.discountedPrice == null}">
-                    <h3 th:text="${'&#8377;'+item.product.discountedPrice}" style="color: #b43e8f"></h3>
-                </div>
+</div>
+    <div class="card mb-4 col-11"  th:unless="${cartedItems.isEmpty()}" style="width: 100%; height: auto">
+        <div class="card-body p-4 d-flex flex-row justify-content-between">
             <div>
-                <form th:action="@{/user/cart/remove/{productId}/{variableId}(productId=${item.product.productId},variableId=${item.variable.variableId})}" method="get">
-                    <input type="hidden" name="userId" th:value="${userId}">
-                    <input type="hidden" name="cartedItemId" th:value="${item.cartedItemId}">
-
-                    <button type="submit" class="btn" style="background-color: #b43e8f; color: white; border-radius: 5px; border: none">REMOVE FROM CART</button>
-
-                </form>
-
+                <h5>Total Amount</h5>
+            </div>
+            <div>
+                <h5 th:text="${totalAmount}" style="color: #b43e8f"></h5>
             </div>
         </div>
     </div>
-    <div th:unless="${cartedItems.isEmpty()}">
-        <a th:href="@{/user/cart/buy/{userId}(userId=${userId})}" class="btn" style="color: white; background-color: #b43e8f; border: none; border-radius: 10px">BUY</a>
+    <div class="card col-11" th:unless="${cartedItems.isEmpty()}" style="width: 100%; height: auto">
+        <div class="card-body" style="width: 100%">
+            <a th:href="@{/user/cart/buy/{userId}(userId=${userId})}" class="btn btn-warning btn-block btn-lg">Proceed to Buy</a>
+        </div>
     </div>
+
 </div>
+<div th:replace="~{fragment::footer}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
+
 </body>
 </html>

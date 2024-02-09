@@ -42,42 +42,8 @@
 </head>
 <body class="container-fluid">
 
-<div th:replace="~{fragment::navBarAdmin}"></div>
-<div class="row" th:style="'height: 70px;'"></div>
-<nav class="sideBar position-fixed d-flex justify-content-around align-items-center">
-    <ul class="d-flex flex-row justify-content-between align-items-center">
+<div th:replace="~{fragment::admin-dashboard}"></div>
 
-        <li class="sideBarContent">
-            <a th:href="@{/admin/order}"><h4>ORDERS</h4></a>
-
-        </li>
-        <div class="sideBarContent">
-            <a th:href="@{/admin/products/}"><h4>PRODUCTS</h4></a>
-
-        </div>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/customers}"><h4>CUSTOMERS</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/coupon}"><h4>COUPONS</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/category/}"><h4>CATEGORIES</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/brand/}"><h4>BRANDS</h4></a>
-
-        </li>
-        <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-center align-items-center">
-            <form th:action="@{/logout}" method="post">
-                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
-            </form>
-        </li>
-    </ul>
-</nav>
 <main class="container">
     <div class="col-3">
        <div class="d-flex flex-column justify-content-center align-items-center">

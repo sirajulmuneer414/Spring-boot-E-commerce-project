@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lenscraft-Admin add product</title>
+    <title>Lenscraft-Admin add product offer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 
@@ -42,42 +42,8 @@ list-style-type: none;
     </style>
 </head>
 <body class="container-fluid">
-<div th:replace="~{fragment::navBarAdmin}"></div>
-<div class="row" th:style="'height: 70px;'"></div>
-<nav class="sideBar position-fixed d-flex justify-content-around align-items-center">
-    <ul class="d-flex flex-row justify-content-between align-items-center">
+<div th:replace="~{fragment::admin-navbar}"></div>
 
-        <li class="sideBarContent">
-            <a th:href="@{/admin/order}"><h4>ORDERS</h4></a>
-
-        </li>
-        <div class="sideBarContent">
-            <a th:href="@{/admin/products/}"><h4>PRODUCTS</h4></a>
-
-        </div>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/customers}"><h4>CUSTOMERS</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/coupon}"><h4>COUPONS</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/category/}"><h4>CATEGORIES</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/brand/}"><h4>BRANDS</h4></a>
-
-        </li>
-        <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-center align-items-center">
-            <form th:action="@{/logout}" method="post">
-                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
-            </form>
-        </li>
-    </ul>
-</nav>
 <div class="row formMain" style="height: calc(100vh - 0px); margin-top: 70px; width: 100vw">
     <div class="col-sm-8 col-md-5 col-lg-4 col-xl-4 formBox">
 
@@ -91,10 +57,6 @@ list-style-type: none;
                 <div class="form-group">
                     <label class="" for="offerPercentage">Discount Percentage:</label>
                     <input type="number" id="offerPercentage" class="form-control" th:field="*{offerPercentage}" required="required" min="1" max="99"/>
-                </div>
-                <div class="form-group">
-                    <label class="" for="quantity">Minimum Quantity:</label>
-                    <input type="number" id="quantity" class="form-control" th:field="*{minimumQuantity}" required="required" min="1" max="5"/>
                 </div>
                 <div class="form-group">
                     <label class="" for="description">Description:</label>

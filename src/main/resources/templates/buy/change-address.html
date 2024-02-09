@@ -22,34 +22,58 @@
     </style>
 </head>
 <body class="container-fluid">
-<div th:replace="~{fragment::navBarHome}"></div>
+<div th:replace="~{fragment::navbar}"></div>
 <div class="row d-flex flex-column justify-content-center align-items-center" style="margin-top: 70px">
-<form th:action="@{/user/buy/address/change}" method="post">
-    <div th:each="address : ${addresses}">
+<form th:action="@{/user/buy/address/change}" method="post" class="border rounded border-dark col-10 col-lg-8 col-xl-8 p-3">
+    <input type="hidden" name="username" th:value="${username}">
+    <div th:if="${addresses.isEmpty()}" class="card">
 
-        <div class="form-check">
-            <input type="radio" th:id="${address.addressId}" name="addressId" th:value="${address.addressId}" class="form-check-input">
-            <label class="form-check-label" th:for="${address.addressId}">  <div>
-                <h5 th:text="${address.buyerName}">
-                </h5>
-                <br>
-                <h5 th:text="${'Address : '+address.houseAddress}"></h5>
-                <span th:text="${address.district+','+address.state}"></span>
-                <br>
-                <h5 th:text="${'Pincode :'+address.pincode}"></h5>
-                <h5 th:text="${'Mobile Number : '+address.mobileNumber}"></h5>
-            </div></label>
-        </div>
-        <input type="hidden" name="username" th:value="${username}">
+        <p class="card-body">No Address Available</p>
+
     </div>
-    <div>
-        <button type="submit" class="btn" style="border: none; border-radius: 10px; background-color: #b43e8f">SUBMIT</button>
+    <th:block th:each="address, iterStat : ${addresses}" >
+        <div class="address-card row border rounded border-info mt-2">
+            <div class="col-1">
+                <input name="addressId" type="radio" th:value="${address.addressId}" th:id="'address' + ${iterStat.count}" th:checked="${iterStat.first}" data-address-id="${address.addressId}">
+            </div>
+            <div class="col-4">
+                <div class="address-line mt-1">Name:</div>
+                <div class="address-line mt-1">BuildingName:</div>
+                <div class="address-line mt-1">City:</div>
+                <div class="address-line mt-1">Pincode:</div>
+                <div class="address-line mt-1">State:</div>
+                <div class="address-line mt-1">Mobile Number:</div>
+            </div>
+            <div class="col-7">
+                <div class="address-value mt-1">
+                    <span th:text="${address.buyerName}"></span>
+                </div>
+                <div class="address-value mt-1">
+                    <span th:text="${address.houseAddress}"></span>
+                </div>
+                <div class="address-value mt-1">
+                    <span th:text="${address.district}"></span>
+                </div>
+                <div class="address-value mt-1">
+                    <span th:text="${address.pincode}"></span>
+                </div>
+                <div class="address-value mt-1">
+                    <span th:text="${address.state}"></span>
+                </div>
+                <div class="address-value mt-1">
+                    <span th:text="${address.mobileNumber}"></span>
+                </div>
+            </div>
+        </div>
+    </th:block>
+    <div class="d-flex justify-content-center mt-5">
+        <button type="submit" class="btn btn btn-warning btn-block btn-lg">SUBMIT</button>
     </div>
 </form>
-    <div>
+    <div class="col-6 d-flex justify-content-center mt-4">
         <form th:action="@{/user/address/add}" method="get" >
             <input type="hidden" name="fromChange" value="yes">
-            <button type="submit" class="btn" style="border: none; border-radius: 10px; background-color: #b43e8f">ADD ADDRESS</button>
+            <button type="submit" class="btn btn-dark" style="border: none; border-radius: 10px; ">ADD ADDRESS</button>
         </form>
     </div>
 

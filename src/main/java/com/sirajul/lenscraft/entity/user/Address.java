@@ -34,6 +34,11 @@ public class Address {
 
     String mobileNumber;
 
+    @Column(
+            nullable = true
+    )
+    boolean active;
+
     @ManyToOne
     UserInformation user;
 

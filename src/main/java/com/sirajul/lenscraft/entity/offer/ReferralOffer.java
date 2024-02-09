@@ -1,12 +1,10 @@
 package com.sirajul.lenscraft.entity.offer;
 
 import com.sirajul.lenscraft.entity.user.UserInformation;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,11 +17,11 @@ public class ReferralOffer {
 
     Integer moneyToWallet;
 
-    @OneToMany
-    List<UserInformation> userAvailed;
+    Integer moneyToReferred;
 
-    public ReferralOffer(){
-        userAvailed = new ArrayList<>();
-    }
+    LocalDate startDate;
+
+    LocalDate endDate;
+
 
 }

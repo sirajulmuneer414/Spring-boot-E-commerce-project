@@ -21,4 +21,8 @@ public interface UserRepository extends JpaRepository<UserInformation, UUID> {
     List<UserInformationDto> findAllByFirstNameContaining(String keyword);
 
     Long countByRole(Role role);
+
+    boolean existsByReferralCodeIgnoreCase(String code);
+
+    UserInformation findByReferralCodeIgnoreCase(String referralCode);
 }

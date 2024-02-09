@@ -4,43 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Brands</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+padding: 0;
+margin: 0;
+box-sizing: border-box;
+font-family: 'Poppins', sans-serif;
+}
+   nav {
+background-color: #b43e8f;
+height: 80px;
+position: fixed;
+}
+    </style>
 
 </head>
 <body class="container-fluid">
-<nav th:replace="fragment::navBarAdmin"></nav>
+<nav th:replace="~{fragment::admin-navbar}"></nav>
 
-<div class="row d-flex justify-content-center align-items-center" th:style="'height: 100vh;'">
+<div class="row d-flex justify-content-center p-5" th:style="'height: 100vh;'">
 
-    <table class="table text-center">
+    <table class="col-11 mt-5 table text-center">
         <thead class="thead-dark bg-secondary text-white">
             <tr>
                 <th>Brand Name</th>
                 <th>Number of Products</th>
+                <th>Status</th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
         <tr th:each="brand : ${brands}">
             <td th:text="${brand.brandName}"></td>
             <td><span th:text="${#lists.size(brand.products)}"></span></td>
-            <td><a th:href="@{admin/brand/edit/{id}(id=${brand.brandId})}" class="btn btn-warning">EDIT</a></td>
+            <td th:if="${brand.brandStatus.name() == 'ACTIVE'}"><a th:href="@{/admin/brand/block/{id}(id=${brand.brandId})}" class="btn btn-success">ACTIVE</a></td>
+            <td th:if="${brand.brandStatus.name() == 'BLOCKED'}"><a th:href="@{/admin/brand/unblock/{id}(id=${brand.brandId})}" class="btn btn-danger">BLOCKED</a></td>
+            <td><a th:href="@{/admin/brand/edit/{id}(id=${brand.brandId})}" class="btn btn-warning">EDIT</a></td>
+            <td th:if="${#lists.size(brand.products)==0}"><a th:href="@{/admin/brand/delete/{id}(id=${brand.brandId})}" class="btn btn-danger">DELETE</a></td>
         </tr>
         </tbody>
     </table>
 
-    <div>
-        <a class="btn btn-primary" th:href="@{add}">ADD BRAND</a>
+    <div class="col-11">
+        <a class="btn btn-dark" th:href="@{brand/add}">ADD BRAND</a>
     </div>
 
 
-</div>
-<div class="row d-flex justify-content-end">
-    <div class="col-3">
-        <a th:href="@{/admin/products/}" class="btn btn-primary">Go To Products</a>
+
+<div class="col-12 d-flex justify-content-end">
+    <div class="">
+        <a th:href="@{/admin/products}" class="btn btn-dark">Go To Products</a>
     </div>
 </div>
-
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>

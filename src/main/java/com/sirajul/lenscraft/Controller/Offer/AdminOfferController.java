@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -83,40 +84,40 @@ public class AdminOfferController {
 
         offer.setEndDate(offerDto.getEndDate());
 
-        offer.setMinimumQuantity(offerDto.getMinimumQuantity());
+        offer.setMinimumQuantity(1);
 
         product.setOffer(offer);
 
+        product.setHavingOffer(true);
+
         productService.save(product);
 
-        return "redirect:/admin/products/";
+        return "redirect:/admin/products";
     }
     @PostMapping("/product/delete/{id}")
     public String deleteProductOffer(
-            @PathVariable("id") Long productId,
-            @RequestParam(name = "fromOffer", required = false,defaultValue = "false")String fromOffer
+            @PathVariable("id") Long productId
     ){
 
         Product product = productService.findProductById(productId);
 
         product.setOffer(new OfferEmbeddable());
 
-        product.setDiscountedPrice(0);
+        product.setDiscountedPrice(product.getPrice());
+
+        product.setHavingOffer(false);
 
         productService.save(product);
 
-        if(fromOffer.matches("true")){
-            return "redirect:/admin/offer";
-        }
 
-        return "redirect:/admin/products/";
+
+        return "redirect:/admin/products";
 
     }
 
     @GetMapping("/product/edit/{id}")
     public String editProductOffer(
             @PathVariable("id") Long productId,
-            @RequestParam(name = "fromOffer", required = false,defaultValue = "false")String fromOffer,
             Model model
     ){
         Product product = productService.findProductById(productId);
@@ -131,12 +132,6 @@ public class AdminOfferController {
         model.addAttribute("productName",product.getProductName());
         model.addAttribute("offer",offerDto);
 
-        if(fromOffer.matches("true")){
-            model.addAttribute("fromOffer","true");
-        }
-        else {
-            model.addAttribute("fromOffer","false");
-        }
 
         return "admin/offers/edit-product-offer";
     }
@@ -145,7 +140,6 @@ public class AdminOfferController {
     public String editProductOfferPost(
             @PathVariable("id") Long productId,
             @ModelAttribute("offerDto") OfferDto dto,
-            @RequestParam(name = "fromOffer", required = false,defaultValue = "false")String fromOffer,
             RedirectAttributes redirectAttributes
     ){
         Product product = productService.findProductById(productId);
@@ -158,12 +152,11 @@ public class AdminOfferController {
             product.setDiscountedPrice(discountedPrice);
         }
 
+        productService.save(product);
+
         redirectAttributes.addFlashAttribute("editSuccess","The Offer of product with id "+ productId+" was successfully updated");
 
-        if(fromOffer.matches("true")){
-            return "redirect:/admin/offer";
-        }
-        return "redirect:/admin/products/";
+        return "redirect:/admin/products";
     }
 
     @GetMapping("/category/add/{id}")
@@ -174,6 +167,8 @@ public class AdminOfferController {
         Category category = categoryService.findCategoryById(categoryId);
 
         OfferDto dto = new OfferDto();
+
+        model.addAttribute("offerDto",dto);
 
         model.addAttribute("categoryId",categoryId);
 
@@ -195,6 +190,20 @@ public class AdminOfferController {
 
         offer = offerDtoMapping.dtoToOffer(dto,offer);
 
+        category.setHavingOffer(true);
+
+        List<Product> products = category.getProducts();
+
+        for(Product prod : products){
+            if(!prod.isHavingOffer()){
+                int discountedPrice = (prod.getPrice() - (prod.getPrice() * offer.getOfferPercentage() / 100));
+
+                prod.setDiscountedPrice(discountedPrice);
+
+            }
+            productService.save(prod);
+        }
+
         categoryService.addCategory(category);
 
         redirectAttributes.addFlashAttribute("OfferAdditionSuccess","The Category Offer of "+category.getCategoryName()+" added successfully.");
@@ -212,9 +221,22 @@ public class AdminOfferController {
 
         category.setOffer(new OfferEmbeddable());
 
-        if(fromOffer.matches("true")){
-            return "redirect:/admin/offer";
+        List<Product> products = category.getProducts();
+
+        for(Product prod : products){
+            if(!prod.isHavingOffer()){
+                int discountedPrice = prod.getPrice();
+
+                prod.setDiscountedPrice(discountedPrice);
+
+            }
+            productService.save(prod);
         }
+
+        category.setHavingOffer(false);
+
+        categoryService.addCategory(category);
+
 
         return "redirect:/admin/category";
     }
@@ -229,7 +251,7 @@ public class AdminOfferController {
 
         OfferDto offerDto = offerDtoMapping.offerToDto(category.getOffer());
 
-        model.addAttribute("offerDto",offerDto);
+        model.addAttribute("offer",offerDto);
 
         model.addAttribute("categoryId",categoryId);
 
@@ -243,8 +265,7 @@ public class AdminOfferController {
     @PostMapping("/category/edit/{id}")
     public String editCategoryOffer(
             @PathVariable("id") Long categoryId,
-            @RequestParam("fromOffer") String fromOffer,
-            @ModelAttribute("offerDto") OfferDto dto
+            @ModelAttribute("offer") OfferDto dto
     ){
         Category category = categoryService.findCategoryById(categoryId);
 
@@ -252,33 +273,58 @@ public class AdminOfferController {
 
         offer = offerDtoMapping.editCheckingAndAdding(dto,offer);
 
-        categoryService.addCategory(category);
+        List<Product> products = category.getProducts();
 
-        if(fromOffer.matches("true")){
-            return "redirect:/admin/offer";
+        for(Product prod : products){
+            if(!prod.isHavingOffer()){
+                int discountedPrice = (prod.getPrice() - (prod.getPrice() * offer.getOfferPercentage() / 100));
+
+                prod.setDiscountedPrice(discountedPrice);
+
+            }
+            productService.save(prod);
         }
+
+        categoryService.addCategory(category);
 
         return "redirect:/admin/category";
     }
 
-    @GetMapping("/referral/add")
+    @PostMapping("/referral/add")
     public String getAddReferralOffer(
             Model model,
             RedirectAttributes redirectAttributes,
-            @RequestParam("moneyToWallet") Integer moneyToWallet
+            @ModelAttribute("refer") ReferralOffer refer
     ){
-        if(referralOfferService.isOfferAlreadyEstablished()){
-            redirectAttributes.addFlashAttribute("offerExists","Referral Offer Already you cannot implement anymore");
-            return "/admin/offer";
-        }
+        refer.setOfferId(1);
 
-        ReferralOffer offer = new ReferralOffer();
 
-        offer.setMoneyToWallet(moneyToWallet);
+        referralOfferService.save(refer);
 
-        referralOfferService.save(offer);
+        return "redirect:/admin/customers";
 
-        return "";
+    }
+
+    @GetMapping("/referral/delete")
+    public String deleteReferralOffer(
+
+    ){
+        referralOfferService.delete();
+
+        return "redirect:/admin/customers";
+    }
+
+    @PostMapping("/referral/edit")
+    public String getEditReferralOffer(
+            Model model,
+            RedirectAttributes redirectAttributes,
+            @ModelAttribute("refer") ReferralOffer refer
+    ){
+
+
+        referralOfferService.edit(refer);
+
+        return "redirect:/admin/customers";
 
     }
 }

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenscraft - Order Item</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+    /> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+             integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+             crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link th:rel="stylesheet" th:href="@{/css/home.css}" />
+    <link th:rel="stylesheet" th:href="@{/css/shop.css}" />
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+    ></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+padding: 0;
+margin: 0;
+box-sizing: border-box;
+font-family: 'Poppins', sans-serif;
+}
+* a{
+text-decoration: none;
+}
+
+    </style>
+</head>
+
+<body>
+<nav
+        class="navbar bg-body-tertiary p-3"
+        style="border-bottom: 1px solid black"
+>
+    <div
+            class="container-fluid d-flex justify-content-between align-items-middle"
+            style="background-color: white"
+    >
+        <div class="align-self-start">
+            <a class="navbar-brand" href="/">
+                <img
+                        th:src="@{/images/Mainlogo.png}"
+                        style="height: auto; width: 250px"
+                        alt=""
+                />
+            </a>
+        </div>
+        <h6 class="text=danger fw-bold" th:text="${empty}"></h6>
+        <div class="me-5">
+            <div class="d-flex gap-5 align-items-center">
+                <div>
+                    <a class="text-decoration-none text-dark" th:href="@{/user/cart}">
+                        <i class="fa-solid fa-cart-shopping"></i><span> Cart</span>
+                    </a>
+                </div>
+                <div>
+                    <a class="text-decoration-none text-dark" th:href="@{/shop}">
+                        <i class="fa-brands fa-shopify"></i><span> Shop</span>
+                    </a>
+                </div>
+                <div>
+                    <a class="text-decoration-none text-dark" th:href="@{/user/profile}">
+                        <i class="fa-solid fa-user"></i><span> Profile</span>
+                    </a>
+                </div>
+                <div>
+                    <form
+                            th:if=" ${#authorization.expression('isAuthenticated()')}"
+                            th:method="post"
+                            th:action="@{/logout}"
+                    >
+                        <label for="sign-out"><i class="fa-solid fa-right-from-bracket"></i>Logout</label>
+                        <input hidden type="submit" id="sign-out">
+                    </form>
+                    <a   class="btn btn-info"   th:href="@{/login}" th:if="not ${#authorization.expression('isAuthenticated()')}" >Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="row container-fluid d-flex  justify-content-center " style=" margin-top: 80px; max-width: 100vw">
+
+    <div class="col-8 border shadow rounded container-fluid p-2 row">
+        <div class="col-12 container-fluid row d-flex justify-content-center">
+            <div class="col-6">
+            <img
+                    th:src="@{${'/productImages/'+item.product.productId+'/'+item.variable.image1}}"
+                    class="img-fluid rounded-3" alt="Product Image">
+            </div>
+        </div>
+        <div class="col-12 container-fluid row d-flex justify-content-center">
+        <div class="col-9 mt-3">
+            <ul class="list-unstyled">
+                <li class="pl-2">
+                    <p th:text="${item.product.brand.brandName}" style="color: #40A2E3"></p>
+                </li>
+                <li class=pl-2>
+                    <p th:text="${item.product.productName}" style="color: black"></p>
+                </li>
+
+                <li class="mt-1 pl-2">
+                    <p th:text="${'Size : '+item.product.frameSize.name()}" class="text-muted"></p>
+                </li>
+                <li class="mt-1 pl-2">
+                    <p th:text="${'Quantity : '+item.quantity}" class="text-muted"></p>
+                </li>
+                <li class="d-flex justify-content-start  mt-1 pl-2">
+                    <p>Color : </p>
+                    <div  th:style="| height: 20px; width: 20px; background-color: ${item.variable.frameColor}">
+
+                    </div>
+                </li>
+                <li class="d-flex justify-content-start  mt-1 pl-2">
+                    <p >Current Status : </p>
+                    <p class="text-warning fw-bold" th:text="${item.currentStatus.name()}" >
+
+                    </p>
+                </li>
+                <li class="mt-1" th:unless="${item.currentStatus.name == 'CANCELLED' || item.currentStatus.name =='DELIVERED' || item.currentStatus.name =='REJECTED'}">
+                    <form th:action="@{/order/item/cancel/{orderItemId}(orderItemId = ${item.orderItemId})}">
+                        <button type="submit" class="btn btn-danger">CANCEL</button>
+                    </form>
+                </li>
+            </ul>
+
+        </div>
+        </div>
+    </div>
+    <div class="col-6">
+
+    </div>
+</div>
+<div th:replace="~{fragment::footer}"></div>
+</body>
+</html>

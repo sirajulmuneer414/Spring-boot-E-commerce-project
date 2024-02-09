@@ -6,6 +6,10 @@ import com.sirajul.lenscraft.entity.user.Order;
 import com.sirajul.lenscraft.entity.user.OrderItem;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.OrderStatus;
+import com.sirajul.lenscraft.entity.wallet.Transactions;
+import com.sirajul.lenscraft.entity.wallet.Wallet;
+import com.sirajul.lenscraft.entity.wallet.enums.TransactionStatus;
+import com.sirajul.lenscraft.entity.wallet.enums.TypeOfTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +24,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,32 +75,64 @@ public class OrderController {
     @GetMapping("/item/cancel/{orderItemId}")
     public String cancelOrderItem(
             @PathVariable("orderItemId") UUID orderItemId
+
     ) {
 
         OrderItem orderItem = orderedItemsService.findById(orderItemId);
 
-        orderItem.setOrderStatus(OrderStatus.CANCELLED);
+        orderItem.setCurrentStatus(OrderStatus.CANCELLED);
+
+        Integer amount = orderItem.getCurrentPrice();
 
         orderedItemsService.saveAndReturn(orderItem);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         UserInformation user = userService.findByEmailId(auth.getName());
+        Wallet wallet = user.getWallet();
+        List<Transactions> transactions = new ArrayList<>();
+        if(wallet == null){
+            wallet = new Wallet();
+            wallet.setUser(user);
+            wallet.setBalance(0);
+            user.setWallet(wallet);
+            userService.save(user);
+        }
+        else{
+            transactions = wallet.getTransactions();
+        }
 
-        return "redirect:/order?userId=" + user.getUserId();
+        Transactions trans = new Transactions();
+
+        trans.setTransactionType(TypeOfTransaction.ORDER_CANCEL);
+        trans.setTransactionTime(LocalDateTime.now());
+        trans.setAmount(amount);
+        trans.setWallet(wallet);
+        trans.setTransactionStatus(TransactionStatus.DEBIT);
+
+        transactions.add(trans);
+        wallet.setTransactions(transactions);
+wallet.setBalance(wallet.getBalance()+amount);
+        user.setWallet(wallet);
+
+        userService.save(user);
+
+
+        return "redirect:/order/item/view-item/"+orderItem.getOrderItemId();
+
     }
 
 
-    @GetMapping("/item/view/{orderItemId}")
+    @GetMapping("/item/view-item/{orderItemId}")
     public String viewOrderItem(
             @PathVariable("orderItemId") UUID orderItemId,
             Model model
     ) {
         OrderItem orderItem = orderedItemsService.findById(orderItemId);
 
-        model.addAttribute("orderItem",orderItem);
+        model.addAttribute("item",orderItem);
 
-        return "user/order/order-item-view";
+        return "user/order/order-items";
 
     }
 }

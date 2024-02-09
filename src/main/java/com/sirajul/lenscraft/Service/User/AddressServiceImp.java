@@ -14,6 +14,7 @@ public class AddressServiceImp implements AddressService {
     @Override
     public Address saveAndReturn(Address address) {
 
+        address.setActive(true);
         Address addressToReturn = addressRepository.save(address);
 
     return addressToReturn;
@@ -26,11 +27,13 @@ public class AddressServiceImp implements AddressService {
 
     @Override
     public void delete(Address address) {
-        addressRepository.delete(address);
+        address.setActive(false);
+        addressRepository.save(address);
     }
 
     @Override
     public void save(Address address) {
+        address.setActive(true);
         addressRepository.save(address);
     }
 }

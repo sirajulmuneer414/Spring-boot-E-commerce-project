@@ -18,32 +18,37 @@
       box-sizing: border-box;
       font-family: 'Poppins', sans-serif;
   }
+          nav {
+    background-color: #b43e8f;
+    height: 80px;
+    position: fixed;
+}
     </style>
 </head>
 <body class="container-fluid">
-<div th:replace="~{fragment::navBarAdmin}"></div>
+<div th:replace="~{fragment::admin-navbar}"></div>
 <div class="row d-flex justify-content-center align-items-center" style="height: 100vh">
-    <div class="col-4 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4 d-flex justify-content-center">
-        <form th:action="@{/admin/category/edit/{id}(id=${categoryToEdit.categoryId})}" method="post" th:object="${category}">
+    <div class="col-6 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4 d-flex justify-content-center">
+        <form th:action="@{/admin/category/edit/{id}(id=${category.categoryId})}" method="post" th:object="${category}">
             <div class="form-group">
                 <label for="categoryName">CategoryName</label>
-                <input type="text" id="categoryName" th:value="*{categoryName}" th:text="*{categoryName}" th:text="*{categoryName}">
+                <input type="text" id="categoryName" th:field="*{categoryName}" th:value="${category.categoryName}">
 
             </div>
             <div class="form-group">
                 <label for="categoryDescription">Description</label>
-                <input type="text" id="categoryDescription" th:value="*{categoryDescription}" th:text="*{categoryDescription}" th:text="*{categoryDescription}">
+                <input type="text" id="categoryDescription" th:field="*{categoryDescription}" th:value="${category.categoryDescription}" >
 
             </div>
-            <div class="w-100 d-flex justify-content-center align-items-center">
+            <div class="d-flex justify-content-center align-items-center">
 
                 <button type="submit" class="btn">Submit</button>
 
             </div>
 
         </form>
-        <div class="w-100 d-flex justify-content-end">
-            <a th:href="@{/admin/category/" class="btn btn-warning">Go To Categories</a>
+        <div class="d-flex justify-content-end">
+            <a th:href="@{/admin/category}" class="btn btn-warning">Go To Categories</a>
 
         </div>
     </div>

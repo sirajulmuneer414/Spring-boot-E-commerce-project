@@ -89,36 +89,3 @@ const paymentStart = (e) => {
     }
 }
 
-const brandAddition = (e) => {
-
-    e.preventDefault();
-
-    let brandName = document.getElementById("brandName");
-
-    if (brandName == null || brandName == " ") {
-
-        blurt("Invalid Entry", "This brand name is not supported !!");
-        return;
-    }
-
-    $.ajax(
-        {
-            url: '/admin/brand/check',
-            type: 'GET',
-            dataType: 'boolean',
-            success: function (response) {
-
-                if (response) {
-                    blurt("Brand Name already excists!", "Please write another name");
-                    return;
-                }
-                else {
-                    var form = document.getElementById("brandForm");
-                    form.submit();
-                }
-
-            }
-        }
-    )
-
-}

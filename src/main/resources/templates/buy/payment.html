@@ -24,15 +24,15 @@
     </style>
 
 </head>
-<body class="container-fluid">
-<div th:replace="~{fragment::navBarHome}"></div>
+<body >
+<div th:replace="~{fragment::navbar}"></div>
+<div class="container-fluid">
+<div class="row d-flex justify-content-center" style="margin-top: 70px; height: calc(100vh - 70px); width: 100%">
 
-<div class="row d-flex justify-content-center" style="margin-top: 70px; height: calc(100vh - 70px)">
-
-    <div class="col-10">
-        <h3>Payment Options</h3>
+    <div class="col-7 border card rounded p-3" style="height: fit-content">
+        <h3 class="card-title">Payment Options</h3>
         <hr>
-    <form th:action="@{/user/cart/buy/payment}" method="post" onsubmit="paymentStart(event)" id="orderForm">
+    <form th:action="@{/user/cart/buy/payment}" method="post" onsubmit="paymentStart(event)" id="orderForm" class="card-body">
         <div class="form-check">
             <input class="form-check-input" type="radio" name="paymentType" id="exampleRadios1" value="CASH ON DELIVERY" checked>
             <label class="form-check-label" for="exampleRadios1">

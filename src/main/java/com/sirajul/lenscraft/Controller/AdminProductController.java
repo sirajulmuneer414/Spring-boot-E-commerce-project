@@ -51,7 +51,7 @@ public class AdminProductController {
     VariableService variableService;
 
 
-    @GetMapping("/")
+    @GetMapping()
     public String getProductPage(Model model,@RequestParam(name = "keyword",required = false)String keyword) {
         List<Product> productsIn = new ArrayList<>();
 
@@ -62,12 +62,8 @@ public class AdminProductController {
             productsIn = productService.findAllProducts();
         }
 
-        List<ProductDto> products = new ArrayList<>();
-        for (Product product : productsIn) {
-            ProductDto dto = productMapping.ProductToDto(product);
-            products.add(dto);
-        }
-        model.addAttribute("products", products);
+
+        model.addAttribute("products", productsIn);
         return "admin/getProducts";
     }
 
@@ -76,9 +72,9 @@ public class AdminProductController {
 
         ProductDto productDto = new ProductDto();
 
-        List<Brand> brands = brandService.findAllBrands();
+        List<Brand> brands = brandService.findAllBrandsActive();
 
-        List<Category> categories = categoryService.findAllCategories();
+        List<Category> categories = categoryService.findAllActiveCategories();
 
         model.addAttribute("productDto", productDto);
         model.addAttribute("brands", brands);
@@ -91,7 +87,7 @@ public class AdminProductController {
     public String addProduct(@ModelAttribute ProductDto productDto,
                              @RequestParam("brandId") Integer brandId,
                              @RequestParam("categoryId") Long categoryId,
-                             @RequestParam("variable.image1") List<MultipartFile> image1,
+                             @RequestParam("variable.image1")List<MultipartFile> image1,
                              @RequestParam(name = "variable.image2",required = false) List<MultipartFile> image2,
                              @RequestParam(name = "variable.image3",required = false) List<MultipartFile> image3,
                              @RequestParam("variable.frameColor") List<String> frameColor,
@@ -125,6 +121,9 @@ public class AdminProductController {
         }
 
 
+
+
+
         List<Variables> variables = variableMapping.DtoListToVariable(variablesDtos);
 
         Product product = productService.saveProductAndGetProduct(productDto, image1, image2, image3);
@@ -139,7 +138,7 @@ public class AdminProductController {
         variableService.saveVariables(variables);
 
 
-        return "redirect:/admin/products/";
+        return "redirect:/admin/products";
     }
 
 
@@ -148,6 +147,22 @@ public class AdminProductController {
 
         productService.deleteById(productId);
 
+        return "redirect:/admin/products";
+    }
+
+    @GetMapping("/block/{id}")
+    public String blockProduct(
+            @PathVariable("id") Long productId
+    ){
+        productService.blockById(productId);
+        return "redirect:/admin/products";
+    }
+
+    @GetMapping("/unblock/{id}")
+    public String unBlockProduct(
+            @PathVariable("id") Long productId
+    ){
+        productService.unBlockById(productId);
         return "redirect:/admin/products";
     }
 

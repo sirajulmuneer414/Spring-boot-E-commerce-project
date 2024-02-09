@@ -1,8 +1,7 @@
 package com.sirajul.lenscraft.entity.product;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.sirajul.lenscraft.entity.user.UserInformation;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,16 +16,17 @@ import java.util.UUID;
 @Builder
 public class Ratings {
     @Id
-    @Column(
-            name = "product_id"
+    @GeneratedValue(
+            strategy = GenerationType.UUID
     )
-    Long productId;
+    UUID ratingId;
 
-    @Id
-    @Column(
-            name = "user_id"
-    )
-    UUID userId;
+    @ManyToOne
+    Product product;
+
+    @ManyToOne
+    UserInformation user;
+
 
     @Column(
             name = "product_rating"

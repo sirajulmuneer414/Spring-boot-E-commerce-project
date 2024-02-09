@@ -10,6 +10,7 @@ import com.sirajul.lenscraft.entity.product.Brand;
 import com.sirajul.lenscraft.entity.product.Category;
 import com.sirajul.lenscraft.entity.product.Product;
 import com.sirajul.lenscraft.entity.product.Variables;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import com.sirajul.lenscraft.mapping.ProductMapping;
 import com.sirajul.lenscraft.utils.FileUploadUtil;
 import jakarta.transaction.Transactional;
@@ -46,7 +47,7 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public Product saveProductAndGetProduct(ProductDto productDto, List<MultipartFile> image1, List<MultipartFile> image2, List<MultipartFile> image3) {
+    public Product saveProductAndGetProduct(ProductDto productDto,List<MultipartFile> image1, List<MultipartFile> image2, List<MultipartFile> image3) {
 
 
        productRepository.save(productMapping.DtoToProduct(productDto));
@@ -163,5 +164,66 @@ public class ProductServiceImp implements ProductService {
        int pageCount = (int)productRepository.count()/pageSize;
 
         return pageCount;
+    }
+
+    @Override
+    public List<Product> findAllProductByCategory(Category category) {
+        return productRepository.findByCategory(category);
+    }
+
+    @Override
+    public Page<Product> findAllProductByCategory(Category category, int pageNo, int pageSize) {
+        Pageable page = PageRequest.of(pageNo-1,pageSize,Sort.by(Sort.Direction.DESC,"productId"));
+        return productRepository.findByCategory(category,page);
+    }
+
+    @Override
+    public void blockById(Long productId) {
+        Product product = productRepository.findById(productId).get();
+
+        product.setActiveStatus(ActiveStatus.BLOCKED);
+
+        productRepository.save(product);
+
+
+    }
+
+    @Override
+    public void unBlockById(Long productId) {
+        Product product = productRepository.findById(productId).get();
+
+        product.setActiveStatus(ActiveStatus.ACTIVE);
+
+        productRepository.save(product);
+
+    }
+
+    @Override
+    public Page<Product> findAllProductsContainingActive(String keyword, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        // Fetch products based on the provided keyword and pageable information
+        List<Product> products = new ArrayList<>();
+
+        for(Product product : productRepository.findByProductNameContaining(keyword)){
+            if(product.getActiveStatus() == ActiveStatus.ACTIVE){
+                products.add(product);
+            }
+        }
+
+        // Return the page with products and pageable information
+        return new PageImpl<>(products, pageable, products.size());
+    }
+
+    @Override
+    public Page<Product> findAllProductsInPageableActive(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+
+        List<Product> products = productRepository.findAllByActiveStatus(ActiveStatus.ACTIVE);
+
+
+        // Return the page with products and pageable information
+        return new PageImpl<>(products, pageable, products.size());
     }
 }

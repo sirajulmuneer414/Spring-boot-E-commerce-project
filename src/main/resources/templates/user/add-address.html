@@ -54,13 +54,16 @@
     </style>
 </head>
 <body class="container-fluid">
-<div th:replace="~{fragment::navBarHome}"></div>
+<div th:replace="~{fragment::navbar}"></div>
 <div class="row formMain container-fluid d-flex justify-content-center align-items-center" style="height: calc(100vh - 70px); margin-top: 70px">
+    <div class="d-flex justify-content-center">
+        <h3><b>ADD ADDRESS</b></h3>
+    </div>
 
     <div class="col-sm-8 col-md-5 col-lg-4 col-xl-4 formBox">
 
         <form th:action="@{/user/address/add/post}" method="post" th:object="${address}" class="formPart">
-
+            <input th:if="${change}" type="hidden" name="fromChange" value="yes">
             <div class="form-group">
                 <label for="firstName">Buyer's Name</label>
                 <input type="text" class="form-control" id="firstName" placeholder="Enter Buyer's Name"

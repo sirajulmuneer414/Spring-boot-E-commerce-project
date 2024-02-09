@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     var modal = $('#modal');
 
     var image = document.getElementById('sample_image');

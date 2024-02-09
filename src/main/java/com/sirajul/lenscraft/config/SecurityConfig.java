@@ -40,7 +40,7 @@ public class SecurityConfig {
                 auth ->
                         auth.requestMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
                                 .requestMatchers("/user/**","/order/**").hasAnyAuthority(Role.ADMIN.name(),Role.USER.name(),Role.SELLER.name())
-                                .requestMatchers("/**","/register","/verification").permitAll()
+                                .requestMatchers("/**","/register","/verification","/forgot-password/**","/temp").permitAll()
                                 .anyRequest().authenticated()
         )
                 .formLogin(

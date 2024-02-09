@@ -4,11 +4,12 @@ import com.sirajul.lenscraft.DTO.SignupDto;
 import com.sirajul.lenscraft.DTO.UserInformationDto;
 import com.sirajul.lenscraft.Repository.UserRepository;
 import com.sirajul.lenscraft.Service.interfaces.CartService;
+import com.sirajul.lenscraft.Service.interfaces.ReferralOfferService;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
 import com.sirajul.lenscraft.Service.interfaces.WishlistService;
 import com.sirajul.lenscraft.entity.user.*;
 import com.sirajul.lenscraft.entity.user.enums.Role;
-import com.sirajul.lenscraft.entity.user.enums.UserStatus;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import com.sirajul.lenscraft.exception.InvalidOtpException;
 import com.sirajul.lenscraft.mapping.UserInformationMapping;
 import com.sirajul.lenscraft.utils.OtpUtil;
@@ -30,6 +31,9 @@ public class UserServiceImp implements UserService {
 
     @Autowired
     OtpUtil otpUtil;
+
+    @Autowired
+    ReferralOfferService referralOfferService;
 
     @Autowired private PasswordEncoder passwordEncoder;
 
@@ -91,8 +95,12 @@ public class UserServiceImp implements UserService {
 
             user.setAddresses(new ArrayList<Address>());
 
-            userRepository.save(user);
+            user = userRepository.save(user);
 
+            if(userRepository.existsByReferralCodeIgnoreCase(signupDto.getReferralCode())) {
+                UserInformation userReferred = userRepository.findByReferralCodeIgnoreCase(signupDto.getReferralCode());
+                referralOfferService.assignMoneyToWallets(user, userReferred);
+            }
 
             otpUtil.sendEmail(signupDto.getEmailId());
             return true;
@@ -139,7 +147,7 @@ public class UserServiceImp implements UserService {
 
         UserInformation user = userRepository.findById(id).get();
 
-        user.setUserStatus(UserStatus.BLOCKED);
+        user.setActiveStatus(ActiveStatus.BLOCKED);
 
         userRepository.save(user);
     }
@@ -153,7 +161,7 @@ public class UserServiceImp implements UserService {
     public void unBlockUserById(UUID id) {
         UserInformation user = userRepository.findById(id).get();
 
-        user.setUserStatus(UserStatus.ACTIVE);
+        user.setActiveStatus(ActiveStatus.ACTIVE);
 
         userRepository.save(user);
 
@@ -174,6 +182,11 @@ public class UserServiceImp implements UserService {
 
        return userRepository.countByRole(Role.USER);
 
+    }
+
+    @Override
+    public boolean existsByReferralCode(String code) {
+        return userRepository.existsByReferralCodeIgnoreCase(code);
     }
 
 }

@@ -36,9 +36,8 @@ public class ControllerHome {
     @GetMapping("/")
     public String getShop(Model model){
 
-        List<CategoryHomeDto> categories = categoryService.findAllCategoriesConvertedToDto();
+        List<Category> categories = categoryService.findAllActiveCategories();
 
-        List<Product> productList =  productService.findAllProducts();
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -51,7 +50,6 @@ if(!(auth instanceof AnonymousAuthenticationToken)) {
         System.out.println(username);
 
         model.addAttribute("categories",categories);
-        model.addAttribute("productList",productList);
         model.addAttribute("username",username);
         model.addAttribute("userId",userId);
 

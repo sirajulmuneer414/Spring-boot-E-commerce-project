@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Lenscraft - Profile</title>
+    <link rel="shortcut icon" href="/img/logo.png" type="image/x-icon" />
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"
+    />
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+    />
+    <link th:rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"
+            rel="stylesheet"
+            type="text/css"
+    />
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+    />
+    <link th:rel="stylesheet" th:href="@{/css/profile.css}" />
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+    ></script>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+padding: 0;
+margin: 0;
+box-sizing: border-box;
+font-family: 'Poppins', sans-serif;
+}
+* a{
+text-decoration: none;
+}
+
+
+    </style>
+</head>
+<body>
+<nav
+        class="navbar bg-body-tertiary p-3"
+        style="border-bottom: 1px solid black"
+>
+    <div
+            class="container-fluid d-flex justify-content-between align-items-middle"
+            style="background-color: white"
+    >
+        <div class="align-self-start">
+            <a class="navbar-brand" href="/">
+                <img
+                        th:src="@{/images/Mainlogo.png}"
+                        style="height: auto; width: 250px"
+                        alt=""
+                />
+            </a>
+        </div>
+        <h6 class="text=danger fw-bold" th:text="${empty}"></h6>
+        <div class="me-5">
+            <div class="d-flex gap-5 align-items-center">
+                <div>
+                    <a class="text-decoration-none text-dark" th:href="@{/user/cart}">
+                        <i class="fa-solid fa-cart-shopping"></i><span> Cart</span>
+                    </a>
+                </div>
+                <div>
+                    <a class="text-decoration-none text-dark" th:href="@{/shop}">
+                        <i class="fa-brands fa-shopify"></i><span> Shop</span>
+                    </a>
+                </div>
+                <div>
+                    <a class="text-decoration-none text-dark" th:href="@{/user/profile}">
+                        <i class="fa-solid fa-user"></i><span> Profile</span>
+                    </a>
+                </div>
+                <div>
+                    <form
+                            th:if=" ${#authorization.expression('isAuthenticated()')}"
+                            th:method="post"
+                            th:action="@{/logout}"
+                    >
+                        <label for="sign-out"><i class="fa-solid fa-right-from-bracket"></i>Logout</label>
+                        <input hidden type="submit" id="sign-out">
+                    </form>
+                    <a   class="btn btn-info"   th:href="@{/login}" th:if="not ${#authorization.expression('isAuthenticated()')}" >Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<p class="bg-success text-white" th:text="${success}"></p>
+<p
+        class="bg-success text-white text-center"
+        th:text="${changePasswordSuccess}"
+></p>
+<p
+        class="bg-danger text-white text-center"
+        th:text="${changePasswordFailed}"
+></p>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-3">
+            <section>
+                <div
+                        id="userDetails"
+                        class="d-flex flex-column justify-content-center align-items-center mt-5 ms-4 rounded"
+                        style="box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2);"
+                >
+<!--                    <img  th:src="@{${'/profilePic/'+user.emailId+'/'+user.profilePic}}" >-->
+                    <!-- <label for="user-profile-image-input"><i class="fa-solid fa-upload text-primary"></i></label>
+                    <input hidden id="user-profile-image-input" type="file" accept="image/**" > -->
+                    <h4 id="username" th:text="${user.firstName+' '+user.lastName}" class="mt-5"></h4>
+                    <p th:text="${user.emailId}" class="mt-2"></p>
+                    <p >Referal Id: <span class="text-primary" th:text="${user.referralCode}"></span></p>
+                    <div class="d-flex">
+                        <a th:href="@{/}" style="background-color: rgb(238,238,238)">
+                  <span class="fas fa-home  text-secondary btn-lg"></span
+                  ></a>
+
+                            <button
+                                    type="button"
+                                    class="add-man"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editUser"
+                                    style="border: none; background-color: rgb(238,238,238); margin-left: 3px"
+                            >
+                                <span class="fas fa-edit text-secondary btn-lg"></span>
+                            </button>
+
+                    </div>
+                </div>
+                <div
+                        class="modal fade"
+                        id="editUser"
+                        tabindex="-1"
+                        aria-labelledby="editUserLabel"
+                        aria-hidden="true"
+                >
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5
+                                        class="modal-title fw-bold"
+                                        id="editUserLabel"
+                                >
+                                    Edit Address
+                                </h5>
+                                <button
+                                        type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close"
+                                ></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Form for editing the address -->
+                                <form
+                                        class="form-horizontal"
+                                        th:action="@{/user/profile/edit}"
+                                        method="get"
+                                        th:object="${user}"
+                                >
+                                    <input type="hidden" name="userId" th:value="${user.userId}">
+                                    <div class="control-group">
+                                        <div class="col-lg-12 mt-2">
+                                            <label for="firstName" class="control-label"
+                                            >First Name</label
+                                            >
+                                            <input
+                                                    class="form-control"
+                                                    id="firstName"
+                                                    th:field="*{firstName}"
+                                                    type="text"
+                                                    th:value="${user.firstName}"
+
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <!-- address-line1 input-->
+                                    <!-- address-line2 input-->
+                                    <div class="control-group mt-2">
+                                        <label class="control-label" for="lastName">Last Name</label>
+                                        <div class="col-lg-12">
+                                            <input
+                                                    id="lastName"
+                                                    th:field="*{lastName}"
+                                                    type="text"
+                                                    class="form-control"
+                                                    th:value="${user.lastName}"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">
+                                            Save changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sidebar-user" class="mt-5 ms-4" >
+                    <ul style="box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2); border-radius: 20px;"
+                        class="d-flex  flex-column justify-content-center text-dark list-unstyled">
+                      <li class="mt-3 ms-5">
+                        <a
+                                type="button"
+                                class="btn bg-white text-dark"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addAddressModal"
+                        >
+                            <i class="fa-solid fa-lock"></i> Change Password
+                        </a>
+                    </li>  <hr />
+                        <li class=" mt-3 ms-5">
+                            <form th:action="@{/order}" method="get" class="text-dark" th:href="@{/order}"
+                            >
+                                <input type="hidden" name="userId" th:value="${user.userId}">
+                                <button type="submit" style="border: none; background-color: white"><i class="fa-solid fa-truck me-2"></i>Orders</button>
+                            </form
+                            >
+                        </li>
+                        <hr />
+                        <li class=" mt-3 ms-5">
+                            <a  class="text-dark" th:href="@{/user/cart}"
+                            ><i class="fa-solid fa-cart-shopping me-2"></i>Cart</a
+                            >
+                        </li>
+                        <hr />
+                        <li class=" mt-3 ms-5">
+                            <form  class="text-dark" th:action="@{/wallet}" method="get"
+                            >
+                                <input type="hidden" name="userId" th:value="${user.userId}">
+                                <button type="submit" style="border:none; background-color: white"><i class="fa-solid fa-wallet me-2"></i> Wallet </button> </form
+                            >
+                        </li>
+                        <hr />
+                        <li class=" mt-3 ms-5">
+                            <form method="post" th:action="@{/logout}">
+                                <button style="background: none; border: 0;" type="submit" class="text-dark"
+                                ><i class="fas fa-sign-out-alt me-2"></i>Logout</button
+                                >
+                            </form>
+
+                        </li>
+                        <hr />
+                    </ul>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-9">
+            <div class="row mb-5">
+                <div id="profile-details" class="col-lg-12">
+
+                    <div>
+                        <!-- Modal -->
+                        <div
+                                class="modal fade"
+                                id="addAddressModal"
+                                tabindex="-1"
+                                aria-labelledby="addAddressLabel"
+                                aria-hidden="true"
+                        >
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold" id="exampleModalLabel">
+                                            Change Password
+                                        </h5>
+                                        <button
+                                                type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal"
+                                                aria-label="Close"
+                                        ></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form
+                                                class="file-upload"
+                                                th:action="@{/user/profile/change-password}"
+                                                method="post"
+                                        >
+                                            <div class="bg-secondary-soft px-4 py-5 rounded">
+                                                <input type="hidden" name="userId" id="usernameHidden" th:value="${user.userId}">
+                                                <div class="col-md-12">
+                                                    <label class="form-label">Current Password</label>
+                                                    <input
+                                                            id="password1"
+                                                            type="password"
+                                                            name="oldPassword"
+                                                            class="form-control"
+                                                            placeholder=""
+                                                            required
+                                                            minlength="8"
+                                                            maxlength="20"
+                                                    />
+                                                </div>
+                                                <span class="input-group-addon">
+                              <i
+                                      class="far fa-eye"
+                                      id="password1-toggle"
+                                      onclick="togglePassword('password1', 'password1-toggle')"
+                              ></i>
+                            </span>
+                                                <div class="col-md-12">
+                                                    <label class="form-label">New Password</label>
+                                                    <input
+                                                            id="password2"
+                                                            type="password"
+                                                            class="form-control"
+                                                            placeholder=""
+                                                            aria-label="Last name"
+                                                            name="newPassword"
+                                                            required
+                                                            minlength="8"
+                                                            maxlength="20"
+                                                    />
+                                                    <span class="input-group-addon">
+                                <i
+                                        class="far fa-eye"
+                                        id="password2-toggle"
+                                        onclick="togglePassword('password2', 'password2-toggle')"
+                                ></i>
+                              </span>
+                                                </div>
+
+                                                <div class="col-md-12 m-4">
+                                                    <a
+                                                            class="text-danger"
+                                                            th:href="@{/forgot-password}"
+                                                    >Forgot Password?</a
+                                                    >
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">
+                                                    Save changes
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <div>
+                            <div id="add-address" class="col-lg-12 mb-3">
+
+                                <div
+                                        id="add-btn" style="border-radius: 10px;"
+                                        class="col-lg-12 d-flex align-items-center justify-content-center bg-dark p-3 shadow"
+                                >
+                                    <form th:action="@{/user/address/add}" method="get">
+                                    <button
+                                            type="submit"
+                                            style="border: none"
+                                            class="bg-dark"
+                                    >
+                                        <span class="text-white"><i class="fas fa-plus text-white"></i> Add Address</span>
+                                    </button>
+                                    </form>
+
+                                </div>
+                                <!-- Button trigger modal -->
+
+                                <!-- Modal -->
+                                <div
+                                        class="modal fade"
+                                        id="example"
+                                        tabindex="-1"
+                                        aria-labelledby="exampleModalLabel"
+                                        aria-hidden="true"
+                                >
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title fw-bold" id="exampleModal1">
+                                                    Add Address
+                                                </h5>
+                                                <button
+                                                        type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"
+                                                ></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form
+                                                        class="form-horizontal"
+                                                        th:action="@{/user/add-address}"
+                                                        method="post"
+                                                >
+                                                    <div class="control-group">
+                                                        <div class="col-lg-12 mt-2">
+                                                            <label for="full-name" class="control-label"
+                                                            >Full Name</label
+                                                            >
+                                                            <input
+                                                                    class="form-control"
+                                                                    id="full-name"
+                                                                    name="fullName"
+                                                                    type="text"
+                                                                    placeholder="Enter your full name"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="control-group">
+                                                        <div class="col-lg-12 mt-2">
+                                                            <label
+                                                                    for="phone-number"
+                                                                    class="control-label"
+                                                            >Mobile Number</label
+                                                            >
+                                                            <input
+                                                                    class="form-control"
+                                                                    id="phone-number"
+                                                                    name="phoneNumber"
+                                                                    type="text"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <!-- address-line1 input-->
+                                                    <div class="control-group mt-2">
+                                                        <label class="control-label"
+                                                        >Apartment, building</label
+                                                        >
+                                                        <div class="col-lg-12">
+                                                            <input
+                                                                    id="address-line1"
+                                                                    name="buildingName"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <!-- address-line2 input-->
+                                                    <div class="control-group mt-2">
+                                                        <label class="control-label">Street </label>
+                                                        <div class="col-lg-12">
+                                                            <input
+                                                                    id="address-line2"
+                                                                    name="streetName"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <!-- city input-->
+                                                    <div class="control-group mt-2">
+                                                        <label class="control-label">City</label>
+                                                        <div class="col-lg-12">
+                                                            <input
+                                                                    id="city"
+                                                                    name="city"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <!-- region input-->
+                                                    <div class="control-group mt-2">
+                                                        <label class="control-label">State </label>
+                                                        <div class="col-lg-12">
+                                                            <input
+                                                                    id="region"
+                                                                    name="state"
+                                                                    type="text"
+                                                                    placeholder="state / province / region"
+                                                                    class="form-control"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <!-- postal-code input-->
+                                                    <div class="control-group mt-2">
+                                                        <label class="control-label">Postal Code</label>
+                                                        <div class="col-lg-12">
+                                                            <input
+                                                                    id="postal-code"
+                                                                    name="postalCode"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            Save changes
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4 th:if="${not #lists.isEmpty(addresses)}" class="text-center">Addresses</h4>
+                        <div
+                                id="address"
+                                class="col-lg-12 mt-4 p-3 border rounded"
+                                th:each="address : ${addresses}"
+                        >
+                            <div>
+                                <h4 th:text="${address.buyerName}"></h4>
+                                <p>
+                                    <span th:text="${address.houseAddress}"> </span>,<span
+                                        th:text="${address.district}"
+                                ></span
+                                >,
+                                    <span th:text="${address.state}"></span>,
+                                    <span th:text="${address.pincode}"></span>,
+                                    <span th:text="${address.mobileNumber}"></span>
+                                </p>
+                            </div>
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    <button
+                                            type="button"
+                                            class="add-man"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editAddressModal1"
+                                    >
+                                        <span class="fas fa-trash text-secondary"></span>
+                                    </button>
+                                </div>
+                                <div
+                                        class="modal fade"
+                                        id="editAddressModal1"
+                                        tabindex="-1"
+                                        aria-labelledby="editAddressLabel"
+                                        aria-hidden="true"
+                                >
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5
+                                                        class="modal-title fw-bold"
+                                                        id="editAddressLabel1"
+                                                >
+                                                    Delete Address
+                                                </h5>
+                                                <button
+                                                        type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"
+                                                ></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <!-- Form for editing the address -->
+                                                <p>Are you sure want to delete this address</p>
+                                                <form
+                                                        method="get"
+                                                        th:action="@{/user/address/delete/{addressId}(addressId = ${address.addressId})}"
+                                                >
+                                                    <input type="hidden" name="userId" th:value="${user.userId}">
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-danger">
+                                                            delete
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="delete">
+                                    <button
+                                            type="button"
+                                            class="add-man"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editAddressModal"
+                                    >
+                                        <span class="fas fa-edit text-secondary"></span>
+                                    </button>
+                                </div>
+                                <!-- Edit Address Modal -->
+                                <div
+                                        class="modal fade"
+                                        id="editAddressModal"
+                                        tabindex="-1"
+                                        aria-labelledby="editAddressLabel"
+                                        aria-hidden="true"
+                                >
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5
+                                                        class="modal-title fw-bold"
+                                                        id="editAddressLabel"
+                                                >
+                                                    Edit Address
+                                                </h5>
+                                                <button
+                                                        type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"
+                                                ></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <!-- Form for editing the address -->
+                                                <form
+                                                        class="form-horizontal"
+                                                        th:action="@{/user/address/edit/{addressId}(addressId = ${address.addressId})}"
+                                                        method="post"
+                                                        th:object="${addressToEdit}"
+                                                >
+                                                    <input type="hidden" name="userId" th:value="${user.userId}">
+                                                    <div class="control-group">
+                                                        <div class="col-lg-12 mt-2">
+                                                            <label for="full-name" class="control-label"
+                                                            >Buyer Name</label
+                                                            >
+                                                            <input
+                                                                    class="form-control"
+                                                                    id="full-name1"
+                                                                    th:field="*{buyerName}"
+                                                                    type="text"
+                                                                    th:value="${address.buyerName}"
+                                                                    th:placeholder="${address.buyerName}"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="control-group">
+                                                        <div class="col-lg-12 mt-2">
+                                                            <label
+                                                                    for="phone-number"
+                                                                    class="control-label"
+                                                            >Mobile Number</label
+                                                            >
+                                                            <input
+                                                                    class="form-control"
+                                                                    id="phone-number1"
+                                                                    th:field="*{mobileNumber}"
+                                                                    type="text"
+                                                                    th:value="${address.mobileNumber}"
+                                                                    th:placeholder="${address.mobileNumber}"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <!-- address-line1 input-->
+                                                    <div class="control-group mt-2">
+                                                        <label class="control-label"
+                                                        >Apartment, building</label
+                                                        >
+                                                        <div class="col-lg-12">
+                                                            <input
+                                                                    id="addres"
+                                                                    th:field="*{houseAddress}"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    th:value="${address.houseAddress}"
+                                                                    th:placeholder="${address.houseAddress}"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <!-- address-line2 input-->
+                                                    <div class="control-group mt-2">
+                                                        <label class="control-label">State </label>
+                                                        <div class="col-lg-12">
+                                                            <input
+                                                                    id="address-line"
+                                                                    th:field="*{state}"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    th:value="${address.state}"
+                                                                    th:placeholder="${address.state}"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <!-- city input-->
+                                                    <div class="control-group mt-2">
+                                                        <label class="control-label">District</label>
+                                                        <div class="col-lg-12">
+                                                            <input
+                                                                    id="city1"
+                                                                    th:field="*{district}"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    th:value="${address.district}"
+                                                                    th:placeholder="${address.district}"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <!-- region input-->
+
+                                                    <!-- postal-code input-->
+                                                    <div class="control-group mt-2">
+                                                        <label class="control-label">Postal Code</label>
+                                                        <div class="col-lg-12">
+                                                            <input
+                                                                    id="postal-code1"
+                                                                    th:field="*{pincode}"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    th:value="${address.pincode}"
+                                                                    th:placeholder="${address.pincode}"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            Save changes
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script>
+    function togglePassword(inputId, toggleId) {
+      var input = document.getElementById(inputId);
+      var inputType = input.getAttribute("type");
+      if (inputType === "password") {
+        input.setAttribute("type", "text");
+        document.getElementById(toggleId).classList.remove("fa-eye");
+        document.getElementById(toggleId).classList.add("fa-eye-slash");
+      } else {
+        input.setAttribute("type", "password");
+        document.getElementById(toggleId).classList.remove("fa-eye-slash");
+        document.getElementById(toggleId).classList.add("fa-eye");
+      }
+    }
+
+    var myModal = document.getElementById("myModal");
+    var myInput = document.getElementById("myInput");
+
+    myModal.addEventListener("shown.bs.modal", function () {
+      myInput.focus();
+    });
+
+    function validateForm() {
+      var newUsername = document.getElementById("username").value;
+      var usernameError = document.getElementById("username-error");
+      var isValid = true;
+      usernameError.textContent = "";
+
+      if (!newUsername) {
+        usernameError.textContent = "Username is required.";
+        isValid = false;
+      } else if (!/^[a-zA-Z0-9._%+-]{3,}$/.test(newUsername)) {
+        usernameError.textContent =
+          "Username should contain only alphanumeric characters and be at least 3 characters long.";
+        isValid = false;
+      }
+
+      return isValid;
+    }
+</script>
+</html>

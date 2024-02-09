@@ -3,9 +3,11 @@ package com.sirajul.lenscraft.Service.User;
 import com.sirajul.lenscraft.Repository.OrderedItemsRepository;
 import com.sirajul.lenscraft.Service.interfaces.OrderedItemsService;
 import com.sirajul.lenscraft.entity.user.OrderItem;
+import com.sirajul.lenscraft.entity.user.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,6 +32,7 @@ public class OrderedItemsServiceImp implements OrderedItemsService {
 
     @Override
     public Long countOfItems() {
-        return orderedItemsRepository.count();
+        List<OrderItem> item = orderedItemsRepository.findAllByCurrentStatus(OrderStatus.DELIVERED);
+        return Long.valueOf(item.size());
     }
 }

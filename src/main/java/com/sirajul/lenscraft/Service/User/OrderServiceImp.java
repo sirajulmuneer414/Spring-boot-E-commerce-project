@@ -2,8 +2,10 @@ package com.sirajul.lenscraft.Service.User;
 
 import com.sirajul.lenscraft.DTO.order.OrderDto;
 import com.sirajul.lenscraft.Repository.OrderRepository;
+import com.sirajul.lenscraft.Repository.OrderedItemsRepository;
 import com.sirajul.lenscraft.Service.interfaces.*;
 import com.sirajul.lenscraft.entity.product.Product;
+import com.sirajul.lenscraft.entity.product.Variables;
 import com.sirajul.lenscraft.entity.user.CartedItems;
 import com.sirajul.lenscraft.entity.user.Coupon;
 import com.sirajul.lenscraft.entity.user.Order;
@@ -15,10 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
 @Service
 public class OrderServiceImp implements OrderService {
@@ -35,10 +35,16 @@ public class OrderServiceImp implements OrderService {
     ProductService productService;
 
     @Autowired
+    VariableService variableService;
+
+    @Autowired
     AddressService addressService;
 
     @Autowired
     CouponService couponService;
+
+    @Autowired
+    OrderedItemsRepository orderedItemsRepository;
 
     @Override
     public Order saveAndReturn(OrderDto orderDto) {
@@ -54,8 +60,9 @@ public class OrderServiceImp implements OrderService {
 
         order.setAddress(addressService.findById(orderDto.getAddressId()));
 
-        order.setFullOrderStatus(FullOrderStatus.PENDING);
-        if(orderDto.getCouponId() != null) {
+
+        order.setCurrentStatus(FullOrderStatus.PENDING);
+        if (orderDto.getCouponId() != null) {
 
             Coupon coupon = couponService.findCouponById(orderDto.getCouponId());
 
@@ -73,10 +80,18 @@ public class OrderServiceImp implements OrderService {
 
         order = orderRepository.save(order);
 
-        for(CartedItems item : cartedItems){
+        for (CartedItems item : cartedItems) {
             OrderItem orderItem = new OrderItem();
 
+            Product product = item.getProduct();
+
             orderItem.setProduct(item.getProduct());
+
+            Variables variable = item.getVariable();
+
+            variable.setQuantity(variable.getQuantity()- item.getQuantity());
+
+            variableService.saveVariable(variable);
 
             orderItem.setVariable(item.getVariable());
 
@@ -84,27 +99,30 @@ public class OrderServiceImp implements OrderService {
 
             orderItem.setCurrentPrice(item.getCurrentPrice());
 
-
-
-            orderItem.setOrderStatus(OrderStatus.PENDING);
+            orderItem.setCurrentStatus(OrderStatus.PENDING);
 
             orderItem.setOrder(order);
 
             orderItem = orderedItemsService.saveAndReturn(orderItem);
 
+//            orderItem.getStatus().put(OrderStatus.PENDING,LocalDate.now());
+//
+//            orderItem = orderedItemsService.saveAndReturn(orderItem);
+
             order.getOrderItems().add(orderItem);
         }
 
-        order.setFullOrderStatus(FullOrderStatus.PENDING);
 
         order.setOrderedTime(LocalDateTime.now());
+
+      order.getStatus().put(FullOrderStatus.PENDING,LocalDate.now());
 
         return orderRepository.save(order);
     }
 
     @Override
     public List<Order> findAllInOrder() {
-        return orderRepository.findAll(Sort.by(Sort.Direction.ASC,"orderedTime"));
+        return orderRepository.findAll(Sort.by(Sort.Direction.ASC, "orderedTime"));
     }
 
     @Override
@@ -122,4 +140,197 @@ public class OrderServiceImp implements OrderService {
         orderRepository.delete(order);
     }
 
+    @Override
+    public Map<String, Double> getWeeklySales() {
+        try {
+            Map<String, Double> weeklySales = new LinkedHashMap<>();
+            Calendar calendar = Calendar.getInstance();
+            for (int i = 1; i <= 7; i++) {
+                Date weekEndDate = calendar.getTime();
+                calendar.add(Calendar.WEEK_OF_YEAR, -1);
+                Date weekStartDate = calendar.getTime();
+                LocalDate weekStart = weekStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate weekEnd = weekEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                List<Order> list = orderRepository.getWeeklyFromStartToEnd(weekStart, weekEnd);
+
+                double totalOrderAmount = list.stream().mapToDouble(Order::getTotalAmount).sum();
+                weeklySales.put(weekStart + "_" + weekEnd, totalOrderAmount);
+            }
+            return weeklySales;
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred");
+        }
+
+    }
+
+    @Override
+    public Map<String, Long> getWeeklyCount() {
+        try {
+            Map<String, Long> weeklyCount = new LinkedHashMap<>();
+            Calendar calendar = Calendar.getInstance();
+            for (int i = 1; i <= 7; i++) {
+                Date weekEndDate = calendar.getTime();
+                calendar.add(Calendar.WEEK_OF_YEAR, -1);
+                Date weekStartDate = calendar.getTime();
+                LocalDate weekStart = weekStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate weekEnd = weekEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                List<Order> list = orderRepository.getWeeklyFromStartToEnd(weekStart, weekEnd);
+
+                Long count = 0L;
+
+                for(Order order : list){
+                    count += Long.valueOf(order.getOrderItems().size());
+                }
+
+                weeklyCount.put(weekStart + "_" + weekEnd, count);
+            }
+            return weeklyCount;
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred");
+        }
+
+    }
+
+    @Override
+    public Map<String, Double> getDailySales() {
+        try {
+            Map<String, Double> dailySale = new LinkedHashMap<>();
+            double orderTotalAmount;
+            Calendar calendar = Calendar.getInstance();
+            for (int i = 0; i < 7; i++) {
+                Date date = calendar.getTime();
+                LocalDate currentDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                List<Order> list = orderRepository.getDailyFromCurrentDay(currentDate);
+                orderTotalAmount = list.stream().mapToDouble(Order::getTotalAmount).sum();
+                dailySale.put(currentDate.toString(), orderTotalAmount);
+                calendar.add(Calendar.DAY_OF_YEAR, -1);
+            }
+            return dailySale;
+        } catch (Exception e) {
+            throw new RuntimeException("An error Occurred");
+        }
+
+
+    }
+
+    @Override
+    public Map<String, Long> getDailyCount() {
+        try {
+            Map<String, Long> dailySale = new LinkedHashMap<>();
+            Calendar calendar = Calendar.getInstance();
+            Long count = 0L;
+            for (int i = 0; i < 7; i++) {
+                Date date = calendar.getTime();
+                LocalDate currentDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                List<Order> list = orderRepository.getDailyFromCurrentDay(currentDate);
+
+
+                for(Order order : list){
+                    count += Long.valueOf(order.getOrderItems().size());
+                }
+                dailySale.put(currentDate.toString(), count);
+                calendar.add(Calendar.DAY_OF_YEAR, -1);
+            }
+            return dailySale;
+        } catch (Exception e) {
+            throw new RuntimeException("An error Occurred");
+        }
+
+
+    }
+
+    @Override
+    public Map<String, Double> getMonthlySales() {
+        try {
+            Map<String, Double> monthlySales = new LinkedHashMap<>();
+            YearMonth currentYearMonth = YearMonth.now();
+            Month currentMonth = currentYearMonth.getMonth();
+            for (int i = currentMonth.getValue() - 1; i >= 0; i--) {
+                YearMonth targetYearMonth = currentYearMonth.minusMonths(i);
+                Month targetMonth = targetYearMonth.getMonth();
+                LocalDate monthStart = targetYearMonth.atDay(1);
+                LocalDate monthEnd = targetYearMonth.atEndOfMonth();
+                List<Order> list = orderRepository.getMonthlyFromStartToEnd(monthStart, monthEnd);
+                double totalOrderAmount = list.stream().mapToDouble(Order::getTotalAmount).sum();
+                monthlySales.put(targetMonth.toString(), totalOrderAmount);
+            }
+            return monthlySales;
+        } catch (Exception e) {
+            throw new RuntimeException("An error Occurred");
+        }
+    }
+
+    @Override
+    public Map<String, Long> getMonthlySalesCount() {
+        try {
+            Map<String, Long> monthlySales = new LinkedHashMap<>();
+            YearMonth currentYearMonth = YearMonth.now();
+            Month currentMonth = currentYearMonth.getMonth();
+            Long count = 0L;
+            for (int i = currentMonth.getValue() - 1; i >= 0; i--) {
+                YearMonth targetYearMonth = currentYearMonth.minusMonths(i);
+                Month targetMonth = targetYearMonth.getMonth();
+                LocalDate monthStart = targetYearMonth.atDay(1);
+                LocalDate monthEnd = targetYearMonth.atEndOfMonth();
+                List<Order> list = orderRepository.getMonthlyFromStartToEnd(monthStart, monthEnd);
+
+
+                for(Order order : list){
+                    count += Long.valueOf(order.getOrderItems().size());
+                }
+                monthlySales.put(targetMonth.toString(), count);
+            }
+            return monthlySales;
+        } catch (Exception e) {
+
+            throw new RuntimeException("An error Occurred");
+        }
+    }
+
+    @Override
+    public Map<String, Double> getYearlySales() {
+        try {
+            Map<String, Double> yearlySales = new LinkedHashMap<>();
+            Year currentYear = Year.now();
+            for (int i = 4; i >= 0; i--) {
+                Year targetYear = currentYear.minusYears(i);
+                LocalDate yearStart = targetYear.atDay(1);
+                LocalDate yearEnd = targetYear.atMonth(Month.DECEMBER).atEndOfMonth();
+                List<Order> list = orderRepository.getYearlyFromStartToEnd(yearStart, yearEnd);
+                double totalOrderAmount = list.stream().mapToDouble(Order::getTotalAmount).sum();
+                yearlySales.put(Integer.toString(targetYear.getValue()), totalOrderAmount);
+            }
+            return yearlySales;
+        }catch (Exception e){
+            throw new RuntimeException("An error Occurred");
+        }
+    }
+
+    @Override
+    public Map<String, Long> getYearlySalesCount() {
+        try {
+            Map<String, Long> yearlySales = new LinkedHashMap<>();
+            Year currentYear = Year.now();
+            Long count=0L;
+            for (int i = 4; i >= 0; i--) {
+                Year targetYear = currentYear.minusYears(i);
+                LocalDate yearStart = targetYear.atDay(1);
+                LocalDate yearEnd = targetYear.atMonth(Month.DECEMBER).atEndOfMonth();
+                List<Order> list = orderRepository.getYearlyFromStartToEnd(yearStart, yearEnd);
+
+                for(Order order : list){
+                    count += Long.valueOf(order.getOrderItems().size());
+                }
+                yearlySales.put(Integer.toString(targetYear.getValue()), count);
+            }
+            return yearlySales;
+        }catch (Exception e){
+            throw new RuntimeException("An error Occurred");
+        }
+    }
+
+    @Override
+    public List<Order> findAllInOrderDelivered() {
+        return orderRepository.findAllByCurrentStatus(FullOrderStatus.COMPLETED);
+    }
 }

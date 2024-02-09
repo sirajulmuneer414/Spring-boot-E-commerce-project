@@ -2,7 +2,7 @@ package com.sirajul.lenscraft.config;
 
 import com.sirajul.lenscraft.Repository.UserRepository;
 import com.sirajul.lenscraft.entity.user.UserInformation;
-import com.sirajul.lenscraft.entity.user.enums.UserStatus;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import com.sirajul.lenscraft.exception.BlockedUserFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class CustomUserService implements UserDetailsService {
             log.info("username not found exception");
             throw new UsernameNotFoundException(username);
         }
-        else if(user.getUserStatus().equals(UserStatus.BLOCKED)){
+        else if(user.getActiveStatus().equals(ActiveStatus.BLOCKED)){
             throw new BlockedUserFoundException("The user " + username + " is Blocked");
         }
         log.info("no issue in load");

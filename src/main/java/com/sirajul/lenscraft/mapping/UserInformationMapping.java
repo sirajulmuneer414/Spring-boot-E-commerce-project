@@ -5,10 +5,9 @@ import com.sirajul.lenscraft.DTO.UserInformationDto;
 import com.sirajul.lenscraft.Repository.UserRepository;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.Role;
-import com.sirajul.lenscraft.entity.user.enums.UserStatus;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,7 +32,7 @@ public class UserInformationMapping {
         user.setPassword(signupDto.getPassword());
         user.setProfilePic(signupDto.getProfilePic());
         user.setUserCreated(LocalDateTime.now());
-        user.setUserStatus(UserStatus.ACTIVE);
+        user.setActiveStatus(ActiveStatus.ACTIVE);
 
         return user;
     }
@@ -49,7 +48,7 @@ public class UserInformationMapping {
         System.out.println("the user profile pic name is "+user.getProfilePic());
 
         dto.setProfilePic(user.getProfilePic());
-        dto.setUserStatus(user.getUserStatus().name());
+        dto.setUserStatus(user.getActiveStatus().name());
         dto.setRole(user.getRole().name());
 
         return dto;
@@ -83,10 +82,10 @@ public class UserInformationMapping {
         }
         switch(userDto.getUserStatus()){
             case "BLOCKED":
-                user.setUserStatus(UserStatus.BLOCKED);
+                user.setActiveStatus(ActiveStatus.BLOCKED);
                 break;
             default:
-                user.setUserStatus(UserStatus.ACTIVE);
+                user.setActiveStatus(ActiveStatus.ACTIVE);
         }
         return user;
     }
@@ -102,7 +101,7 @@ public class UserInformationMapping {
             dto.setFirstName(user.getFirstName());
             dto.setLastName(user.getLastName());
             dto.setProfilePic(user.getProfilePic());
-            dto.setUserStatus(user.getUserStatus().name());
+            dto.setUserStatus(user.getActiveStatus().name());
             dto.setRole(user.getRole().name());
 
             usersDto.add(dto);
@@ -132,10 +131,10 @@ public class UserInformationMapping {
             }
             switch(dto.getUserStatus()){
                 case "BLOCKED":
-                    user.setUserStatus(UserStatus.BLOCKED);
+                    user.setActiveStatus(ActiveStatus.BLOCKED);
                     break;
                 default:
-                    user.setUserStatus(UserStatus.ACTIVE);
+                    user.setActiveStatus(ActiveStatus.ACTIVE);
             }
 
             usersDto.add(dto);

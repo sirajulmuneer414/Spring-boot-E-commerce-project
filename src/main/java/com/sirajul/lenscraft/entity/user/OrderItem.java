@@ -9,11 +9,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class OrderItem {
@@ -37,14 +39,16 @@ public class OrderItem {
 
     Integer currentPrice;
 
-    @Enumerated(
-            EnumType.STRING
-    )
-    OrderStatus orderStatus;
+
+    @Enumerated(EnumType.STRING)
+    OrderStatus currentStatus;
 
     @ManyToOne
     Order order;
 
+    public  OrderItem(){
+//        status = new HashMap<>();
+    }
 
 
 }

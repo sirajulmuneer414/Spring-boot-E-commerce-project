@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <title>Lenscraft - Wallet</title>
+    <link rel="shortcut icon" href="/img/logo.png" type="image/x-icon" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link th:rel="stylesheet" th:href="@{/css/wallet.css}" />
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+    />
+    <link th:rel="stylesheet" th:href="@{/css/home.css}" />
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+    ></script>
+</head>
+<body>
+<nav
+        class="navbar bg-body-tertiary p-3"
+        style="border-bottom: 1px solid black"
+>
+    <div
+            class="container-fluid d-flex justify-content-between align-items-middle"
+            style="background-color: white"
+    >
+        <div class="align-self-start">
+            <a class="navbar-brand" href="/">
+                <img
+                        th:src="@{/images/Mainlogo.png}"
+                        style="height: auto; width: 250px"
+                        alt=""
+                />
+            </a>
+        </div>
+        <h6 class="text=danger fw-bold" th:text="${empty}"></h6>
+        <div class="me-5">
+            <div class="d-flex gap-5 align-items-center">
+                <div>
+                    <a class="text-decoration-none text-dark" th:href="@{/user/cart}">
+                        <i class="fa-solid fa-cart-shopping"></i><span> Cart</span>
+                    </a>
+                </div>
+                <div>
+                    <a class="text-decoration-none text-dark" th:href="@{/shop}">
+                        <i class="fa-brands fa-shopify"></i><span> Shop</span>
+                    </a>
+                </div>
+                <div>
+                    <a class="text-decoration-none text-dark" th:href="@{/user/profile}">
+                        <i class="fa-solid fa-user"></i><span> Profile</span>
+                    </a>
+                </div>
+                <div>
+                    <form
+                            th:if=" ${#authorization.expression('isAuthenticated()')}"
+                            th:method="post"
+                            th:action="@{/logout}"
+                    >
+                        <label for="sign-out"><i class="fa-solid fa-right-from-bracket"></i>Logout</label>
+                        <input hidden type="submit" id="sign-out">
+                    </form>
+                    <a   class="btn btn-info"   th:href="@{/login}" th:if="not ${#authorization.expression('isAuthenticated()')}" >Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="container" style="width: 100vw">
+    <h1 class="mt-5">My Wallet</h1>
+    <div class="row mt-4">
+        <div class="col-4">
+            <div id="balance-card" class="card border  shadow " style="height: fit-content">
+                <div class="card-body">
+                    <h3>Wallet Balance</h3>
+                    <p  style="text-align:center;font-size: 40px;" class="text-success" th:text="${wallet.balance}"></p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-8">
+            <div id="transction-card" class="card border shadow" style=" width: 100%; height: fit-content">
+                <div class="card-body"  >
+                    <h3>Transaction History</h3>
+                    <div id="table-div" style="max-height: 400px; overflow-y: auto;">
+
+                        <table class="table table-striped border shadow-lg">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr  th:each="transaction:${transactions}">
+
+                                <td class="types" th:text="${transaction.transactionType}"></td>
+                                <td class="date" th:text="${transaction.transactionTime.toLocalDate()}"></td>
+                                <td class="time" th:text="${transaction.transactionTime.toLocalTime()}"></td>
+                                <td class="amount" th:classappend="${transaction.transactionStatus.name() == 'DEBIT' ? 'text-success' : 'text-danger'}" th:text="${transaction.transactionStatus.name() == 'DEBIT' ? '+' + transaction.amount : '-' + transaction.amount}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal for Add Money -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Add Money to Wallet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/user/addMoney}" method="post" id="payment-form" onsubmit="paymentStart(event)">
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount:</label>
+                        <input type="text" class="form-control" id="amount" name="amount" required oninput="restrictInput(this)"/>
+
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Money</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragment::footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+<script>
+<script>
+    document.addEventListener("DOMContentLoaded", function (){
+          styleTableElements()
+    })
+    function styleTableElements(){
+      var statuses = document.querySelectorAll(".status");
+      var types = document.querySelectorAll(".types");
+      var amounts = document.querySelectorAll(".amount");
+
+      statuses.forEach(function(status, index){
+        var text = status.textContent.trim();
+
+        if (text === "CREDIT") {
+          status.textContent = "credit";
+          status.style.color = "green";
+          amounts[index].style.color = "green"; // Set the color of the corresponding amount element
+        } else if (text === "DEBIT"){
+          status.textContent = "debit";
+          status.style.color = "red";
+          amounts[index].style.color = "red"; // Set the color of the corresponding amount element
+        }
+      });
+
+      types.forEach(function(type){
+        var text = type.textContent.trim();
+        if (text === "REFERRAL_BONUS") {
+          type.textContent = "Referral Bonus";
+          type.style.color = "green";
+        } else if (text === "ADD_MONEY"){
+          type.textContent = "Added using Razorpay";
+          type.style.color = "green";
+        } else if (text === "WELCOME_BONUS"){
+          type.textContent = "Welcome Bonus";
+          type.style.color = "green";
+        } else if (text === "ORDER_CANCEL"){
+          type.textContent = "On cancelling Order";
+          type.style.color = "green";
+        } else if (text === "ORDER"){
+          type.textContent = "Product ordered";
+          type.style.color = "red";
+        }
+      });
+    }
+      function restrictInput(input) {
+          // Remove any non-numeric characters and leading zeros
+          input.value = input.value.replace(/[^0-9]/g, '').replace(/^0+/, '');
+      }
+      function paymentStart(e){
+        e.preventDefault()
+        var amount=document.getElementById("amount").value
+        var csrfToken = $("meta[name='_csrf']").attr("content");
+        $.ajax({
+            url: '/createOrder',
+            type: 'POST',
+            data: { amount: amount },
+            dataType: 'json',
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            },
+            success: function (response) {
+              console.log(response);
+              if (response.status == "created") {
+                let options = {
+                  key: "rzp_test_XOMufWarHqGN9i",
+                  amount: response.amount,
+                  currency: "INR",
+                  name: "shoose",
+                  description: "payment for the product",
+                  image: "https://rukminim2.flixcart.com/image/832/832/l1jmc280/shoe/m/y/z/6-innova-04cwhtsky-asian-white-original-imagd3atfhw3tdwh.jpeg?q=70",
+                  order_id: response.id,
+                  handler: function (response) {
+
+                    var paymentForm = document.getElementById("payment-form");
+                    console.log("orderform" + paymentForm);
+                    paymentForm.submit();
+                    moneyAdded();
+                  },
+                  "prefill": {
+                    "name": "",
+                    "email": "",
+                    "contact": ""
+                  }, "notes": {
+                    "address": "Razorpay Corporate Office"
+                  },
+                  "theme": {
+                    "color": "#3399cc"
+                  }
+                };
+                let rzp = new Razorpay(options);
+                rzp.on("payment.failed", function (response) {
+                  console.log("payment failed");
+                  alert("oops.... payment failed");
+                });
+                rzp.open();
+              }
+            }
+          });
+      }
+
+      function moneyAdded(){
+        Toastify({
+    text: "Money Added Successfully.",
+    duration: 1000,
+    newWindow: true,
+    close: false,
+    gravity: "top",
+    position: "center",
+    stopOnFocus: true,
+    style: {
+      background: "green",
+    },
+    onClick: function(){}
+  }).showToast();
+      }
+</script>
+</body>
+</html>

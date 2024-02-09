@@ -37,34 +37,32 @@ public class AdminOrderController {
 
         orders = orderService.findAllInOrder();
 
-        List<Order> newOrders = new ArrayList<>();
-        for(Order order: orders){
-
-            int delivered = 0;
-            int cancelled = 0;
-
+        for(Order order : orders){
+            int countD = 0;
+            int countC = 0;
             for(OrderItem item : order.getOrderItems()){
-                if(item.getOrderStatus() == OrderStatus.DELIVERED){
-                    delivered++;
+
+
+                if(item.getCurrentStatus().name().matches("DELIVERED")){
+                    countD++;
                 }
-                else if(item.getOrderStatus() == OrderStatus.CANCELLED){
-                    cancelled++;
+                else if(item.getCurrentStatus().name().matches("CANCELLED")){
+                    countC++;
                 }
-            }
-            if(delivered == orders.size()){
-                order.setFullOrderStatus(FullOrderStatus.COMPLETED);
+                else {
+                    break;
+                }
 
             }
-            if(cancelled == orders.size()){
-                order.setFullOrderStatus(FullOrderStatus.CANCELLED);
-
+            if(countD == order.getOrderItems().size()){
+                order.setCurrentStatus(FullOrderStatus.COMPLETED);
+                orderService.save(order);
             }
-
-            newOrders.add(order);
-
+            else if(countC == order.getOrderItems().size()){
+                order.setCurrentStatus(FullOrderStatus.CANCELLED);
+                orderService.save(order);
+            }
         }
-
-        orders = newOrders;
 
         model.addAttribute("orders", orders);
 
@@ -83,27 +81,27 @@ public class AdminOrderController {
         List<OrderItem> items = order.getOrderItems();
 
         model.addAttribute("items",items);
-        return "admin/orders/order-items";
+        return "admin/orders/admin-order-items";
     }
 
-    @GetMapping("/items/edit/{orderId}")
-    public String editOrder(Model model,
-                            @PathVariable("orderId")UUID orderId,
-                            @RequestParam("status")String orderStatus){
-
-        Order order = orderService.findById(orderId);
-
-        switch (orderStatus){
-
-            case "COMPLETED" -> order.setFullOrderStatus(FullOrderStatus.COMPLETED);
-            case "CANCELLED" -> order.setFullOrderStatus(FullOrderStatus.CANCELLED);
-            default -> order.setFullOrderStatus(FullOrderStatus.PENDING);
-
-        }
-        orderService.save(order);
-
-        return "redirect:/admin/order";
-    }
+//    @GetMapping("/items/edit/{orderId}")
+//    public String editOrder(Model model,
+//                            @PathVariable("orderId")UUID orderId,
+//                            @RequestParam("status")String orderStatus){
+//
+//        Order order = orderService.findById(orderId);
+//
+//        switch (orderStatus){
+//
+//            case "COMPLETED" -> order.setFullOrderStatus(FullOrderStatus.COMPLETED);
+//            case "CANCELLED" -> order.setFullOrderStatus(FullOrderStatus.CANCELLED);
+//            default -> order.setFullOrderStatus(FullOrderStatus.PENDING);
+//
+//        }
+//        orderService.save(order);
+//
+//        return "redirect:/admin/order";
+//    }
 
     @GetMapping("/items/delete/{orderId}")
     public String deleteOrder(Model model,
@@ -122,25 +120,17 @@ public class AdminOrderController {
         return "redirect:/admin/order";
     }
 
-    @GetMapping("/items/item/{orderItemId}")
+    @GetMapping("/items/item-view/{orderItemId}")
     public String postOrderStatus(
             Model model,
-            @PathVariable("orderItemId")UUID orderItemId,
-            @RequestParam("status")String itemStatus
+            @PathVariable("orderItemId")UUID orderItemId
     ){
 
         OrderItem item = orderedItemsService.findById(orderItemId);
 
-        switch (itemStatus) {
-            case "DELIVERED" -> item.setOrderStatus(OrderStatus.DELIVERED);
-            case "CANCELLED" -> item.setOrderStatus(OrderStatus.CANCELLED);
-            default -> item.setOrderStatus(OrderStatus.PENDING);
-        }
+        model.addAttribute("item",item);
 
-        orderedItemsService.saveAndReturn(item);
-
-        return "redirect:/admin/order/items/"+ item.getOrder().getOrderId();
-
+        return "admin/orders/item-view";
     }
     @PostMapping("/items/item/delete/{orderItemId}")
     public String deleteOrderStatus(
@@ -157,5 +147,24 @@ public class AdminOrderController {
 
         return "redirect:/items/"+ item.getOrder().getOrderId();
 
+    }
+
+    @GetMapping("/items/item/status-change/{orderItemId}")
+    public String changeStatusOfOrderItem(
+            @PathVariable("orderItemId") UUID orderItemId,
+            @RequestParam("status") String status
+    ){
+
+        OrderItem item = orderedItemsService.findById(orderItemId);
+
+        for(OrderStatus stat : OrderStatus.values()){
+            if(stat.name().matches(status)){
+                item.setCurrentStatus(stat);
+            }
+        }
+
+        orderedItemsService.saveAndReturn(item);
+
+        return "redirect:/admin/order/items/item-view/"+item.getOrderItemId();
     }
 }

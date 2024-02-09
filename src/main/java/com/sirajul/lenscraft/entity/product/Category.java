@@ -48,6 +48,7 @@ public class Category {
 
     String categoryImage;
 
+
     @Column(
             name = "category_description",
             columnDefinition = "TEXT"
@@ -56,6 +57,11 @@ public class Category {
 
     @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
     List<Product> products;
+
+    @Column(
+            columnDefinition = "boolean default false"
+    )
+    boolean isHavingOffer;
 
     @Embedded
     OfferEmbeddable offer;

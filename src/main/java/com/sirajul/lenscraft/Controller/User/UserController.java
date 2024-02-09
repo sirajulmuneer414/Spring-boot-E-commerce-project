@@ -2,14 +2,17 @@ package com.sirajul.lenscraft.Controller.User;
 
 import com.razorpay.RazorpayClient;
 import com.sirajul.lenscraft.DTO.Product.CouponDto;
+import com.sirajul.lenscraft.DTO.ToPassBoolean;
 import com.sirajul.lenscraft.DTO.order.OrderDto;
 import com.sirajul.lenscraft.Service.interfaces.*;
 import com.sirajul.lenscraft.comparator.CartedItemComparator;
 import com.sirajul.lenscraft.entity.product.Product;
 import com.sirajul.lenscraft.entity.product.Variables;
 import com.sirajul.lenscraft.entity.user.*;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Var;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +32,9 @@ import java.util.*;
 public class UserController {
 @Autowired
 UserService userService;
+
+@Autowired
+ReferralOfferService referralOfferService;
 
 @Autowired
 ProductService productService;
@@ -95,6 +101,8 @@ public String getWishlist(Model model){
     return "redirect:/shop/productView/"+productId+"/"+variableId;
 }
 
+
+
 @GetMapping("/wishlist/remove/{productId}/{variableId}")
     public String removeFromWishlist(@RequestParam(name = "fromProduct", required = false)String fromProduct,
                                      @PathVariable("productId")Long productId,
@@ -146,6 +154,15 @@ public String getCart(
     session.setAttribute("discount",0);
 
     session.setAttribute("couponId",null);
+    Integer totalAmount = 0;
+
+    for(CartedItems item : cartedItems){
+
+        totalAmount += item.getCurrentPrice();
+
+    }
+
+    model.addAttribute("totalAmount",totalAmount);
 
     return "user/Cart";
 }
@@ -167,11 +184,8 @@ public String getCart(
     cartedItem.setProduct(product);
     cartedItem.setVariable(variable);
     cartedItem.setCart(cart);
-    if(product.getDiscountedPrice() == 0 || product.getDiscountedPrice() == null){
-        cartedItem.setCurrentPrice(product.getPrice());
-    }else{
-        cartedItem.setCurrentPrice(product.getDiscountedPrice());
-    }
+
+    cartedItem.setCurrentPrice(product.getDiscountedPrice());
 
     cartedItemsService.saveCartedItem(cartedItem);
 
@@ -202,7 +216,13 @@ public String getCart(
 
     CartedItems cartedItem = cartedItemsService.findById(CartedItemId);
 
+
+    Variables variable = cartedItem.getVariable();
+    variable.setQuantity(variable.getQuantity()+cartedItem.getQuantity());
+    variableService.saveVariable(variable);
+
     cart.getCartedItems().remove(cartedItem);
+
 
     cartedItemsService.deleteCartedItem(cartedItem);
 
@@ -254,7 +274,9 @@ public String getCart(
     CartedItems cartedItem = cartedItemsService.findById(cartedItemId);
 
     cartedItem.setQuantity(cartedItem.getQuantity() + 1);
-    cartedItem.setCurrentPrice(cartedItem.getProduct().getPrice() * cartedItem.getQuantity());
+    cartedItem.setCurrentPrice(cartedItem.getProduct().getDiscountedPrice() * cartedItem.getQuantity());
+    Variables variable = cartedItem.getVariable();
+    variable.setQuantity(variable.getQuantity()-1);
 
     cartedItemsService.saveCartedItem(cartedItem);
 
@@ -271,7 +293,12 @@ public String getCart(
     CartedItems cartedItem = cartedItemsService.findById(cartedItemId);
 
     cartedItem.setQuantity(cartedItem.getQuantity()-1);
-    cartedItem.setCurrentPrice(cartedItem.getProduct().getPrice() * cartedItem.getQuantity());
+    cartedItem.setCurrentPrice(cartedItem.getProduct().getDiscountedPrice() * cartedItem.getQuantity());
+    Variables variable = cartedItem.getVariable();
+
+    variable.setQuantity(variable.getQuantity()+1);
+
+    variableService.saveVariable(variable);
 
     if(cartedItem.getQuantity() == 0){
 
@@ -319,9 +346,11 @@ public String getCart(
     if(couponIdDto != null){
         orderDto.setCouponId(couponIdDto);
 
-        model.addAttribute("couponSelected",couponService.findCouponByIdDto(couponIdDto));
+       CouponDto coupon = couponService.findCouponByIdDto(couponIdDto);
 
-        discountedPrice = (totalAmount / 100) *  discount;
+        model.addAttribute("couponSelected",coupon);
+
+        discountedPrice = coupon.getDiscountPercentage();
     }else{
         model.addAttribute("couponSelected",null);
     }
@@ -355,6 +384,8 @@ public String getCart(
         OrderDto dto = (OrderDto) session.getAttribute("order");
 
         int amount = dto.getTotalAmount();
+
+        session.setAttribute("order",dto);
         var client=new RazorpayClient("rzp_test_3BnqGyxnP22wsH","WrGbzmVjQ5QriEPZXbkw4A4I");
         JSONObject orderRequest = new JSONObject();
         orderRequest.put("amount",amount*100);
@@ -365,8 +396,6 @@ public String getCart(
     }
 @GetMapping("/buy/address/change")
     public String addAddressToOrder(
-
-
             Model model,
             HttpSession session
 
@@ -378,11 +407,19 @@ public String getCart(
 
     List<Address> addresses = user.getAddresses();
 
+    List<Address> addressToShow = new ArrayList<>();
+
+    for(Address add : addresses){
+        if(add.isActive()){
+            addressToShow.add(add);
+        }
+    }
+
     String username = user.getEmailId();
 
     model.addAttribute("username",username);
 
-    model.addAttribute("addresses",addresses);
+    model.addAttribute("addresses",addressToShow);
 
     session.setAttribute("order",orderDto);
 
@@ -451,46 +488,61 @@ public String getCart(
 
     user.getOrders().add(order);
 
-    user.getCart().getCartedItems().removeAll(user.getCart().getCartedItems());
+
+    Cart cart = user.getCart();
+
+    List<CartedItems> cartedItems = new ArrayList<>(cart.getCartedItems());
+    Iterator<CartedItems> iterator = cartedItems.iterator();
+
+    while (iterator.hasNext()) {
+        CartedItems items = iterator.next();
+        cartedItemsService.deleteCartedItem(items);
+        iterator.remove(); // Use iterator's remove method to avoid ConcurrentModificationException
+    }
+
+    cart.setCartedItems(cartedItems); // Update the cart with the modified list
+
+    user.setCart(cart);
 
     userService.save(user);
 
-    model.addAttribute("orderId",order.getOrderId());
+    model.addAttribute("userId",user.getUserId());
     model.addAttribute("username",auth.getName());
 
     return "buy/order-confirmed";
 }
-@GetMapping("/address")
-    public String getAddress(
-            Model model,
-            @RequestParam("username")String emailId
-){
-
-
-
-    UserInformation user = userService.findByEmailId(emailId);
-
-    List<Address> addresses = user.getAddresses();
-
-    model.addAttribute("addresses",addresses);
-
-    model.addAttribute("user",user);
-
-    model.addAttribute("username",emailId);
-
-    return "user/address";
-
-}
+//@GetMapping("/address")
+//    public String getAddress(
+//            Model model,
+//            @RequestParam("username")String emailId
+//){
+//
+//
+//
+//    UserInformation user = userService.findByEmailId(emailId);
+//
+//    List<Address> addresses = user.getAddresses();
+//
+//    model.addAttribute("addresses",addresses);
+//
+//    model.addAttribute("user",user);
+//
+//    model.addAttribute("username",emailId);
+//
+//    return "user/address";
+//
+//}
 
 @GetMapping("/address/add")
     public String addAddress(Model model,
-                             @RequestParam(name = "fromChange", required = false)String change){
+                             @RequestParam(name = "fromChange", required = false,defaultValue = "no")String change,
+                             HttpSession session){
 
     Address address = new Address();
 
     model.addAttribute("address",address);
     if(change.matches("yes")){
-        model.addAttribute("reroute", true);
+      model.addAttribute("change",true);
     }
 
     return "user/add-address";
@@ -500,7 +552,8 @@ public String getCart(
 @PostMapping("/address/add/post")
     public String postAddAddress(
             @ModelAttribute Address address,
-            @RequestParam(name = "fromChange", required = false)String change
+            @RequestParam(name = "fromChange", required = false,defaultValue = "no")String change,
+            HttpSession session
 ){
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -521,19 +574,20 @@ public String getCart(
         userService.save(user);
 
         if(change.matches("yes")){
-            return "redirect:/user/buy/address/change";
+
+            return "redirect:/user/cart/buy/"+user.getUserId();
         }
 
-        return "redirect:/user/address";
+        return "redirect:/user/profile";
 }
 @GetMapping("/address/delete/{addressId}")
     public String deleteAddress(
             @PathVariable("addressId")Long addressId,
-            @RequestParam("username")String emailId
+            @RequestParam("userId")UUID userId
 ){
     Address address = addressService.findById(addressId);
 
-    UserInformation user = userService.findByEmailId(emailId);
+    UserInformation user = userService.findById(userId);
 
     user.getAddresses().remove(address);
 
@@ -541,7 +595,7 @@ public String getCart(
 
     userService.save(user);
 
-    return "redirect:/user/address";
+    return "redirect:/user/profile";
 }
 
 @GetMapping("/address/edit/{addressId}")
@@ -562,7 +616,7 @@ public String getCart(
     public String postEditAddress(
             @PathVariable("addressId")Long addressId,
             @ModelAttribute Address address,
-            @RequestParam("username")String emailId
+            @RequestParam("userId")UUID userId
 ){
     Address addressToChange = addressService.findById(addressId);
 
@@ -588,7 +642,7 @@ public String getCart(
 
     addressService.save(addressToChange);
 
-    return "redirect:/user/address";
+    return "redirect:/user/profile";
 
 }
 

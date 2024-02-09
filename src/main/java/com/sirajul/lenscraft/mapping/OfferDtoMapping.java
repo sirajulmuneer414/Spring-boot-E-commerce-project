@@ -19,10 +19,6 @@ public class OfferDtoMapping {
 
         }
 
-        if(dto.getMinimumQuantity() != null && dto.getMinimumQuantity() != 0 && dto.getMinimumQuantity() != offer.getMinimumQuantity()) {
-            offer.setMinimumQuantity(dto.getMinimumQuantity());
-        }
-
         if(dto.getOfferPercentage() != null && dto.getOfferPercentage() != 0 && dto.getOfferPercentage() != offer.getOfferPercentage()) {
             offer.setOfferPercentage(dto.getOfferPercentage());
         }
@@ -44,7 +40,6 @@ public class OfferDtoMapping {
         dto.setOfferPercentage(offer.getOfferPercentage());
         dto.setEndDate(offer.getEndDate());
         dto.setStartDate(offer.getStartDate());
-        dto.setMinimumQuantity(offer.getMinimumQuantity());
 
         return dto;
     }
@@ -56,8 +51,6 @@ public class OfferDtoMapping {
         offer.setOfferDescription(dto.getOfferDescription());
 
         offer.setOfferPercentage(dto.getOfferPercentage());
-
-        offer.setMinimumQuantity(dto.getMinimumQuantity());
 
         offer.setStartDate(dto.getStartDate());
 
@@ -72,8 +65,6 @@ public class OfferDtoMapping {
         offer.setOfferPercentage(dto.getOfferPercentage());
 
         offer.setOfferDescription(dto.getOfferDescription());
-
-        offer.setMinimumQuantity(dto.getMinimumQuantity());
 
         offer.setStartDate(dto.getStartDate());
 

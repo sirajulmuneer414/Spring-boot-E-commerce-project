@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @ToString
 public class PasswordChangerDto {
 
+    String emailId;
+
     String otp;
 
     LocalDateTime otpGeneratedTime;

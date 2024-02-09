@@ -6,9 +6,13 @@
     <title>Lenscraft-Product View</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
@@ -25,7 +29,7 @@
 
 </head>
 <body class="container-fluid">
-<div th:replace="~{fragment::navBarHome}"></div>
+<div th:replace="~{fragment::navbar}"></div>
 <div class="row" style="margin-top: 100px; margin-bottom: 50px ">
     <div class="col-6 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6 d-flex justify-content-center">
 
@@ -65,16 +69,17 @@
             <li>
                 <h6 th:text="${'Size : '+product.frameSize.name()}" class="text-muted"></h6>
             </li>
-            <li th:if="${product.discountedPrice == null && product.category.offer.offerPercentage == 0}">
-                <h3 th:text="${'&#8377;'+product.price}" style="color: #b43e8f"></h3>
+            <li th:unless="${product.isHavingOffer or product.category.isHavingOffer}" >
+                <h3 th:text="${'&#8377;'+product.price}" style="color: #40A2E3"></h3>
             </li>
-            <li th:unless="${product.discountedPrice == null}">
+
+            <li th:if="${product.isHavingOffer}">
                 <h3 th:text="${'&#8377;'+product.price}" class="text-muted" style="text-decoration: line-through"></h3>
-                <h3 th:text="${'&#8377;'+product.discountedPrice}" style="color: #b43e8f"></h3>
+                <h3 th:text="${'&#8377;'+product.discountedPrice}" style="color: #40A2E3"></h3><span class="rounded p-2" th:text="${product.offer.offerPercentage+'&#x25; OFF'}" style="color: white; background-color: green"></span>
             </li>
-            <li th:if="${product.category.offer.offerPercentage != 0 && product.discountPrice == 0}">
+            <li th:if="${product.category.isHavingOffer and !product.isHavingOffer}">
                 <h3 th:text="${'&#8377;'+product.price}" class="text-muted" style="text-decoration: line-through"></h3>
-                <h3 th:text="${'&#8377;'+product.discountedPrice}" style="color: #b43e8f"></h3>
+                <h3 th:text="${'&#8377;'+product.discountedPrice}" style="color: #40A2E3"></h3><span class="rounded p-2" th:text="${product.category.offer.offerPercentage+'&#x25; OFF'}" style="color: white; background-color: red"></span>
             </li>
             <li class="d-flex align-items-center">
                 <a th:href="@{/shop/productView/{id}/{variableId}(id=${product.productId},variableId=${targetVariable.variableId})}"><div th:style="| height: 30px; width: 30px;padding: 5px; border: 1px solid #000000; background-color: ${targetVariable.frameColor}"></div></a>
@@ -85,27 +90,27 @@
                 </div>
             </li>
             <li class="d-flex align-items-center">
-                <div>
-                    <form th:action="@{/user/wishlist/add/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:unless="${wishlisted}">
-                        <input type="hidden" name="username" th:value="${username}">
-                <button type="submit" class="btn" style="border-radius: 10px; background-color: #d9d9d9; color: #b43e8f">ADD TO WISHLIST</button>
-                    </form>
-                    <form th:action="@{/user/wishlist/remove/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:if="${wishlisted}">
-                        <input type="hidden" name="username" th:value="${username}">
-                        <input type="hidden" name="fromProduct" th:value="yes">
-                <button type="submit" class="btn" style="border-radius: 10px; background-color: #d9d9d9; color: #b43e8f">REMOVE FROM WISHLIST</button>
-                    </form>
-                </div>
+<!--                <div>-->
+<!--                    <form th:action="@{/user/wishlist/add/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:unless="${wishlisted}">-->
+<!--                        <input type="hidden" name="username" th:value="${username}">-->
+<!--                <button type="submit" class="btn" style="border-radius: 10px; background-color: #d9d9d9; color: #b43e8f">ADD TO WISHLIST</button>-->
+<!--                    </form>-->
+<!--                    <form th:action="@{/user/wishlist/remove/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:if="${wishlisted}">-->
+<!--                        <input type="hidden" name="username" th:value="${username}">-->
+<!--                        <input type="hidden" name="fromProduct" th:value="yes">-->
+<!--                <button type="submit" class="btn" style="border-radius: 10px; background-color: #d9d9d9; color: #b43e8f">REMOVE FROM WISHLIST</button>-->
+<!--                    </form>-->
+<!--                </div>-->
                 <div>
                     <form th:action="@{/user/cart/add/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:unless="${carted}">
                         <input type="hidden" name="username" th:value="${username}">
-                <button type="submit" class="btn" style="border-radius: 10px; background-color: #b43e8f; color: #fff">ADD TO CART</button>
+                <button type="submit" class="btn" style="border-radius: 10px; background-color: #40A2E3; color: #fff">ADD TO CART</button>
                     </form>
                     <form th:action="@{/user/cart/remove/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:if="${carted}">
                         <input type="hidden" name="userId" th:value="${userId}">
                         <input type="hidden" name="cartedItemId" th:value="${cartedItemId}">
                         <input type="hidden" name="fromProduct" th:value="yes">
-                <button type="submit" class="btn" style="border-radius: 10px; background-color: #b43e8f; color: #fff">REMOVE FROM CART</button>
+                <button type="submit" class="btn" style="border-radius: 10px; background-color: #FF8080; color: #fff">REMOVE FROM CART</button>
                     </form>
                 </div>
             </li>
@@ -132,6 +137,6 @@
     </div>
 </div>
 
-
+<div th:replace="~{fragment::footer}"></div>
 </body>
 </html>

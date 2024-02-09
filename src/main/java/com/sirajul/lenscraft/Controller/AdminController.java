@@ -1,13 +1,17 @@
 package com.sirajul.lenscraft.Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sirajul.lenscraft.DTO.UserInformationDto;
 import com.sirajul.lenscraft.Service.interfaces.OrderService;
 import com.sirajul.lenscraft.Service.interfaces.OrderedItemsService;
+import com.sirajul.lenscraft.Service.interfaces.ReferralOfferService;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
+import com.sirajul.lenscraft.entity.offer.ReferralOffer;
 import com.sirajul.lenscraft.entity.user.Order;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.Role;
-import com.sirajul.lenscraft.entity.user.enums.UserStatus;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import com.sirajul.lenscraft.mapping.UserInformationMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -30,11 +35,14 @@ public class AdminController {
     UserInformationMapping userInfoMapping;
 
     @Autowired
+    ReferralOfferService referralOfferService;
+
+    @Autowired
     OrderService orderService;
 
     @Autowired
     OrderedItemsService orderedItemsService;
-    @GetMapping("/")
+    @GetMapping()
     public String getDashboard(){
 
         return "redirect:/dashboard";
@@ -43,11 +51,11 @@ public class AdminController {
     @GetMapping("/dashboard")
     public String dashboard(
             Model model
-    ){
+    ) throws JsonProcessingException {
         Long countOfUsers = userService.countOfUsers();
         model.addAttribute("totalCustomers",countOfUsers);
 
-        List<Order> orders = orderService.findAllInOrder();
+        List<Order> orders = orderService.findAllInOrderDelivered();
 
         Long totalSales = 0L;
 
@@ -60,6 +68,23 @@ public class AdminController {
         Long items = orderedItemsService.countOfItems();
 
         model.addAttribute("soldProducts",items);
+        Map<String,Double> weeklySales=orderService.getWeeklySales();
+        Map<String,Long>weeklyCount=orderService.getWeeklyCount();
+        Map<String,Double>dailySales=orderService.getDailySales();
+        Map<String,Long>dailyCount=orderService.getDailyCount();
+        Map<String,Double>monthlySales=orderService.getMonthlySales();
+        Map<String,Long>monthlySalesCount=orderService.getMonthlySalesCount();
+        Map<String,Double>yearlySales=orderService.getYearlySales();
+        Map<String,Long>yearlySalesCount=orderService.getYearlySalesCount();
+        ObjectMapper objectMapper=new ObjectMapper();
+        model.addAttribute("yearlySales",objectMapper.writeValueAsString(yearlySales));
+        model.addAttribute("yearlySalesCount",objectMapper.writeValueAsString(yearlySalesCount));
+        model.addAttribute("monthlySales",objectMapper.writeValueAsString(monthlySales));
+        model.addAttribute("monthlySalesCount",objectMapper.writeValueAsString(monthlySalesCount));
+        model.addAttribute("dailySales",objectMapper.writeValueAsString(dailySales));
+        model.addAttribute("dailyCount",objectMapper.writeValueAsString(dailyCount));
+        model.addAttribute("weeklyCount",objectMapper.writeValueAsString(weeklyCount));
+        model.addAttribute("weeklySales", objectMapper.writeValueAsString(weeklySales));
 
         return "admin/dashboard";
     }
@@ -78,6 +103,21 @@ public class AdminController {
         }
 
         model.addAttribute("userList",users);
+
+        boolean referIsThere = false;
+
+        ReferralOffer refer = new ReferralOffer();
+
+        if(referralOfferService.isOfferAlreadyEstablished()){
+
+            referIsThere = true;
+
+            refer = referralOfferService.getTheReferalOffer();
+
+        }
+
+        model.addAttribute("referIsThere",referIsThere);
+        model.addAttribute("refer",refer);
 
         return "admin/customerlist";
 
@@ -103,7 +143,7 @@ public class AdminController {
 
         }
         List<String> statuses = new ArrayList<>();
-        for(UserStatus status : UserStatus.values()){
+        for(ActiveStatus status : ActiveStatus.values()){
 
             statuses.add(status.name());
 

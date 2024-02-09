@@ -1,7 +1,9 @@
 package com.sirajul.lenscraft.entity.wallet.enums;
 
 public enum TypeOfTransaction {
-    WITHDRAW,
-    DEPOSIT,
-    REWARD
+    ORDER_CANCEL,
+    ORDER,
+    WELCOME_BONUS,
+    ADD_MONEY,
+    REFERRAL_BONUS
 }

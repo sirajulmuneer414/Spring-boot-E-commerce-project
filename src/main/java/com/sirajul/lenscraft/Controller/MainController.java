@@ -1,6 +1,7 @@
 package com.sirajul.lenscraft.Controller;
 
 import com.sirajul.lenscraft.DTO.SignupDto;
+import com.sirajul.lenscraft.Service.interfaces.ReferralOfferService;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
 import com.sirajul.lenscraft.entity.user.enums.Role;
 import com.sirajul.lenscraft.exception.InvalidOtpException;
@@ -29,12 +30,18 @@ public class MainController {
     UserService userService;
 
     @Autowired
+    ReferralOfferService referralOfferService;
+
+    @Autowired
     OtpUtil otpUtil;
      @GetMapping("/register")
         public String getRegister(Model model){
 
+         boolean referIsThere = referralOfferService.isOfferAlreadyEstablished();
          SignupDto signupDto = new SignupDto();
          model.addAttribute("user",signupDto);
+         model.addAttribute("referIsThere",referIsThere);
+
 
          return "signup";
         }
@@ -45,12 +52,13 @@ public class MainController {
                                    RedirectAttributes redirectAttributes,
                                    @RequestParam(name="adminPassword",required = false)String adminPassword,
                                    @RequestParam(name="refer",required = false)String referralCode,
-                                   @RequestParam("image") MultipartFile file
+                                   @RequestParam(name="image",required = false) MultipartFile file
                                    ) throws IOException {
 
         boolean userExists = userService.userExistsByEmail(signupDto.getEmailId());
 
         log.info(adminPassword);
+
 
         if(userExists){
             String errorMessage = "The Email Id you have entered already exists";
@@ -59,6 +67,7 @@ public class MainController {
             return "redirect:/register";
 
         }
+        if(file != null){
          if (!file.isEmpty()) {
              String fileName = StringUtils.cleanPath(file.getOriginalFilename());
              log.info("inside profile picture uploading");
@@ -70,9 +79,11 @@ public class MainController {
 
 
          }
+        }
 
 
         String otp = otpUtil.generateOtp();
+         System.out.println("This here is the OTP : "+otp);
         signupDto.setOtp(otp);
         signupDto.setOtpGeneratedTime(LocalDateTime.now());
 

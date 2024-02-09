@@ -1,15 +1,22 @@
 package com.sirajul.lenscraft.Controller;
 
+import ch.qos.logback.core.util.DefaultInvocationGate;
+import com.sirajul.lenscraft.DTO.ToPassBoolean;
 import com.sirajul.lenscraft.Service.interfaces.CategoryService;
 import com.sirajul.lenscraft.entity.product.Category;
+import com.sirajul.lenscraft.entity.product.Product;
 import com.sirajul.lenscraft.entity.product.enums.CategoryStatus;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import com.sirajul.lenscraft.utils.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,12 +43,43 @@ public class AdminCategoryController {
 
         Category category = categoryService.findCategoryById(categoryId);
 
-        model.addAttribute("categoryToEdit",category);
+        model.addAttribute("category",category);
 
         return "admin/editCategory";
     }
+    @GetMapping("/check")
+    @ResponseBody
+    public ResponseEntity<ToPassBoolean> addCategoryCheck(@RequestParam("brandName") String brandName){
+        ToPassBoolean checker = new ToPassBoolean();
+        if(categoryService.existsByCategoryName(brandName)){
+            checker.setCheck(false);
+            return new ResponseEntity<>(checker, HttpStatus.IM_USED);
+        }
+        checker.setCheck(true);
+        return new ResponseEntity<>(checker,HttpStatus.ACCEPTED);
+    }
 
-    @GetMapping("/add")
+
+    @PostMapping("/edit/{id}")
+    public String editCategory(@PathVariable("id") Long categoryId,
+                               @ModelAttribute Category categoryFromEdit,
+                               Model model) {
+
+        Category category = categoryService.findCategoryById(categoryId);
+
+        if(categoryFromEdit.getCategoryName() != "" && categoryFromEdit.getCategoryName() != category.getCategoryName() && categoryService.existsByCategoryName(categoryFromEdit.getCategoryName())){
+            category.setCategoryName(categoryFromEdit.getCategoryName());
+        }
+
+        if(categoryFromEdit.getCategoryDescription() != "" && categoryFromEdit.getCategoryDescription() != category.getCategoryDescription()){
+            category.setCategoryDescription(categoryFromEdit.getCategoryDescription());
+        }
+        categoryService.addCategory(category);
+
+        return "redirect:/admin/category";
+    }
+
+        @GetMapping("/add")
     public String getAddCategory(Model model){
 
         Category category = new Category();
@@ -54,7 +92,7 @@ public class AdminCategoryController {
     @PostMapping("/add")
     public String addCategory(
             @ModelAttribute("categoryToAdd") Category category,
-            @RequestParam("image")MultipartFile image
+            @RequestParam(name="image",required = false)MultipartFile image
             ) throws IOException {
 
         category.setCategoryStatus(CategoryStatus.ACTIVE);
@@ -73,7 +111,7 @@ public class AdminCategoryController {
         categoryService.addCategory(category);
 
 
-        return "redirect:/admin/category/";
+        return "redirect:/admin/category";
     }
 
     @GetMapping("/block/{id}")
@@ -83,21 +121,54 @@ public class AdminCategoryController {
 
         category.setCategoryStatus(CategoryStatus.BLOCKED);
 
+        List<Product> products = category.getProducts();
+
+        for(Product product : products){
+
+            product.setActiveStatus(ActiveStatus.BLOCKED);
+
+            categoryService.saveProductFromCategory(product);
+        }
+
         categoryService.addCategory(category);
 
-        return "redirect:/admin/category/";
+        return "redirect:/admin/category";
 
     }
-    @GetMapping("/unBlock/{id}")
+    @GetMapping("/unblock/{id}")
     public String unBlockCategory(@PathVariable("id")Long categoryId){
 
         Category category = categoryService.getCategoryById(categoryId);
 
         category.setCategoryStatus(CategoryStatus.ACTIVE);
 
+        List<Product> products = category.getProducts();
+
+        for(Product product : products){
+
+            product.setActiveStatus(ActiveStatus.ACTIVE);
+
+            categoryService.saveProductFromCategory(product);
+        }
+
         categoryService.addCategory(category);
 
-        return "redirect:/admin/category/";
+        return "redirect:/admin/category";
+
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteCategory(@PathVariable("id")Long categoryId,
+                                 RedirectAttributes redirectAttributes){
+
+        Category category = categoryService.findCategoryById(categoryId);
+
+        if(category.getProducts().isEmpty()){
+            categoryService.deleteCategory(category);
+            return "redirect:/admin/category";
+        }
+        redirectAttributes.addFlashAttribute("error","The category already in use");
+        return "redirect:/admin/category";
 
     }
 

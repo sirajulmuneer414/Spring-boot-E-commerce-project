@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
-    <title>Shoose</title>
+    <title>Lenscraft</title>
     <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"
@@ -41,10 +41,10 @@
                 style="background-color: white"
         >
             <div class="align-self-start">
-                <a class="navbar-brand" th:href="@{/home}">
+                <a class="navbar-brand" th:href="@{/}">
                     <img
                             th:src="@{/images/Mainlogo.png}"
-                            style="height: auto; width: 150px"
+                            style="height: auto; width: 250px"
                             alt=""
                     />
                 </a>
@@ -87,13 +87,13 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="company-info">
-                    <h3>Shoose</h3>
+                    <h3>Lenscraft</h3>
                     <p>
                         Robert Robertson, 1234 NW Bobcat Lane,<br />
                         St. Robert, MO 65584-5678.
                     </p>
                     <div class="social-icons">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#" ><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
@@ -103,17 +103,18 @@
                 <h2>Stay upto date about our new products</h2>
                 <div class="input-group px-5">
                     <input
+                            id="emailFooter"
                             type="email"
                             class="form-control"
                             placeholder="Enter your email"
                     />
                     <div class="input-group-append">
-                        <button class="btn btn-danger">Subscribe</button>
+                        <button class="btn btn-danger" onclick="clearEmail()">Subscribe</button>
                     </div>
                 </div>
             </div>
             <div class="mt-5 pt-5 text-center">
-                <p>Shoose.co © 2000-2023, All Rights Reserved</p>
+                <p>Lenscraft.co © 2000-2023, All Rights Reserved</p>
             </div>
         </div>
     </div>
@@ -128,10 +129,10 @@
                 style="background-color: white"
         >
             <div class="align-self-start">
-                <a class="navbar-brand" href="/homepage">
+                <a class="navbar-brand" href="/">
                     <img
-                            th:src="@{/img/logo.png}"
-                            style="height: 60px; width: 150px"
+                            th:src="@{/images/Mainlogo.png}"
+                            style="height: auto; width: 250px"
                             alt=""
                     />
                 </a>
@@ -141,54 +142,54 @@
                     <div>
                         <a
                                 class="text-decoration-none text-dark"
-                                th:href="@{/admin/home}"
+                                th:href="@{/admin/dashboard}"
                         ><b>Dashboard</b></a
                         >
                     </div>
                     <div>
                         <a
                                 class="text-decoration-none text-dark"
-                                th:href="@{/admin/products-list}"
+                                th:href="@{/admin/products}"
                         ><b>Products</b></a
                         >
                     </div>
                     <div>
                         <a
                                 class="text-decoration-none text-dark"
-                                th:href="@{/admin/categories}"
+                                th:href="@{/admin/category}"
                         ><b>Categories</b></a
                         >
                     </div>
                     <div>
                         <a
                                 class="text-decoration-none text-dark"
-                                th:href="@{/admin/customers-list}"
+                                th:href="@{/admin/customers}"
                         ><b>Customers</b></a
                         >
                     </div>
                     <div>
                         <a
                                 class="text-decoration-none text-dark"
-                                th:href="@{/admin/orders-list}"
+                                th:href="@{/admin/order}"
                         ><b>Orders</b></a
                         >
                     </div>
                     <div>
                         <a
                                 class="text-decoration-none text-dark"
-                                th:href="@{/admin/coupons}"
+                                th:href="@{/admin/coupon}"
                         ><b>Coupons</b></a
                         >
                     </div>
                     <div>
                         <a
                                 class="text-decoration-none text-dark"
-                                th:href="@{/admin/banners}"
-                        ><b>Banners</b></a
+                                th:href="@{/admin/brand}"
+                        ><b>Brand</b></a
                         >
                     </div>
                     <div>
-                        <form th:method="post" th:action="@{/logout}">
+                        <form method="post" th:action="@{/logout}">
                             <input
                                     class="btn btn-danger text-white"
                                     type="submit"
@@ -210,17 +211,17 @@
             </div>
             <!-- <div class="header_img"> <img src="/images/heroimage.png" alt=""> </div> -->
         </header>
-        <div class="l-navbar" id="nav-bar" style="background-color: white ;    ">
+        <div class="l-navbar" id="nav-bar" style="background-color: white ;   ">
             <nav class="nav">
                 <div>
 
 
                     <div class="nav_list">
-                        <a th:href="@{/admin/home}" class="nav_link active">
+                        <a th:href="@{/admin}" class="nav_link active" >
                             <i class='bx bx-grid-alt nav_icon'></i>
                             <span class="nav_name">Dashboard</span>
                         </a>
-                        <a th:href="@{/admin/products-list}" class="nav_link">
+                        <a th:href="@{/admin/products}" class="nav_link">
                             <i class='fa-solid fa-box nav_icon'></i>
                             <span class="nav_name">Products</span>
                         </a>
@@ -249,10 +250,11 @@
 
                     </div>
                 </div>
+            </nav>
         </div>
 
     </div>
-    </nav>
+
 </div>
 </div>
 <script th:inline="javascript">
@@ -282,6 +284,12 @@
         links.forEach(link => link.addEventListener('click', activateLink));
 
         document.getElementById('header-toggle').addEventListener('click', toggleSidebar);
+
+        function clearEmail(){
+            var input = document.getElementById('footerEmail');
+            input.value = '';
+            input.placeholder = 'Enter your email';
+        }
     });
     /*]]>*/
 </script>

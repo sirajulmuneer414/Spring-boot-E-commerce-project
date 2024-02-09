@@ -17,8 +17,6 @@ public class OfferDto {
 
     Integer offerPercentage;
 
-    Integer minimumQuantity;
-
     String offerDescription;
 
     LocalDate startDate;

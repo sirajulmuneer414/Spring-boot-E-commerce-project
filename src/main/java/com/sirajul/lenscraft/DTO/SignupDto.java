@@ -30,6 +30,8 @@ public class SignupDto{
 
         String phone;
 
+        String referralCode;
+
         String otp;
 
         String profilePic;

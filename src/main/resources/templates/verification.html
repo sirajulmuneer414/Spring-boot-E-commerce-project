@@ -18,7 +18,7 @@
                     <img th:src="@{/images/Mainlogo.png}" class="w-100 h-auto">
                 </div>
                 <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 col-xxl-2 navLogo d-flex align-items-center">
-                    <a th:href="@{/register/cancel}" class="btn text-danger">CANCEL</a>
+                    <a th:href="@{/register/cancel}" class="btn btn-danger">CANCEL</a>
                 </div>
 
             </div>
@@ -28,12 +28,14 @@
 
             <form th:action="@{/verification}" method="post">
 
-                <div class="form-group">
+                <div class="form-group my-3">
                     <label for="otp" >Enter The OTP </label>
                     <input type="text" id="otp" name="otp" placeholder="Enter the 6-letter OTP">
                 </div>
+                <div class="d-flex justify-content-between">
                 <a th:href="@{/resend-otp}">Resend OTP</a>
-                <button type="submit" class="btn btn-primary">Verify</button>
+                <button type="submit" class="btn btn-warning">Verify</button>
+                </div>
 
             </form>
 

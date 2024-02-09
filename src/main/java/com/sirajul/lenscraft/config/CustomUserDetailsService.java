@@ -1,7 +1,7 @@
 package com.sirajul.lenscraft.config;
 
 import com.sirajul.lenscraft.entity.user.UserInformation;
-import com.sirajul.lenscraft.entity.user.enums.UserStatus;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -62,7 +62,7 @@ public class CustomUserDetailsService implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-         if(user.getUserStatus().equals(UserStatus.BLOCKED)){
+         if(user.getActiveStatus().equals(ActiveStatus.BLOCKED)){
              return false;
          }
         return true;

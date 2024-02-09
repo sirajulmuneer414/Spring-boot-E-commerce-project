@@ -1,6 +1,7 @@
 package com.sirajul.lenscraft.Service.interfaces;
 
 import com.sirajul.lenscraft.DTO.Product.ProductDto;
+import com.sirajul.lenscraft.entity.product.Category;
 import com.sirajul.lenscraft.entity.product.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,4 +31,16 @@ public interface ProductService {
     Page<Product> findAllProductsContaining(String keyword, int pageNo, int pageSize);
 
     int totalPagesCount(int pageSize);
+
+    List<Product> findAllProductByCategory(Category category);
+
+    Page<Product> findAllProductByCategory(Category category, int pageNo, int pageSize);
+
+    void blockById(Long productId);
+
+    void unBlockById(Long productId);
+
+    Page<Product> findAllProductsContainingActive(String keyword, int pageNo, int pageSize);
+
+    Page<Product> findAllProductsInPageableActive(int pageNo, int pageSize);
 }

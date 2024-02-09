@@ -6,6 +6,8 @@
     <title>Customer List</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.20/dist/sweetalert2.min.css">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
@@ -50,34 +52,67 @@ nav {
 
     </style>
 </head>
-<body class="container-fluid">
-<div th:fragment="navBarAdminWithSearch" class="row fixed-top">
-    <nav class="navDiv w-100 container-fluid" th:style="'background-color: #b43e8f; height: 70px;'">
-        <div class="h-100 navBox d-flex justify-content-between align-items-center">
-            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 col-xxl-2 navLogo d-flex justify-content-center align-items-center h-100">
-                <a th:href="@{/admin/dashboard}"><img th:src="@{/images/Mainlogo.png}" class="w-100 h-auto"></a>
-            </div>
-            <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
-                <form th:action="@{/admin/customers}" method="get">
-                <div class="input-group">
-                    <div id="search-autocomplete" class="form-outline">
-                        <input type="text" id="form1" class="form-control" placeholder="Search" name="keyword"/>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-                </form>
-            </div>
-            <div class="col-3 d-flex justify-content-center align-items-center">
+<body>
+<div th:replace="~{fragment::admin-navbar}">
+</div>
+<div class="container">
+<div class="row d-flex justify-content-center align-items-center" >
+    <div class="col-8 border rounded container-fluid mt-5 mb-5 p-4" th:if="${referIsThere}" style="height: fit-content">
+        <table class="row">
+            <thead class="col-12 container-fluid">
+            <tr class="row">
+                <th class="col-3">
+                   <b> Money To Reg. User</b>
+                </th>
+                <th class="col-3">
+                   <b> Money To Ref. User</b>
+                </th>
+                <th class="col-3">
+                    <b> Start Date</b>
+                </th>
+                <th class="col-3">
+                    <b> End Date</b>
+                </th>
 
-                <a class="btn btn-light navBtn" th:href="@{/}">SHOP</a>
+            </tr>
+
+            </thead>
+            <tbody class="col-12 container-fluid" >
+            <tr class="row">
+                <td class="col-3">
+                    <p th:text="${refer.moneyToWallet}"></p>
+                </td>
+                <td class="col-3">
+                    <p th:text="${refer.moneyToReferred}"></p>
+                </td>
+                <td class="col-3">
+                    <p th:text="${refer.startDate}"></p>
+                </td>
+                <td class="col-3">
+                    <p th:text="${refer.endDate}"></p>
+                </td>
+            </tr>
+            </tbody>
+
+        </table>
+        <div class="row">
+            <div class="col-6">
+
+            </div>
+            <div class="col-6 d-flex justify-content-end mt-2">
+                <div class="px-5">
+                <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#editReferModal">Edit Offer</button>
+                </div>
+                <div>
+                <a class="btn btn-danger" th:href="@{/admin/offer/referral/delete}">DELETE</a>
+                </div>
 
             </div>
         </div>
-    </nav>
-</div>
-<div class="row d-flex justify-content-center align-items-center" th:style="'height: 100vh'">
+    </div>
+    <div class="col-12 d-flex justify-content-end mt-5 mb-5" th:unless="${referIsThere}" style="height: fit-content">
+        <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addReferModal">Add Offer</button>
+    </div>
 <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12 container-fluid w-100 overflow-auto">
     <table class="table text-center col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
         <thead class="thead-dark bg-secondary  text-white">
@@ -114,7 +149,175 @@ nav {
     </table>
 </div>
 </div>
+</div>
+<div class="modal fade" th:unless="${referIsThere}" id="addReferModal" tabindex="-1" role="dialog" aria-labelledby="addReferModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addReferModalLabel">Add Refer Coupon</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add form elements for adding a coupon -->
+                <form th:action="@{/admin/offer/referral/add}" method="post" id="referForm" th:object="${refer}" onsubmit="validateCouponForm(event)">
+                    <div class="form-group">
+                        <label for="moneyToReg">Money to registering User</label>
+                        <input type="number" class="form-control" id="moneyToReg" th:field="*{moneyToWallet}" placeholder="Enter The Amount" min="10" max="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="moneyToRef">Money to referred User</label>
+                        <input type="number" class="form-control" id="moneyToRef" th:field="*{moneyToReferred}" placeholder="Enter The Amount" min="10" max="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" th:field="*{startDate}" >
+                    </div>
+                    <div class="form-group">
+                        <label for="expiryDate">Expiry Date</label>
+                        <input type="date" class="form-control" id="expiryDate" th:field="*{endDate}" >
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" onclick="validateCouponForm(event)" class="btn btn-primary">Save Offer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:if="${referIsThere}" class="modal fade" id="editReferModal" tabindex="-1" role="dialog" aria-labelledby="editReferModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEditModalLabel">Edit Refer Offer</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add form elements for adding a coupon -->
+                <form th:action="@{/admin/offer/referral/edit}" method="post" id="referFormEdit" th:object="${refer}" onsubmit="validateCouponForm(event)">
+                    <div class="form-group">
+                        <label for="editMoneyReg">Money to registering User</label>
+                        <input type="number" class="form-control" id="editMoneyReg" th:field="*{moneyToWallet}" placeholder="Enter The Amount" th:value="${refer.moneyToWallet}"  min="10" max="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="editMoneyRef">Money to referred User</label>
+                        <input type="number" class="form-control" id="editMoneyRef" th:field="*{moneyToReferred}" placeholder="Enter The Amount" th:value="${refer.moneyToReferred}"  min="10" max="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="editStartDate">Start Date</label>
+                        <input type="date" class="form-control" id="editStartDate" th:field="*{startDate}"  th:value="${refer.startDate}">
+                    </div>
+                    <div class="form-group">
+                        <label for="editExpiryDate">Expiry Date</label>
+                        <input type="date" class="form-control" id="editExpiryDate" th:field="*{endDate}" th:value="${refer.endDate}">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" onclick="validateCouponForm(event)" class="btn btn-primary">Save Offer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.20/dist/sweetalert2.all.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script>$(document).ready(function() {
+    // Move the 'today' variable declaration to the top
+    const today = new Date();
+
+    // Set the minimum value for the Start Date input to today
+    document.getElementById('startDate').min = formatDate(today);
+    document.getElementById('expiryDate').min = formatDate(today);
+
+    document.getElementById('editStartDate').min = formatDate(today);
+    document.getElementById('editExpiryDate').min = formatDate(today);
+
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
+        const day = date.getDate().toString().padStart(2, '0');
+        return year + '-' + month + '-' + day; // or use template literals: `${year}-${month}-${day}`
+    }
+
+    function validateEditCouponForm(e) {
+        e.preventDefault();
+
+        // Retrieve form inputs
+        const startDate = document.getElementById('editStartDate').value;
+        const expiryDate = document.getElementById('editExpiryDate').value;
+
+        function showAlert(title, text, icon) {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK',
+            });
+        }
+
+        // Validate start date
+        if (startDate < today) {
+            showAlert('Validation Error', 'Start Date should not be earlier than today.', 'error');
+            return;
+        }
+
+        // Validate expiry date
+        if (expiryDate < startDate) {
+            showAlert('Validation Error', 'Expiry Date should not be earlier than Start Date.', 'error');
+            return;
+        }
+
+        // If all validations pass, the form submission will not be blocked
+        const form = document.getElementById('referFormToEdit');
+        form.submit();
+    }
+
+    function validateCouponForm(e) {
+        e.preventDefault();
+
+        // Retrieve form inputs
+        const startDate = document.getElementById('startDate').value;
+        const expiryDate = document.getElementById('expiryDate').value;
+
+        function showAlert(title, text, icon) {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK',
+            });
+        }
+
+        // Validate start date
+        if (startDate < today) {
+            showAlert('Validation Error', 'Start Date should not be earlier than today.', 'error');
+            return;
+        }
+
+        // Validate expiry date
+        if (expiryDate < startDate) {
+            showAlert('Validation Error', 'Expiry Date should not be earlier than Start Date.', 'error');
+            return;
+        }
+
+        // If all validations pass, the form submission will not be blocked
+        const form = document.getElementById('referForm');
+        form.submit();
+    }
+});
+</script>
 </body>
 </html>

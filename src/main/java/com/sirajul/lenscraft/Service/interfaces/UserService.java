@@ -33,4 +33,6 @@ public interface UserService {
     void save(UserInformation user);
 
     Long countOfUsers();
+
+    boolean existsByReferralCode(String code);
 }

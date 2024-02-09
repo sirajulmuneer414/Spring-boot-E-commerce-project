@@ -1,7 +1,7 @@
 package com.sirajul.lenscraft.entity.user;
 
 import com.sirajul.lenscraft.entity.user.enums.Role;
-import com.sirajul.lenscraft.entity.user.enums.UserStatus;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import com.sirajul.lenscraft.entity.wallet.Wallet;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -14,13 +14,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 @Component
 @Entity
 @Setter
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(
@@ -73,7 +73,7 @@ public class UserInformation{
             name = "user_status"
     )
     @Enumerated(EnumType.STRING)
-    UserStatus userStatus = UserStatus.ACTIVE;
+    ActiveStatus activeStatus = ActiveStatus.ACTIVE;
 
     String profilePic;
 
@@ -85,7 +85,7 @@ public class UserInformation{
     @OneToOne(cascade = CascadeType.ALL)
     Cart cart;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     Wallet wallet;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
@@ -93,5 +93,10 @@ public class UserInformation{
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     List<Order> orders;
+
+    public UserInformation(){
+        orders = new ArrayList<>();
+        addresses = new ArrayList<>();
+    }
 
 }

@@ -52,34 +52,11 @@ nav {
 
     </style>
 </head>
-<body class="container-fluid">
-<div th:fragment="navBarAdminWithSearch" class="row fixed-top">
-    <nav class="navDiv w-100 container-fluid" th:style="'background-color: #b43e8f; height: 70px;'">
-        <div class="h-100 navBox d-flex justify-content-between align-items-center">
-            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 col-xxl-2 navLogo d-flex justify-content-center align-items-center h-100">
-                <a th:href="@{/admin/dashboard}"><img th:src="@{/images/Mainlogo.png}" class="w-100 h-auto"></a>
-            </div>
-<!--            <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4 col-xxl-4">-->
-<!--                <form th:action="@{/admin/products/}" method="get">-->
-<!--                    <div class="input-group">-->
-<!--                        <div id="search-autocomplete" class="form-outline">-->
-<!--                            <input type="text" id="form1" class="form-control" placeholder="Search" name="keyword"/>-->
-<!--                        </div>-->
-<!--                        <button type="submit" class="btn btn-info">-->
-<!--                            <i class="fas fa-search"></i>-->
-<!--                        </button>-->
-<!--                    </div>-->
-<!--                </form>-->
-<!--            </div>-->
-            <div class="col-3 d-flex justify-content-center align-items-center">
+<body>
+<div th:replace="~{fragment::admin-navbar}" >
 
-                <a class="btn btn-light navBtn" th:href="@{/}">SHOP</a>
-
-            </div>
-        </div>
-    </nav>
 </div>
-<div class="row d-flex flex-column justify-content-center align-items-center" style="height: calc(100vh - 70px)">
+<div class="container-fluid row d-flex flex-column justify-content-center align-items-center" style="height: calc(100vh - 70px)">
 
     <div class="col-11 col-sm-11 col-md-11 col-lg-11 col-xl-11 col-xxl-11 container-fluid w-100 overflow-auto">
         <table class="table text-center col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
@@ -98,17 +75,16 @@ nav {
             </thead>
             <tbody>
             <tr th:each="order : ${orders}" class="table-info">
-                   <td> <a th:href="@{/admin/order/items/{orderId}(orderId=${order.orderId})}" th:text="${order.orderId}" style="text-decoration: none"></a></td>
+                   <td th:text="${order.orderId}"></td>
                 <td th:text="${order.user.firstName}"></td>
                 <td th:text="${order.totalAmount}"></td>
-                <td th:text="${order.paymentType.name()}"></td>
+                <td th:text="${order.paymentDetails.paymentType.name()}"></td>
+                <td th:text="${order.currentStatus.name()}" style="text-info">
+                </td>
                 <td>
-                    <h6 th:if="${order.fullOrderStatus.name() == 'PENDING'}" class="text-warning">PENDING</h6>
-                    <h6 th:if="${order.fullOrderStatus.name() == 'COMPLETED'}" class="text-success">COMPLETED</h6>
-                    <h6 th:if="${order.fullOrderStatus.name() == 'CANCELLED'}" class="text-danger">CANCELLED</h6>
+                    <a th:href="@{/admin/order/items/{orderId}(orderId = ${order.orderId})}" class="btn btn-info" style="text-decoration: none">VIEW DETAILS</a>
                 </td>
                 <td th:text="${order.orderedTime.toLocalDate()}"></td>
-                <td><a th:href="@{/admin/order/items/delete/{orderId}(orderId=${order.orderId})}" class="btn btn-danger">DELETE</a></td>
             </tr>
             </tbody>
         </table>

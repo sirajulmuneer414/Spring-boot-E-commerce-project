@@ -27,49 +27,31 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"
     ></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+padding: 0;
+margin: 0;
+box-sizing: border-box;
+font-family: 'Poppins', sans-serif;
+}
+nav {
+background-color: #b43e8f;
+height: 80px;
+position: fixed;
+}
+    </style>
 </head>
 <body>
-<div th:replace="~{fragment::navBarAdmin}"></div>
-<div class="row" th:style="'height: 70px;'"></div>
-<nav class="sideBar position-fixed d-flex justify-content-around align-items-center">
-    <ul class="d-flex flex-row justify-content-between align-items-center">
+<div th:replace="~{fragment::admin-navbar}"></div>
 
-        <li class="sideBarContent">
-            <a th:href="@{/admin/order}"><h4>ORDERS</h4></a>
 
-        </li>
-        <div class="sideBarContent">
-            <a th:href="@{/admin/products/}"><h4>PRODUCTS</h4></a>
-
-        </div>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/customers}"><h4>CUSTOMERS</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/coupon}" style="color: #fff"><h4>COUPONS</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/category/}"><h4>CATEGORIES</h4></a>
-
-        </li>
-        <li class="sideBarContent">
-            <a th:href="@{/admin/brand/}"><h4>BRANDS</h4></a>
-
-        </li>
-        <li th:if="${#authorization.expression('isAuthenticated()')}" class="logoutBtn d-flex justify-content-center align-items-center">
-            <form th:action="@{/logout}" method="post">
-                <button type="submit" style="border: none; padding: 0; background-color: #d9d9d9; color: red"><h4>LOG OUT</h4></button>
-            </form>
-        </li>
-    </ul>
-</nav>
 <p class="text-center text-white bg-danger" th:text="${couponExists}"></p>
 <p class="text-center text-white bg-danger" th:text="${couponCodeExists}"></p>
 <h2 class="text-center" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Coupons</h2>
 <div class="d-flex justify-content-end pt-5">
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">Add Coupon</button>
+    <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addCouponModal">Add Coupon</button>
 </div>
 <div class="container mt-5">
     <table class="table text-center custom-table">

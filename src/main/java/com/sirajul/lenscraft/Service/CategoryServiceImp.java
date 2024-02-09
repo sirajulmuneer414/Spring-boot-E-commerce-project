@@ -3,7 +3,10 @@ package com.sirajul.lenscraft.Service;
 import com.sirajul.lenscraft.DTO.shop.CategoryHomeDto;
 import com.sirajul.lenscraft.Repository.CategoryRepository;
 import com.sirajul.lenscraft.Service.interfaces.CategoryService;
+import com.sirajul.lenscraft.Service.interfaces.ProductService;
 import com.sirajul.lenscraft.entity.product.Category;
+import com.sirajul.lenscraft.entity.product.Product;
+import com.sirajul.lenscraft.entity.product.enums.CategoryStatus;
 import com.sirajul.lenscraft.mapping.CategoryDtoMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,9 @@ public class CategoryServiceImp implements CategoryService
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    ProductService productService;
 
     @Autowired
     CategoryDtoMapping categoryDtoMapping;
@@ -69,5 +75,30 @@ public class CategoryServiceImp implements CategoryService
     @Override
     public Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId).get();
+    }
+
+    @Override
+    public void deleteCategory(Category category) {
+        categoryRepository.delete(category);
+    }
+
+    @Override
+    public boolean existsByCategoryName(String categoryName) {
+        return categoryRepository.existsByCategoryNameIgnoreCase(categoryName);
+    }
+
+    @Override
+    public List<Category> findAllActiveCategories() {
+        return categoryRepository.findAllByCategoryStatus(CategoryStatus.ACTIVE);
+    }
+
+    @Override
+    public void update(Category prod) {
+        categoryRepository.save(prod);
+    }
+
+    @Override
+    public void saveProductFromCategory(Product product) {
+        productService.save(product);
     }
 }

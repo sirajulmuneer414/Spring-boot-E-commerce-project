@@ -1,21 +1,24 @@
 package com.sirajul.lenscraft.Controller;
 
 import com.sirajul.lenscraft.DTO.Product.ProductDto;
+import com.sirajul.lenscraft.Service.interfaces.CategoryService;
 import com.sirajul.lenscraft.Service.interfaces.ProductService;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
 import com.sirajul.lenscraft.Service.interfaces.VariableService;
+import com.sirajul.lenscraft.entity.product.Category;
 import com.sirajul.lenscraft.entity.product.Product;
 import com.sirajul.lenscraft.entity.product.Variables;
-import com.sirajul.lenscraft.entity.user.Cart;
-import com.sirajul.lenscraft.entity.user.CartedItems;
-import com.sirajul.lenscraft.entity.user.UserInformation;
-import com.sirajul.lenscraft.entity.user.Wishlist;
+import com.sirajul.lenscraft.entity.user.*;
+import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import com.sirajul.lenscraft.mapping.ProductMapping;
 import jakarta.persistence.GeneratedValue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,12 +49,15 @@ public class ShopController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/")
+    @Autowired
+    CategoryService categoryService;
+
+    @GetMapping()
     public String getShop(
             Model model,
             @RequestParam(name="keyword",required = false) String keyword,
             @RequestParam(name="pageNo",defaultValue = "1",required = false) int pageNo,
-            @RequestParam(name="pageSize",defaultValue = "10",required = false) int pageSize
+            @RequestParam(name="pageSize",defaultValue = "12",required = false) int pageSize
 
     )
     {
@@ -73,10 +79,10 @@ public class ShopController {
         Page<Product> products;
 
         if(keyword !=null){
-            products = productService.findAllProductsContaining(keyword,pageNo,pageSize);
+            products = productService.findAllProductsContainingActive(keyword,pageNo,pageSize);
         }
         else {
-            products = productService.findAllProductsInPageable(pageNo,pageSize);
+            products = productService.findAllProductsInPageableActive(pageNo,pageSize);
         }
 
 
@@ -92,6 +98,60 @@ public class ShopController {
 
 
         return "shop/shop";
+    }
+    @GetMapping("/category")
+public String getCategoryShop(
+            Model model,
+            @RequestParam(name="categoryId") Long categoryId,
+            @RequestParam(name="keyword",required = false) String keyword,
+            @RequestParam(name="pageNo",defaultValue = "1",required = false) int pageNo,
+            @RequestParam(name="pageSize",defaultValue = "12",required = false) int pageSize
+
+    )
+    {
+
+        Category category = categoryService.findCategoryById(categoryId);
+
+        Page<Product> products;
+
+
+            List<Product> initialProducts = new ArrayList<>();
+        if(keyword !=null){
+            for(Product prod : productService.findAllProductsContaining(keyword)){
+
+                if(prod.getCategory() == category){
+                    if(prod.getActiveStatus()== ActiveStatus.ACTIVE) {
+                        initialProducts.add(prod);
+                    }
+                }
+
+            }
+
+        }
+        else {
+            for (Product prod : productService.findAllProductByCategory(category)) {
+                if(prod.getActiveStatus()==ActiveStatus.ACTIVE){
+                    initialProducts.add(prod);
+                }
+
+            }
+        }
+            Pageable pageRequest = PageRequest.of(pageNo - 1, pageSize);
+
+            products = new PageImpl<>(initialProducts.subList((int) pageRequest.getOffset(), (int) Math.min((pageRequest.getOffset() + pageRequest.getPageSize()), initialProducts.size())), pageRequest, initialProducts.size());
+
+
+
+
+
+
+        model.addAttribute("products",products);
+        model.addAttribute("categoryId",categoryId);
+        model.addAttribute("pageNo",pageNo);
+        model.addAttribute("totalPages",initialProducts.size()/pageSize);
+
+
+        return "shop/category-shop";
     }
 
     @GetMapping("/productView/{productId}/{variableId}")
