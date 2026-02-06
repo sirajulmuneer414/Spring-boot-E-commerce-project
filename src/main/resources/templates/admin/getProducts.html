@@ -1,112 +1,147 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lenscraft - Admin productList</title>
-    <link th:rel="stylesheet" th:href="@{/css/product-list.css}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <title>Lenscraft Admin - Products</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+        :root {
+            --primary: #4F46E5;
+            --dark: #0F172A;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif
+        }
 
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
 
-.navDiv {
-    background-color: #b43e8f;
-}
+        body {
+            font-family: var(--font-body);
+            background-color: #f8fafc
+        }
 
-.navBox {
-    display: flex;
-    justify-content: space-between;
-}
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%);
+            padding: 32px 0;
+            color: white;
+            margin-bottom: 32px
+        }
 
-nav {
-    background-color: #b43e8f;
-    height: 80px;
-    position: fixed;
-}
+        .admin-header h1 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            margin: 0
+        }
 
-.navBtn {
-    background-color: #fff;
-    border-radius: 5px;
-    color: #b43e8f;
-}
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08)
+        }
 
-.navBtn:hover {
-    border: 2px solid #fff;
-    color: #fff;
-    background-color: #b43e8f;
-}
+        .table th {
+            font-weight: 600;
+            color: var(--dark);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 16px
+        }
 
-.navlogo {
-    height: auto;
-    width: 100%;
-}
+        .table td {
+            padding: 16px;
+            vertical-align: middle
+        }
 
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            border: none;
+            color: white
+        }
+
+        .btn-edit {
+            background: #3b82f6
+        }
+
+        .btn-delete {
+            background: #ef4444
+        }
+
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+            color: white
+        }
     </style>
 </head>
-<body class="container-fluid">
-<div th:replace="~{fragment::admin-navbar}"></div>
 
-
-<div class="row d-flex flex-column justify-content-center align-items-center" style="height: calc(100vh - 70px)">
-    <div class="d-flex justify-content-end col-11 ">
-        <a class="btn btn-dark me-5 mb-5" th:href="@{/admin/products/add}">add product</a>
+<body>
+    <div th:replace="~{fragment::admin-navbar}"></div>
+    <div class="admin-header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1><i class='bx bx-box me-2'></i>Products</h1>
+            <a th:href="@{/admin/products/add}" class="btn-add"><i class='bx bx-plus me-2'></i>Add Product</a>
+        </div>
     </div>
-    <div class="col-11 col-sm-11 col-md-11 col-lg-11 col-xl-11 col-xxl-11 container-fluid w-100 overflow-auto">
-        <div th:if="${products.isEmpty()}">PRODUCT LIST IS EMPTY</div>
-        <table class="table text-center col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-            <thead class="thead-dark bg-secondary text-white">
-        <tr>
-            <th>Product</th>
-            <th>Product id</th>
-            <th>Stock Status</th>
-            <th>Prize</th>
-            <th>Frame size</th>
-            <th>Frame length</th>
-            <th>Frame Colors</th>
-            <th>Status</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="product : ${products}" class="table-info">
-            <td th:text="${product.productName}"></td>
-            <td th:text="${product.productId}"></td>
-            <td th:if="${product.stockStatus.name()=='IN_STOCK'}"  class="text-success">IN_STOCK</td>
-            <td th:if="${product.stockStatus.name()=='OUT_OF_STOCK'}"  class="text-danger">OUT_OF_STOCK</td>
-            <td th:if="${product.stockStatus.name()=='LOW_STOCK'}"  class="text-warning">LOW_STOCK</td>
-            <td th:text="${product.price}"  class="text-primary"></td>
-            <td th:text="${product.frameSize.name()}"></td>
-            <td>
-                <div th:each="variable : ${product.variables}">
-                    <div th:style="|width: 10px; height: 10px; background: ${variable.frameColor}"></div>
-                    <br>
-                </div>
-            </td>
-            <td><a type="button" th:href="@{/admin/products/edit/{id}(id=${product.productId})}" class="btn btn-warning">EDIT</a></td>
-            <td  th:if="${product.activeStatus.name() == 'ACTIVE'}" ><a type="button" th:if="@{product.activeStatus.name() == 'ACTIVE'}" th:href="@{/admin/products/block/{id}(id=${product.productId})}" class="btn btn-success">ACTIVE</a></td>
-            <td  th:if="${product.activeStatus.name() == 'BLOCKED'}"><a type="button" th:href="@{/admin/products/unblock/{id}(id=${product.productId})}" class="btn btn-danger">BLOCKED</a></td>
-            <td><a type="button" th:href="@{/admin/products/delete/{id}(id=${product.productId})}" class="btn btn-danger">DELETE</a></td>
-            <td><a type="button" th:href="@{/admin/products/get-variables/{id}(id=${product.productId})}" class="btn btn-info">EDIT VARIABLE</a></td>
-            <td th:unless="${product.isHavingOffer}"><a type="button" th:href="@{/admin/offer/product/add/{id}(id=${product.productId})}" class="btn btn-primary">ADD OFFER</a></td>
-            <td th:if="${product.isHavingOffer}"><a type="button" th:href="@{/admin/offer/product/edit/{id}(id=${product.productId})}" class="btn btn-warning">EDIT OFFER</a></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <div class="container pb-5">
+        <div class="table-card">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Brand</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${products}">
+                        <td th:text="${product.productId}">1</td>
+                        <td><img th:src="${#strings.startsWith(product.variables[0].image1, 'http') ? product.variables[0].image1 : '/productImages/'+product.productId+'/'+product.variables[0].image1}"
+                                style="width:50px;height:50px;border-radius:8px;object-fit:cover" alt="Product"></td>
+                        <td th:text="${product.productName}">Name</td>
+                        <td th:text="${product.brand.brandName}">Brand</td>
+                        <td th:text="${product.category.categoryName}">Category</td>
+                        <td th:text="'₹' + ${product.price}">Price</td>
+                        <td th:text="${product.stockStatus}">Stock</td>
+                        <td>
+                            <a th:href="@{/admin/products/edit/{id}(id=${product.productId})}"
+                                class="btn-action btn-edit">Edit</a>
+                            <form th:action="@{/admin/products/delete/{id}(id=${product.productId})}" method="post"
+                                style="display:inline">
+                                <button type="submit" class="btn-action btn-delete">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
+
 </html>

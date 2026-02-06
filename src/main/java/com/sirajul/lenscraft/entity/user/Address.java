@@ -14,33 +14,28 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Address {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long addressId;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long addressId;
 
-    @Valid
-    String buyerName;
+        @Valid
+        String buyerName;
 
-    @Column(
-            columnDefinition = "TEXT"
-    )
-    String houseAddress;
+        @Column(columnDefinition = "TEXT")
+        String houseAddress;
 
-    String state;
+        String state;
 
-    String district;
+        String district;
 
-    Integer pincode;
+        String pincode;
 
-    String mobileNumber;
+        String mobileNumber;
 
-    @Column(
-            nullable = true
-    )
-    boolean active;
+        @Column(nullable = true)
+        boolean active;
 
-    @ManyToOne
-    UserInformation user;
-
+        @ManyToOne
+        UserInformation user;
 
 }

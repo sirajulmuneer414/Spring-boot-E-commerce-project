@@ -1,59 +1,110 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit category</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-            crossorigin="anonymous"></script>
+    <title>Admin - Edit Category</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+        :root {
+            --primary: #4F46E5;
+            --dark: #0F172A;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif
+        }
 
-  * {
-      padding: 0;
-      margin: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-  }
-          nav {
-    background-color: #b43e8f;
-    height: 80px;
-    position: fixed;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: #f8fafc
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%);
+            padding: 32px 0;
+            color: white;
+            margin-bottom: 32px
+        }
+
+        .admin-header h1 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            margin: 0
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            max-width: 600px;
+            margin: 0 auto
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px
+        }
+
+        .form-control {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            transition: all 0.3s
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1)
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3)
+        }
     </style>
 </head>
-<body class="container-fluid">
-<div th:replace="~{fragment::admin-navbar}"></div>
-<div class="row d-flex justify-content-center align-items-center" style="height: 100vh">
-    <div class="col-6 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4 d-flex justify-content-center">
-        <form th:action="@{/admin/category/edit/{id}(id=${category.categoryId})}" method="post" th:object="${category}">
-            <div class="form-group">
-                <label for="categoryName">CategoryName</label>
-                <input type="text" id="categoryName" th:field="*{categoryName}" th:value="${category.categoryName}">
 
-            </div>
-            <div class="form-group">
-                <label for="categoryDescription">Description</label>
-                <input type="text" id="categoryDescription" th:field="*{categoryDescription}" th:value="${category.categoryDescription}" >
-
-            </div>
-            <div class="d-flex justify-content-center align-items-center">
-
-                <button type="submit" class="btn">Submit</button>
-
-            </div>
-
-        </form>
-        <div class="d-flex justify-content-end">
-            <a th:href="@{/admin/category}" class="btn btn-warning">Go To Categories</a>
-
+<body>
+    <div th:replace="~{fragment::admin-navbar}"></div>
+    <div class="admin-header">
+        <div class="container">
+            <h1><i class='bx bx-edit me-2'></i>Edit Category</h1>
         </div>
     </div>
-
-</div>
-
+    <div class="container pb-5">
+        <div class="form-card">
+            <form th:action="@{/admin/category/edit}" method="post" th:object="${category}">
+                <input type="hidden" th:field="*{categoryId}">
+                <div class="mb-3"><label class="form-label">Category Name</label><input type="text"
+                        th:field="*{categoryName}" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label">Description</label><textarea th:field="*{description}"
+                        class="form-control" rows="4"></textarea></div>
+                <button type="submit" class="btn-submit w-100"><i class='bx bx-save me-2'></i>Update Category</button>
+            </form>
+        </div>
+    </div>
 </body>
+
 </html>

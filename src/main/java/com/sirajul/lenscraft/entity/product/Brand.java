@@ -15,39 +15,22 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Brand {
-    @Id
-    @SequenceGenerator(
-            name = "brand_id",
-            sequenceName = "brand_id_generator",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY,
-            generator = "brand_id_generator"
-    )
-    @Column(
-            name = "brand_id"
-    )
-    Integer brandId;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "brand_id")
+        Integer brandId;
 
-    @Column(
-            name = "brand_name"
-    )
-    String brandName;
+        @Column(name = "brand_name")
+        String brandName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(
-            name = "brand_status"
-    )
-    BrandStatus brandStatus;
+        @Enumerated(EnumType.STRING)
+        @Column(name = "brand_status")
+        BrandStatus brandStatus;
 
-    @Column(
-            name = "description",
-            columnDefinition = "TEXT"
-    )
-    String brandDescription;
+        @Column(name = "description", columnDefinition = "TEXT")
+        String brandDescription;
 
-    @OneToMany(mappedBy = "brand")
-    List<Product> products;
+        @OneToMany(mappedBy = "brand")
+        List<Product> products;
 
 }

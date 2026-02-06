@@ -17,59 +17,36 @@ import java.util.List;
 @Builder
 public class Category {
 
-    @Id
-    @SequenceGenerator(
-            name = "category_id",
-            sequenceName = "category_id_generator",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY,
-            generator = "category_id_generator"
-    )
-    @Column(
-            name = "category_id"
-    )
-    Long categoryId;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "category_id")
+        Long categoryId;
 
-    @Column(
-            name = "category_name"
-    )
-    String categoryName;
+        @Column(name = "category_name")
+        String categoryName;
 
+        @Enumerated(EnumType.STRING)
+        @Column(name = "category_status")
+        CategoryStatus categoryStatus;
 
-    @Enumerated(
-        EnumType.STRING
-    )
-    @Column(
-            name = "category_status"
-    )
-    CategoryStatus categoryStatus;
+        String categoryImage;
 
-    String categoryImage;
+        @Column(name = "category_description", columnDefinition = "TEXT")
+        String categoryDescription;
 
+        @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
+        List<Product> products;
 
-    @Column(
-            name = "category_description",
-            columnDefinition = "TEXT"
-    )
-    String categoryDescription;
+        @Column(columnDefinition = "boolean default false")
+        boolean isHavingOffer;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
-    List<Product> products;
+        @Embedded
+        OfferEmbeddable offer;
 
-    @Column(
-            columnDefinition = "boolean default false"
-    )
-    boolean isHavingOffer;
+        public Category() {
 
-    @Embedded
-    OfferEmbeddable offer;
+                offer = new OfferEmbeddable();
+                products = new ArrayList<>();
 
-    public Category(){
-
-        offer = new OfferEmbeddable();
-        products = new ArrayList<>();
-
-    }
+        }
 }

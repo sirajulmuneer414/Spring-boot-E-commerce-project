@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 @Service
 public class CouponServiceImp implements CouponService {
 
@@ -23,9 +24,10 @@ public class CouponServiceImp implements CouponService {
 
     @Autowired
     CouponMapping couponMapping;
+
     @Override
     public List<Coupon> findAllCoupons() {
-        return couponRepository.findAll(Sort.by(Sort.Direction.ASC,"startDate"));
+        return couponRepository.findAll(Sort.by(Sort.Direction.ASC, "startDate"));
     }
 
     @Override
@@ -54,29 +56,31 @@ public class CouponServiceImp implements CouponService {
     }
 
     @Override
-    public void updateCoupon(CouponDto dto,UUID couponId) {
+    public void updateCoupon(CouponDto dto, UUID couponId) {
 
         Coupon coupon = couponRepository.findById(couponId).get();
 
-        if(dto.getCouponCode() !="" && dto.getCouponCode() != null && coupon.getCouponCode() != dto.getCouponCode()){
+        if (dto.getCouponCode() != "" && dto.getCouponCode() != null && coupon.getCouponCode() != dto.getCouponCode()) {
             coupon.setCouponCode(dto.getCouponCode());
         }
-        if(dto.getCouponName() !="" && dto.getCouponName() != null && coupon.getCouponName() != dto.getCouponName()){
+        if (dto.getCouponName() != "" && dto.getCouponName() != null && coupon.getCouponName() != dto.getCouponName()) {
             coupon.setCouponName(dto.getCouponName());
         }
-        if(dto.getCouponDescription() !="" && dto.getCouponDescription() != null && coupon.getCouponDescription() != dto.getCouponDescription()){
+        if (dto.getCouponDescription() != "" && dto.getCouponDescription() != null
+                && coupon.getCouponDescription() != dto.getCouponDescription()) {
             coupon.setCouponDescription(dto.getCouponDescription());
         }
-        if(dto.getMinimumAmount() != 0 && coupon.getMinimumAmount() != dto.getMinimumAmount()){
+        if (dto.getMinimumAmount() != 0 && coupon.getMinimumAmount() != dto.getMinimumAmount()) {
             coupon.setMinimumAmount(dto.getMinimumAmount());
         }
-        if(dto.getStartDate().isAfter(LocalDate.now()) && !coupon.getStartDate().equals(dto.getStartDate())){
+        if (dto.getStartDate().isAfter(LocalDate.now()) && !coupon.getStartDate().equals(dto.getStartDate())) {
             coupon.setStartDate(dto.getStartDate());
         }
-        if(dto.getEndDate().isAfter(LocalDate.now())&& dto.getEndDate().isAfter(dto.getStartDate()) && !coupon.getEndDate().equals(dto.getEndDate())){
+        if (dto.getEndDate().isAfter(LocalDate.now()) && dto.getEndDate().isAfter(dto.getStartDate())
+                && !coupon.getEndDate().equals(dto.getEndDate())) {
             coupon.setEndDate(dto.getEndDate());
         }
-        if(dto.getDiscountPercentage() != 0 && coupon.getDiscountPercentage() != dto.getDiscountPercentage()){
+        if (dto.getDiscountPercentage() != 0 && coupon.getDiscountPercentage() != dto.getDiscountPercentage()) {
             coupon.setDiscountPercentage(dto.getDiscountPercentage());
         }
 
@@ -94,9 +98,13 @@ public class CouponServiceImp implements CouponService {
         List<Coupon> coupons = couponRepository.findByMinimumAmountLessThan(totalAmount);
 
         List<Coupon> couponToView = new ArrayList<>();
-        for(Coupon coupon : coupons){
-            if(!coupon.getUsedUsers().contains(user)) {
-                couponToView.add(coupon);
+        for (Coupon coupon : coupons) {
+            if (!coupon.getUsedUsers().contains(user)) {
+                LocalDate now = LocalDate.now();
+                if ((coupon.getStartDate().isBefore(now) || coupon.getStartDate().equals(now)) &&
+                        (coupon.getEndDate().isAfter(now) || coupon.getEndDate().equals(now))) {
+                    couponToView.add(coupon);
+                }
             }
         }
 

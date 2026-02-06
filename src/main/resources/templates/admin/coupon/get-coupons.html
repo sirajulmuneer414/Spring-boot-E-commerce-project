@@ -1,366 +1,143 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8" />
-    <title>Lenscraft - Admin Coupon</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenscraft Admin - Coupons</title>
     <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-            crossorigin="anonymous"
-    />
-    <link th:rel="stylesheet" th:href="@{/css/product-list.css}" />
-    <!-- Add this to the head of your HTML -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.20/dist/sweetalert2.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.20/dist/sweetalert2.all.min.js"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/boxicons/2.0.7/css/boxicons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous"
-    ></script>
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+        :root {
+            --primary: #4F46E5;
+            --dark: #0F172A;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif
+        }
 
-* {
-padding: 0;
-margin: 0;
-box-sizing: border-box;
-font-family: 'Poppins', sans-serif;
-}
-nav {
-background-color: #b43e8f;
-height: 80px;
-position: fixed;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: #f8fafc
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%);
+            padding: 32px 0;
+            color: white;
+            margin-bottom: 32px
+        }
+
+        .admin-header h1 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            margin: 0
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08)
+        }
+
+        .table th {
+            font-weight: 600;
+            color: var(--dark);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 16px
+        }
+
+        .table td {
+            padding: 16px;
+            vertical-align: middle
+        }
+
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            border: none;
+            color: white
+        }
+
+        .btn-edit {
+            background: #3b82f6
+        }
+
+        .btn-delete {
+            background: #ef4444
+        }
+
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+            color: white
+        }
     </style>
 </head>
+
 <body>
-<div th:replace="~{fragment::admin-navbar}"></div>
-
-
-<p class="text-center text-white bg-danger" th:text="${couponExists}"></p>
-<p class="text-center text-white bg-danger" th:text="${couponCodeExists}"></p>
-<h2 class="text-center" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Coupons</h2>
-<div class="d-flex justify-content-end pt-5">
-    <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addCouponModal">Add Coupon</button>
-</div>
-<div class="container mt-5">
-    <table class="table text-center custom-table">
-        <thead class="thead table-dark">
-        <tr>
-
-            <th>Coupon Name</th>
-            <th>Coupon Code</th>
-            <th>Start Date</th>
-            <th>Expiry Date</th>
-            <th>DiscountAmount</th>
-            <th>Minimum Purchase Amount</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="coupon :${coupons}">
-
-            <td th:text="${coupon.couponName}"></td>
-            <td th:text="${coupon.couponCode}"></td>
-            <td th:text="${coupon.startDate}"></td>
-            <td th:text="${coupon.endDate}"></td>
-            <td th:text="${coupon.discountPercentage}"></td>
-            <td th:text="${coupon.minimumAmount}"></td>
-            <th>
-                    <span  data-bs-toggle="modal" th:data-bs-target="'#editOfferModal-' + ${coupon.couponId}">
-                        <i class="fa-solid fa-pen-to-square" ></i>
-                    </span>
-                <!-- <form th:action="@{/admin/edit-coupon}" method="post" >
-                    <input hidden  th:value="${coupon.couponId}" name="couponId">
-                    <input hidden name="couponName" th:value="${coupon.couponName}">
-                    <button type="submit" > <i class="fa-solid fa-pen-to-square text-danger"></i></button>
-                </form> -->
-                <form th:action="@{/admin/coupon/delete}" method="post" >
-                    <input hidden th:value="${coupon.couponId}" name="couponId">
-                    <button type="submit" > <i class="fas fa-trash text-danger"></i></button>
-                </form>
-
-            </th>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<div th:each="coupon : ${coupons}">
-    <!-- Modal for editing offer -->
-    <div class="modal fade" th:id="'editOfferModal-' + ${coupon.couponId}" tabindex="-1" aria-labelledby="'editOfferModalLabel-' + ${coupon.couponId}" aria-hidden="true">
-        <!-- Modal content -->
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" th:id="'editOfferModalLabel-' + ${coupon.couponId}">Edit Offer for <span th:text="${coupon.couponName}"></span></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Form to edit offer -->
-                    <form th:action="@{/admin/coupon/edit}" th:method="post"  onsubmit="validateEditCouponForm(event)" th:object="${dto}" id="couponFormEdit">
-                        <input type="hidden" name="couponId" th:value="${coupon.couponId}"   />
-                        <div class="form-group">
-                            <label for="couponNameEdit">Coupon Name</label>
-                            <input type="text" class="form-control" id="couponNameEdit" th:field="*{couponName}" th:value="${coupon.couponName}" >
-                        </div>
-                        <div class="form-group">
-                            <label for="couponCodeEdit">Coupon Code</label>
-                            <input type="text" class="form-control" id="couponCodeEdit" th:field="*{couponCode}" th:value="${coupon.couponCode}">
-                        </div>
-                        <div class="form-group">
-                            <label for="startDateEdit">Start Date</label>
-                            <input type="date" class="form-control" id="startDateEdit" th:field="*{startDate}"  th:value="${coupon.startDate}">
-                        </div>
-                        <div class="form-group">
-                            <label for="expiryDateEdit">Expiry Date</label>
-                            <input type="date" class="form-control" id="expiryDateEdit" th:field="*{endDate}"  th:value="${coupon.endDate}">
-                        </div>
-                        <div class="form-group">
-                            <label for="discountAmountEdit">Discount Amount</label>
-                            <input type="number" class="form-control" id="discountAmountEdit" th:field="*{discountPercentage}" th:value="${coupon.discountPercentage}" >
-                        </div>
-                        <div class="form-group">
-                            <label for="minimumPurchaseAmountEdit">Minimum Purchase Amount</label>
-                            <input type="number" class="form-control" id="minimumPurchaseAmountEdit" th:field="*{minimumAmount}" th:value="${coupon.minimumAmount}">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary mt-5">Save</button>
-                    </form>
-                </div>
-
-            </div>
+    <div th:replace="~{fragment::admin-navbar}"></div>
+    <div class="admin-header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1><i class='bx bx-money me-2'></i>Coupons</h1>
+            <a th:href="@{/admin/coupons/add}" class="btn-add"><i class='bx bx-plus me-2'></i>Add Coupon</a>
         </div>
     </div>
-</div>
+    <div class="container pb-5">
+        <div class="table-card">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Discount %</th>
+                        <th>Min Amount</th>
 
-
-
-
-
-
-<!-- Add Coupon Modal -->
-<div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog" aria-labelledby="addCouponModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addCouponModalLabel">Add Coupon</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Add form elements for adding a coupon -->
-                <form th:action="@{/admin/coupon/add}" method="post" id="couponForm" th:object="${dto}" onsubmit="validateCouponForm(event)">
-                    <div class="form-group">
-                        <label for="couponName">Coupon Name</label>
-                        <input type="text" class="form-control" id="couponName" th:field="*{couponName}" placeholder="Enter coupon name" >
-                    </div>
-                    <div class="form-group">
-                        <label for="couponCode">Coupon Code</label>
-                        <input type="text" class="form-control" id="couponCode" th:field="*{couponCode}" placeholder="Enter coupon code" >
-                    </div>
-                    <div class="form-group">
-                        <label for="startDate">Start Date</label>
-                        <input type="date" class="form-control" id="startDate" th:field="*{startDate}" >
-                    </div>
-                    <div class="form-group">
-                        <label for="expiryDate">Expiry Date</label>
-                        <input type="date" class="form-control" id="expiryDate" th:field="*{endDate}" >
-                    </div>
-                    <div class="form-group">
-                        <label for="discountAmount">Discount Amount</label>
-                        <input type="number" class="form-control" id="discountAmount" th:field="*{discountPercentage}" placeholder="Enter discount amount"  min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="minimumPurchaseAmount">Minimum Purchase Amount</label>
-                        <input type="number" class="form-control" id="minimumPurchaseAmount" th:field="*{minimumAmount}" placeholder="Enter minimum purchase amount"  min="0">
-                    </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" onclick="validateCouponForm(event)" class="btn btn-primary">Save Coupon</button>
-            </div>
-            </form>
+                        <th>Valid Until</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="coupon : ${coupons}">
+                        <td th:text="${coupon.couponId}">1</td>
+                        <td><code th:text="${coupon.couponCode}">CODE</code></td>
+                        <td th:text="${coupon.couponName}">Name</td>
+                        <td th:text="${coupon.discountPercentage + '%'}">10%</td>
+                        <td th:text="'₹' + ${coupon.minimumAmount}">₹500</td>
+                        <td th:text="${coupon.endDate}">Date</td>
+                        <td>
+                            <form th:action="@{/admin/coupons/delete/{id}(id=${coupon.couponId})}" method="post"
+                                style="display:inline">
+                                <button type="submit" class="btn-action btn-delete">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
-</div>
-<script>
-    function validateEditCouponForm(e) {
-        e.preventDefault();
-
-        // Retrieve form inputs
-        const couponName = document.getElementById('couponNameEdit').value.trim();
-        const couponCode = document.getElementById('couponCodeEdit').value.trim();
-        const startDate = document.getElementById('startDateEdit').value;
-        const expiryDate = document.getElementById('expiryDateEdit').value;
-        const discountAmount = document.getElementById('discountAmountEdit').value;
-        const minPurchaseAmount = document.getElementById('minimumPurchaseAmountEdit').value;
-
-        function showAlert(title, text, icon) {
-            Swal.fire({
-                title: title,
-                text: text,
-                icon: icon,
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK',
-            });
-        } if (!couponName || couponName.trim() === '' || couponName.includes(' ')) {
-            showAlert('Validation Error', 'Coupon Name is required and cannot contain white spaces.', 'error');
-            return;
-        }
-
-        // Check for null or white spaces in Coupon Code
-        if (!couponCode || couponCode.trim() === '' || couponCode.includes(' ')) {
-            showAlert('Validation Error', 'Coupon Code is required and cannot contain white spaces.', 'error');
-            return;
-        }
-
-        // Validate start date
-        const today = new Date().toISOString().split('T')[0];
-        if (startDate < today) {
-            showAlert('Validation Error', 'Start Date should not be earlier than today.', 'error');
-            return;
-        }
-
-        // Validate expiry date
-        if (expiryDate < startDate) {
-            showAlert('Validation Error', 'Expiry Date should not be earlier than Start Date.', 'error');
-            return;
-        }
-
-        // Validate discount amount
-        if (isNaN(discountAmount) || discountAmount < 1) {
-            showAlert('Validation Error', 'Discount Amount must be a number greater than or equal to 1.', 'error');
-            return;
-        }
-        if (isNaN(minPurchaseAmount) || minPurchaseAmount <= 100) {
-            showAlert('Validation Error', 'Minimum Purchase Amount must be a number greater than 100.', 'error');
-            return;
-        }
-
-        // If all validations pass, the form submission will not be blocked
-        const form = document.getElementById('couponFormEdit');
-        form.submit();
-    }
-
-
-
-         function validateCouponForm(e) {
-        e.preventDefault();
-
-        // Retrieve form inputs
-        const couponName = document.getElementById('couponName').value.trim();
-        const couponCode = document.getElementById('couponCode').value.trim();
-        const startDate = document.getElementById('startDate').value;
-        const expiryDate = document.getElementById('expiryDate').value;
-        const discountAmount = document.getElementById('discountAmount').value;
-        const minPurchaseAmount = document.getElementById('minimumPurchaseAmount').value;
-
-        function showAlert(title, text, icon) {
-            Swal.fire({
-                title: title,
-                text: text,
-                icon: icon,
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK',
-            });
-        }
-
-        if (!couponName || !couponCode || !startDate || !expiryDate || !discountAmount || !minPurchaseAmount) {
-            showAlert('Validation Error', 'All fields must be filled out.', 'error');
-            return;
-        }
-
-        if (couponName.includes(' ') || couponCode.includes(' ')) {
-            showAlert('Validation Error', 'Coupon Name and Coupon Code cannot contain white spaces.', 'error');
-            return;
-        }
-
-        const today = new Date().toISOString().split('T')[0];
-
-        if (startDate < today) {
-            showAlert('Validation Error', 'Start Date should not be earlier than today.', 'error');
-            return;
-        }
-
-        if (expiryDate < startDate) {
-            showAlert('Validation Error', 'Expiry Date should not be earlier than Start Date.', 'error');
-            return;
-        }
-
-        if (isNaN(minPurchaseAmount)) {
-            showAlert('Validation Error', 'Minimum Purchase Amount must be a number.', 'error');
-            return;
-        }
-
-        // If all validations pass, the form submission will not be blocked
-        const form = document.getElementById('couponForm');
-        form.submit();
-    }
-
-
-        const today = new Date();
-
-        // Set the minimum value for the Start Date input to today
-        document.getElementById('startDate').min = formatDate(today);
-        document.getElementById('expiryDate').min = formatDate(today);
-
-        // Function to format the date as 'YYYY-MM-DD' (required format for input type="date")
-        function formatDate(date) {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
-            const day = date.getDate().toString().padStart(2, '0');
-            return year + '-' + month + '-' + day; // or use template literals: `${year}-${month}-${day}`
-        }
-        document.addEventListener("DOMContentLoaded", function (event) {
-
-            const showNavbar = (toggleId, navId, bodyId, headerId) => {
-                const toggle = document.getElementById(toggleId),
-                    nav = document.getElementById(navId),
-                    bodypd = document.getElementById(bodyId),
-                    headerpd = document.getElementById(headerId)
-
-                // Validate that all variables exist
-                if (toggle && nav && bodypd && headerpd) {
-                    toggle.addEventListener('click', () => {
-                        // show navbar
-                        nav.classList.toggle('show')
-                        // change icon
-                        toggle.classList.toggle('bx-x')
-                        // add padding to body
-                        bodypd.classList.toggle('body-pd')
-                        // add padding to header
-                        headerpd.classList.toggle('body-pd')
-                    })
-                }
-            }
-
-            showNavbar('header-toggle', 'nav-bar', 'body-pd', 'header')
-
-            /*===== LINK ACTIVE =====*/
-            const linkColor = document.querySelectorAll('.nav_link')
-
-            function colorLink() {
-                if (linkColor) {
-                    linkColor.forEach(l => l.classList.remove('active'))
-                    this.classList.add('active')
-                }
-            }
-            linkColor.forEach(l => l.addEventListener('click', colorLink))
-
-            // Your code to run since DOM is loaded and ready
-        });
-</script>
 </body>
+
 </html>

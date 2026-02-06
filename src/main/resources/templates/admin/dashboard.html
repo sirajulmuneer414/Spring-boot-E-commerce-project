@@ -1,661 +1,296 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head th:replace="~{fragment::head}">
     <title>Admin Dashboard</title>
-    <link th:rel="stylesheet" th:href="@{/css/product-list.css}" />
-    <link th:rel="stylesheet" th:href="@{/css/dashboard.css}" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/boxicons/2.0.7/css/boxicons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
-* {
-padding: 0;
-margin: 0;
-box-sizing: border-box;
-font-family: 'Poppins', sans-serif;
-}
-
-nav {
-background-color: #b43e8f;
-height: 80px;
-position: fixed;
-}
-#nav-bar {
-width: 0;
-overflow: hidden;
-}
-
-.body-pd-sidebar {
-padding-left: 250px; /* Adjust the padding based on your sidebar width */
-}
-
-#nav-bar.show {
-width: 250px; /* Adjust the width based on your sidebar width */
-}
-
-svg {
-margin: 10px;
-}
-
-.navbar {
-padding: 15px 10px;
-background: #fff;
-border: none;
-border-radius: 0;
-box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-btn {
-box-shadow: none;
-outline: none !important;
-border: none;
-}
-
-.line {
-width: 100%;
-height: 1px;
-border-bottom: 1px dashed #ddd;
-margin: 40px 0;
-}
-
-/* ---------------------------------------------------
-SIDEBAR STYLE
------------------------------------------------------ */
-
-.wrapper {
-display: flex;
-width: 100%;
-align-items: stretch;
-}
-
-#sidebar {
-min-width: 250px;
-max-width: 250px;
-background: #844646;
-color: #fff;
-transition: all 0.3s;
-}
-
-#sidebar.active {
-margin-left: -250px;
-}
-
-#sidebar .sidebar-header {
-padding: 20px;
-background: #844646;
-display: flex;
-justify-content: center;
-}
-
-#sidebar ul.components {
-padding: 0px 0;
-list-style-type: none;
-}
-
-#sidebar ul p {
-color: #fff;
-padding: 10px;
-}
-
-#sidebar ul li a {
-color: white;
-padding: 10px;
-font-size: 1.1em;
-display: block;
-}
-
-#sidebar ul li a:hover {
-color: #ffffff;
-background: #6a4040;
-}
-
-#sidebar ul li.active > a,
-a[aria-expanded="true"] {
-color: #fff;
-background: #6d7fcc;
-}
-
-a[data-toggle="collapse"] {
-position: relative;
-}
-
-.dropdown-toggle::after {
-display: block;
-position: absolute;
-top: 50%;
-right: 20px;
-transform: translateY(-50%);
-}
-
-ul ul a {
-font-size: 0.9em !important;
-padding-left: 30px !important;
-background: #6d7fcc;
-}
-
-ul.CTAs {
-padding: 20px;
-}
-
-ul.CTAs a {
-text-align: center;
-font-size: 0.9em !important;
-display: block;
-border-radius: 5px;
-margin-bottom: 5px;
-}
-
-
-.wrapper {
-display: flex;
-width: 100%;
-align-items: stretch;
-}
-
-.box {
-background-color: #fff; /* White background */
-padding: 20px;
-text-align: center;
-margin-bottom: 20px;
-border: 1px solid #eee; /* Light gray border */
-border-radius: 5px; /* Rounded corners */
-}
-
-.shadow-box {
-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
-}
-
-/* Optional: Style the headings and paragraphs within the boxes */
-.white-box h3 {
-color: #333; /* Dark text color for headings */
-}
-
-.white-box p {
-color: #666; /* Slightly lighter text color for paragraphs */
-}
-
-.card {
-border-radius: 10px;
-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.card-header {
-background-color: #f8f9fa;
-border-bottom: none;
-font-weight: bold;
-font-size: 20px;
-}
-
-.card-body {
-padding: 20px;
-}
-
-svg {
-fill: #ffffff;
-margin: 15px;
-}
-
-button {
-padding: 5px 10px;
-background-color: #04609d;
-color: #fff;
-border: none;
-border-radius: 50px;
-margin: 5px;
-}
-
-/* Hover effect */
-button:hover {
-background-color: #2980b9; /* Change the background color on hover */
-}
-
-input[type="date"] {
-appearance: none;
--webkit-appearance: none;
--moz-appearance: none;
-border: 1px solid #ddd;
-padding: 10px;
-border-radius: 5px;
-outline: none;
-font-size: 16px;
-box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-background-color: #fff;
-cursor: pointer;
-}
-
-/* Styles for the container */
-.date-container {
-display: inline-block;
-position: relative;
-}
-
-/* Styles for the calendar icon */
-.calendar-icon {
-position: absolute;
-top: 50%;
-right: 10px;
-transform: translateY(-50%);
-pointer-events: none;
-}
-
-.calendar-icon::before {
-content: '\1F4C5'; /* Unicode for the calendar icon */
-font-size: 20px;
-color: #555;
-}
-    </style>
 </head>
-<body>
 
-<div th:fragment="admin-navbar">
-    <nav
-            class="navbar bg-body-tertiary p-3"
-            style="border-bottom: 1px solid black"
-    >
-        <div
-                class="container-fluid d-flex justify-content-between align-items-middle"
-                style="background-color: white"
-        >
-            <div class="align-self-start">
-                <a class="navbar-brand" href="/">
-                    <img
-                            th:src="@{/images/Mainlogo.png}"
-                            style="height: 60px; width: 150px"
-                            alt=""
-                    />
-                </a>
+<body class="bg-body">
+
+    <!-- Navbar & Sidebar -->
+    <div th:replace="~{fragment::admin-navbar}"></div>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content position-relative" style="margin-top: 20px; transition: 0.5s;">
+        <!-- Padding managed by JS in sidebar fragment, but we add initial container styling -->
+        <div class="container-fluid py-4 body-pd" id="body-pd">
+
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 class="fw-bold mb-1">Dashboard Overview</h2>
+                    <p class="text-secondary mb-0">Welcome back, here's what's happening with your store.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-white border shadow-sm"><i class='bx bx-filter-alt me-2'></i> Filter</button>
+                    <a href="/admin/dashboard/report" target="_blank" class="btn btn-primary-custom shadow-md"><i
+                            class='bx bx-printer me-2'></i> Print
+                        Report</a>
+                </div>
             </div>
-            <div class="me-5">
-                <div class="d-flex gap-5 align-items-center">
-                    <div>
-                        <a
-                                class="text-decoration-none text-dark"
-                                th:href="@{/admin/home}"
-                        ><b>Dashboard</b></a
-                        >
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-5">
+                <!-- Total Sales -->
+                <div class="col-xl-4 col-md-6">
+                    <div class="card card-custom border-0 h-100 shadow-hover position-relative overflow-hidden">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-secondary fw-medium mb-1">Total Sales</p>
+                                    <h3 class="fw-bold mb-2" th:text="'₹' + ${totalSales}">₹0</h3>
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1">
+                                        <i class='bx bx-trending-up'></i> +12.5%
+                                    </span>
+                                </div>
+                                <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                                    <i class='bx bx-dollar-circle fs-3'></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <a
-                                class="text-decoration-none text-dark"
-                                th:href="@{/admin/products}"
-                        ><b>Products</b></a
-                        >
+                </div>
+
+                <!-- Sold Products -->
+                <div class="col-xl-4 col-md-6">
+                    <div class="card card-custom border-0 h-100 shadow-hover position-relative overflow-hidden">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-secondary fw-medium mb-1">Products Sold</p>
+                                    <h3 class="fw-bold mb-2" th:text="${soldProducts}">0</h3>
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1">
+                                        <i class='bx bx-box'></i> Count
+                                    </span>
+                                </div>
+                                <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                                    <i class='bx bx-shopping-bag fs-3'></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <a
-                                class="text-decoration-none text-dark"
-                                th:href="@{/admin/category}"
-                        ><b>Categories</b></a
-                        >
-                    </div>
-                    <div>
-                        <a
-                                class="text-decoration-none text-dark"
-                                th:href="@{/admin/customers}"
-                        ><b>Customers</b></a
-                        >
-                    </div>
-                    <div>
-                        <a
-                                class="text-decoration-none text-dark"
-                                th:href="@{/admin/order}"
-                        ><b>Orders</b></a
-                        >
-                    </div>
-                    <div>
-                        <a
-                                class="text-decoration-none text-dark"
-                                th:href="@{/admin/coupon}"
-                        ><b>Coupons</b></a
-                        >
-                    </div>
-<!--                    <div>-->
-<!--                        <a-->
-<!--                                class="text-decoration-none text-dark"-->
-<!--                                th:href="@{/admin/banners}"-->
-<!--                        ><b>Banners</b></a-->
-<!--                        >-->
-<!--                    </div>-->
-                    <div>
-                        <form method="post" th:action="@{/logout}">
-                            <input
-                                    class="btn btn-danger text-white"
-                                    type="submit"
-                                    value="Logout"
-                            />
-                        </form>
+                </div>
+
+                <!-- Total Customers -->
+                <div class="col-xl-4 col-md-6">
+                    <div class="card card-custom border-0 h-100 shadow-hover position-relative overflow-hidden">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-secondary fw-medium mb-1">Total Customers</p>
+                                    <h3 class="fw-bold mb-2" th:text="${totalCustomers}">0</h3>
+                                    <span class="badge bg-info-subtle text-info rounded-pill px-2 py-1">
+                                        <i class='bx bx-user-plus'></i> New
+                                    </span>
+                                </div>
+                                <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+                                    <i class='bx bx-group fs-3'></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </nav>
-</div>
 
-<div class="container mt-5">
-    <div class="row">
-        <!-- Three responsive boxes with icons -->
-        <div class="col-md-6 col-lg-4 col-xl-4 col-12 mt-5">
-            <div class="box white-box shadow-box">
-                <i class="fas fa-chart-bar fa-2x"></i>
-                <h3>Total Sales</h3>
-                <p th:text="'₹'+${totalSales}" style="color: #b43e8f"><strong></strong></p>
+            <!-- Charts Section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card card-custom border-0 shadow-sm">
+                        <div
+                            class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="fw-bold mb-0">Sales & Revenue Analytics</h5>
+                            <div class="btn-group shadow-sm rounded-pill overflow-hidden" role="group">
+                                <button type="button"
+                                    class="btn btn-outline-light text-dark fw-medium border-0 px-4 active-filter"
+                                    id="dailyBtn">Daily</button>
+                                <button type="button" class="btn btn-outline-light text-dark fw-medium border-0 px-4"
+                                    id="weeklyBtn">Weekly</button>
+                                <button type="button" class="btn btn-outline-light text-dark fw-medium border-0 px-4"
+                                    id="monthlyBtn">Monthly</button>
+                                <button type="button" class="btn btn-outline-light text-dark fw-medium border-0 px-4"
+                                    id="yearlyBtn">Yearly</button>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <canvas id="combinedChart" width="400" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="col-md-4 mt-5">
-            <div class="box white-box shadow-box">
-                <i class="fas fa-cube fa-2x"></i>
-                <h3>Sold Products</h3>
-                <p th:text="${soldProducts}" style="color: #b43e8f"><strong></strong></p>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-4 col-12 mt-5">
-            <div class="box white-box shadow-box">
-                <i class="fas fa-users fa-2x"></i>
-                <h3>Total Customers</h3>
-                <p th:text="${totalCustomers}" style="color: #b43e8f"><strong></strong></p>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="col-12">
-    <div class="card">
-        <div class="card-body">
-            <button id="dailyBtn">Daily</button>
-            <button id="weeklyBtn">Weekly</button>
-            <button id="monthlyBtn">Monthly</button>
-            <button id="yearlyBtn">Yearly</button>
-
-            <canvas id="combinedChart" width="400" height="100"></canvas>
 
         </div>
-    </div>
-<!--    -->
-<!--                    <div class="table-responsive">-->
-<!--                        <h4 class="mt-5">Top Selling Products</h4>-->
-<!--                        <table class="table table-bordered table-striped">-->
-<!--                            <thead>-->
-<!--                            <tr>-->
-<!--                                <th>Products</th>-->
-<!--                                <th>Stock</th>-->
-<!--                                <th>Price</th>-->
-<!--                                <th>Status</th>-->
-<!--                            </tr>-->
-<!--                            </thead>-->
-<!--                            <tbody>-->
-<!--                            <tr th:each="product : ${topSellingProducts}">-->
-<!--                                <td th:text="${product.name}"></td>-->
-<!--                                <td th:text="${product.stock}"></td>-->
-<!--                                <td th:text="'₹'+${product.price}"></td>-->
-<!--                                <td>-->
-<!--                                    <span th:if="${product.stock > 25}" class="badge badge-success">In Stock</span>-->
-<!--                                    <span th:unless="${product.stock > 25}" class="badge badge-warning">Low Stock</span>-->
-<!--                                </td>-->
+    </main>
 
-<!--                            </tr>-->
-<!--                            </tbody>-->
-<!--                        </table>-->
-<!--                    </div>-->
-</div>
-</div>
-</div>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
+    <!-- Chart Logic -->
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function () {
 
+            // Filter Button Styling
+            const filterBtns = document.querySelectorAll('.card-header .btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('text-dark');
+                    });
+                    this.classList.remove('text-dark');
+                    this.classList.add('bg-primary', 'text-white');
+                });
+            });
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
+            // Set initial active
+            const dailyBtn = document.getElementById('dailyBtn');
+            if (dailyBtn) {
+                dailyBtn.classList.add('bg-primary', 'text-white');
+                dailyBtn.classList.remove('text-dark');
+            }
 
-<script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById('weeklyBtn').addEventListener('click', () => {
+            // --- Chart Implementation ---
+            const ctx = document.getElementById('combinedChart').getContext('2d');
+            let combinedChart;
 
-            let jsonWeekObj = /*[[${weeklySales}]]*/ {};
-            let jsonWeekCountObj = /*[[${weeklyCount}]]*/ {};
-
-            let week = JSON.parse(jsonWeekObj);
-            let weekCount = JSON.parse(jsonWeekCountObj);
-
-            let weekValue = Object.values(week);
-            let weekCountValue = Object.values(weekCount);
-
-
-            let data = {
-                labels: ['week1', 'week2', 'week3', 'week4', 'week5', 'week6', 'week7'],
-                datasets: [{
-                    label: 'Revenue',
-                    data: weekValue.reverse(),
-                    fill: true,
-                    borderColor: '#ff6384',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 2,
-                    lineTension: 0.2
-                }, {
-                    label: 'SalesCount',
-                    data: weekCountValue.reverse(),
-                    fill: true,
-                    borderColor: '#ff0000',
-                    backgroundColor: 'rgba(0,0,0,0.2)',
-                    borderWidth: 2,
-                    lineTension: 0.2
-                }]
+            // Robust Parser
+            const parse = (input) => {
+                try {
+                    if (!input) return {};
+                    if (typeof input === 'object') return input;
+                    return JSON.parse(input);
+                } catch (e) {
+                    console.error("Chart Data Parse Error:", e, input);
+                    return {};
+                }
             };
 
-            combinedChart.data = data;
-            combinedChart.update();
-        });
-        document.getElementById('dailyBtn').addEventListener('click', () => {
-
-            let jsonDailyObj = /*[[${dailySales}]]*/ {};
-            let jsonDailyCountObj = /*[[${dailyCount}]]*/ {};
-
-            let daily = JSON.parse(jsonDailyObj);
-            let dailyCount = JSON.parse(jsonDailyCountObj);
-            let dates = Object.keys(days);
-            let dailyValue = Object.values(daily);
-            let dailyCountValue = Object.values(dailyCount);
-
-
-            let data = {
-                labels: dates.reverse(),
-                datasets: [{
-                    label: 'Revenue',
-                    data: dailyValue.reverse(),
-                    fill: true,
-                    borderColor: '#ff6384',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 2,
-                    lineTension: 0.2
-                }, {
-                    label: 'SalesCount',
-                    data: dailyCountValue.reverse(),
-                    fill: true,
-                    borderColor: '#ec0808',
-                    backgroundColor: 'rgba(0,0,0,0.2)',
-                    borderWidth: 2,
-                    lineTension: 0.2
-                }]
+            // Load Data from Thymeleaf
+            const rawData = {
+                daily: {
+                    sales: parse([[${ dailySales }]]),
+                    count: parse([[${ dailyCount }]])
+                },
+                weekly: {
+                    sales: parse([[${ weeklySales }]]),
+                    count: parse([[${ weeklyCount }]])
+                },
+                monthly: {
+                    sales: parse([[${ monthlySales }]]),
+                    count: parse([[${ monthlySalesCount }]])
+                },
+                yearly: {
+                    sales: parse([[${ yearlySales }]]),
+                    count: parse([[${ yearlySalesCount }]])
+                }
             };
 
-            combinedChart.data = data;
-            combinedChart.update();
-        });
+            console.log("Loaded Chart Data:", rawData);
 
-        document.getElementById('monthlyBtn').addEventListener('click', () => {
-            let jsonMonthObj = /*[[${monthlySales}]]*/ {};
-            let jsonMonthCountObj = /*[[${monthlySalesCount}]]*/ {};
-            let month = JSON.parse(jsonMonthObj);
-            let monthCount = JSON.parse(jsonMonthCountObj);
-            let monthlySales = Object.values(month);
-            let monthlySalesCount = Object.values(monthCount)
+            function updateChart(period) {
+                const dataSet = rawData[period];
+                if (!dataSet) {
+                    console.warn(`No data for period: ${period}`);
+                    return;
+                }
 
+                let labels = Object.keys(dataSet.sales);
+                let salesData = Object.values(dataSet.sales);
+                let countData = Object.values(dataSet.count);
 
-            let data = {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Revenue',
-                    data: monthlySales,
-                    fill: true,
-                    borderColor: '#ff6384',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 2,
-                    lineTension: 0.2
-                }, {
-                    label: 'SalesCount',
-                    data: monthlySalesCount,
-                    fill: true,
-                    borderColor: '#ff003c',
-                    backgroundColor: 'rgba(0,0,0,0.2)',
-                    borderWidth: 2,
-                    lineTension: 0.2
-                }]
-            };
+                // Sorting Logic
+                // Daily/Weekly: Server sends Present -> Past (newest first). Reversing to show Past -> Present.
+                if (period === 'daily' || period === 'weekly') {
+                    labels = labels.reverse();
+                    salesData = salesData.reverse();
+                    countData = countData.reverse();
+                }
+                // Monthly/Yearly: Server sends Past -> Present (oldest first). No reverse needed.
 
-            combinedChart.data = data;
-            combinedChart.update();
-        });
+                if (combinedChart) {
+                    combinedChart.destroy();
+                }
 
-        document.getElementById('yearlyBtn').addEventListener('click', () => {
-            let jsonYearObj = [[${yearlySales}]];
-            let jsonYearCountObj = [[${yearlySalesCount}]];
-            let years = JSON.parse(jsonYearObj);
-            let yearsCount = JSON.parse(jsonYearCountObj);
-            let yearlySales = Object.values(years);
-            let yearlySalesCount = Object.values(yearsCount);
-
-            let data = {
-                labels: ['2019', '2020', '2021', '2022', '2023'],
-                datasets: [{
-                    label: 'Revenue',
-                    data: yearlySales,
-                    fill: true,
-                    borderColor: '#ff6384',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 2,
-                    lineTension: 0.2
-                }, {
-                    label: 'SalesCount',
-                    data: yearlySalesCount,
-                    fill: true,
-                    borderColor: '#ff6384',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 2,
-                    lineTension: 0.2
-                }]
-            };
-
-            combinedChart.data = data;
-            combinedChart.update();
-        });
-    });
-
-    let jsonDailyObj = [[${dailySales}]];
-    let jsonDailyCountObj = [[${dailyCount}]];
-    let days = JSON.parse(jsonDailyObj);
-    let daysCount = JSON.parse(jsonDailyCountObj);
-
-    let dates = Object.keys(days);
-    let transformedKeys = Object.values(days);
-    let daysCounts = Object.values(daysCount);
-    console.log(transformedKeys);
-
-
-    let data = {
-        labels: dates.reverse(),
-        datasets: [{
-            label: 'Revenue',
-            data: transformedKeys.reverse(),
-            fill: true,
-            borderColor: '#ff6384',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderWidth: 2,
-            lineTension: 0.2
-        }, {
-            label: 'SalesCount',
-            data: daysCounts.reverse(),
-            fill: true,
-            borderColor: '#ff6384',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderWidth: 2,
-            lineTension: 0.2
-        }]
-    };
-
-
-    // Create combined line chart
-    let combinedChart = new Chart(document.getElementById('combinedChart').getContext('2d'), {
-        type: 'line',
-        data: data,
-        options: {
-            plugins: {
-                legend: {
-                    labels: {
-                        font: {
-                            size: 14, // Increase the legend font size
-                            weight: 'bold'
+                combinedChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Revenue (₹)',
+                                data: salesData,
+                                borderColor: '#4F46E5', // Indigo
+                                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                                borderWidth: 2,
+                                pointRadius: 4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Orders Count',
+                                data: countData,
+                                borderColor: '#10B981', // Emerald
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                                borderWidth: 2,
+                                pointRadius: 4,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1F2937',
+                                bodyColor: '#4B5563',
+                                borderColor: '#E5E7EB',
+                                borderWidth: 1,
+                                padding: 10
+                            }
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: { display: true, text: 'Revenue (₹)' },
+                                grid: { borderDash: [2, 4], drawBorder: false }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: { display: true, text: 'Orders' },
+                                grid: { drawOnChartArea: false } // only show grid for left axis
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
                         }
                     }
-                },
+                });
             }
-        }
-    });
-    function openModal(){
-    $('#dateSelectionModal').modal('show');
-}
 
-    document.addEventListener("DOMContentLoaded", function (event) {
+            // Initialize
+            updateChart('daily');
 
-        const showNavbar = (toggleId, navId, bodyId, headerId) => {
-            const toggle = document.getElementById(toggleId),
-                nav = document.getElementById(navId),
-                bodypd = document.getElementById(bodyId),
-                headerpd = document.getElementById(headerId)
+            // Bind Events
+            document.getElementById('dailyBtn').onclick = () => updateChart('daily');
+            document.getElementById('weeklyBtn').onclick = () => updateChart('weekly');
+            document.getElementById('monthlyBtn').onclick = () => updateChart('monthly');
+            document.getElementById('yearlyBtn').onclick = () => updateChart('yearly');
 
-            // Validate that all variables exist
-            if (toggle && nav && bodypd && headerpd) {
-                toggle.addEventListener('click', () => {
-                    // show navbar
-                    nav.classList.toggle('show')
-                    // change icon
-                    toggle.classList.toggle('bx-x')
-                    // add padding to body
-                    bodypd.classList.toggle('body-pd')
-                    // add padding to header
-                    headerpd.classList.toggle('body-pd')
-                })
-            }
-        }
-
-        showNavbar('header-toggle', 'nav-bar', 'body-pd', 'header')
-
-        /*===== LINK ACTIVE =====*/
-        const linkColor = document.querySelectorAll('.nav_link')
-
-        function colorLink() {
-            if (linkColor) {
-                linkColor.forEach(l => l.classList.remove('active'))
-                this.classList.add('active')
-            }
-        }
-        linkColor.forEach(l => l.addEventListener('click', colorLink))
-
-        // Your code to run since DOM is loaded and ready
-    });
-</script>
-
+        });
+    </script>
 </body>
+
 </html>

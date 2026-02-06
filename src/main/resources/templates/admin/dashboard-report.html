@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Report - Lenscraft</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #333;
+        }
+
+        .report-section {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+
+        .table-custom th {
+            background-color: #e9ecef !important;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="p-4">
+
+    <!-- Actions -->
+    <div class="container d-flex justify-content-end mb-4 no-print">
+        <button onclick="window.print()" class="btn btn-primary me-2">Print Report</button>
+        <button onclick="window.close()" class="btn btn-secondary">Close</button>
+    </div>
+
+    <div class="container bg-white p-5 shadow-sm rounded">
+
+        <header class="report-header">
+            <h1 class="fw-bold">Lenscraft Sales Report</h1>
+            <p class="text-muted">Generated on <span
+                    th:text="${#dates.format(#dates.createNow(), 'dd MMM yyyy HH:mm')}">Date</span></p>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="row mb-5 text-center">
+            <div class="col-4">
+                <div class="border p-3 rounded bg-light">
+                    <h5 class="text-secondary small text-uppercase">Total Revenue</h5>
+                    <h3 class="fw-bold text-success" th:text="'₹' + ${totalSales}">₹0</h3>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="border p-3 rounded bg-light">
+                    <h5 class="text-secondary small text-uppercase">Total Orders</h5>
+                    <h3 class="fw-bold text-primary" th:text="${soldProducts}">0</h3>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="border p-3 rounded bg-light">
+                    <h5 class="text-secondary small text-uppercase">Total Customers</h5>
+                    <h3 class="fw-bold text-dark" th:text="${totalCustomers}">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Sales -->
+        <div class="report-section">
+            <h4 class="fw-bold border-start border-4 border-primary ps-3 mb-3">Daily Sales (Last 7 Days)</h4>
+            <table class="table table-bordered table-striped table-custom">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th class="text-end">Orders</th>
+                        <th class="text-end">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="entry : ${dailySales}">
+                        <td th:text="${entry.key}">Date</td>
+                        <td class="text-end" th:text="${dailyCount.get(entry.key)}">0</td>
+                        <td class="text-end" th:text="'₹' + ${entry.value}">₹0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Weekly Sales -->
+        <div class="report-section">
+            <h4 class="fw-bold border-start border-4 border-success ps-3 mb-3">Weekly Performance</h4>
+            <table class="table table-bordered table-striped table-custom">
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th class="text-end">Orders</th>
+                        <th class="text-end">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="entry : ${weeklySales}">
+                        <td th:text="${entry.key}">Week</td>
+                        <td class="text-end" th:text="${weeklyCount.get(entry.key)}">0</td>
+                        <td class="text-end" th:text="'₹' + ${entry.value}">₹0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Monthly Sales -->
+        <div class="report-section">
+            <h4 class="fw-bold border-start border-4 border-warning ps-3 mb-3">Monthly Summary</h4>
+            <table class="table table-bordered table-striped table-custom">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th class="text-end">Orders</th>
+                        <th class="text-end">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="entry : ${monthlySales}">
+                        <td th:text="${entry.key}">Month</td>
+                        <td class="text-end" th:text="${monthlySalesCount.get(entry.key)}">0</td>
+                        <td class="text-end" th:text="'₹' + ${entry.value}">₹0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Yearly Sales -->
+        <div class="report-section mb-0">
+            <h4 class="fw-bold border-start border-4 border-danger ps-3 mb-3">Yearly Overview</h4>
+            <table class="table table-bordered table-striped table-custom">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th class="text-end">Orders</th>
+                        <th class="text-end">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="entry : ${yearlySales}">
+                        <td th:text="${entry.key}">Year</td>
+                        <td class="text-end" th:text="${yearlySalesCount.get(entry.key)}">0</td>
+                        <td class="text-end" th:text="'₹' + ${entry.value}">₹0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

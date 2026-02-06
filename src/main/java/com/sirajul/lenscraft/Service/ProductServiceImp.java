@@ -12,15 +12,14 @@ import com.sirajul.lenscraft.entity.product.Product;
 import com.sirajul.lenscraft.entity.product.Variables;
 import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import com.sirajul.lenscraft.mapping.ProductMapping;
-import com.sirajul.lenscraft.utils.FileUploadUtil;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,49 +42,22 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public List<Product> findAllProducts() {
-        return productRepository.findAll(Sort.by(Sort.Direction.ASC,"productId"));
+        return productRepository.findAll(Sort.by(Sort.Direction.ASC, "productId"));
     }
 
     @Override
-    public Product saveProductAndGetProduct(ProductDto productDto,List<MultipartFile> image1, List<MultipartFile> image2, List<MultipartFile> image3) {
+    public Product saveProductAndGetProduct(ProductDto productDto, List<MultipartFile> image1,
+            List<MultipartFile> image2, List<MultipartFile> image3) {
 
-
-       productRepository.save(productMapping.DtoToProduct(productDto));
+        productRepository.save(productMapping.DtoToProduct(productDto));
 
         Product product = productRepository.findByProductName(productDto.getProductName());
 
-        String uploadDir = "lenscraft/src/main/resources/static/productImages/"+product.getProductId();
-
-        for(MultipartFile image : image1){
-            String filename = StringUtils.cleanPath(image.getOriginalFilename());
-            try {
-                FileUploadUtil.saveFile(uploadDir,filename,image);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        for(MultipartFile image : image2){
-            String filename = StringUtils.cleanPath(image.getOriginalFilename());
-            try {
-                FileUploadUtil.saveFile(uploadDir,filename,image);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        for(MultipartFile image : image3){
-            String filename = StringUtils.cleanPath(image.getOriginalFilename());
-            try {
-                FileUploadUtil.saveFile(uploadDir,filename,image);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
         return product;
     }
 
     @Override
     public List<String> getFrameColorsById(Product product) {
-
 
         return variablesRepository.findFrameColorByProduct(product);
     }
@@ -106,9 +78,9 @@ public class ProductServiceImp implements ProductService {
 
         categoryRepository.save(category);
 
-        for(Variables variables : product.getVariables()){
+        for (Variables variables : product.getVariables()) {
 
-        variablesRepository.delete(variables);
+            variablesRepository.delete(variables);
         }
         product.setVariables(new ArrayList<>());
         productRepository.save(product);
@@ -125,7 +97,6 @@ public class ProductServiceImp implements ProductService {
     public void updateProduct(ProductDto productDto) {
         productRepository.save(productMapping.DtoToProduct(productDto));
 
-
     }
 
     @Override
@@ -141,27 +112,26 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public Page<Product> findAllProductsInPageable(int pageNo, int pageSize) {
-        Pageable page = PageRequest.of(pageNo-1,pageSize,Sort.by(Sort.Direction.DESC,"productId"));
+        Pageable page = PageRequest.of(pageNo - 1, pageSize, Sort.by(Sort.Direction.DESC, "productId"));
         return productRepository.findAll(page);
     }
 
     @Override
     public Page<Product> findAllProductsContaining(String keyword, int pageNo, int pageSize) {
 
-            // Create a pageable object to support pagination
-            Pageable pageable = PageRequest.of(pageNo, pageSize);
+        // Create a pageable object to support pagination
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-            // Fetch products based on the provided keyword and pageable information
-            List<Product> products = productRepository.findByProductNameContaining(keyword);
+        // Fetch products based on the provided keyword and pageable information
+        List<Product> products = productRepository.findByProductNameContaining(keyword);
 
-            // Return the page with products and pageable information
-            return new PageImpl<>(products, pageable, products.size());
-        }
-
+        // Return the page with products and pageable information
+        return new PageImpl<>(products, pageable, products.size());
+    }
 
     @Override
     public int totalPagesCount(int pageSize) {
-       int pageCount = (int)productRepository.count()/pageSize;
+        int pageCount = (int) productRepository.count() / pageSize;
 
         return pageCount;
     }
@@ -173,8 +143,8 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public Page<Product> findAllProductByCategory(Category category, int pageNo, int pageSize) {
-        Pageable page = PageRequest.of(pageNo-1,pageSize,Sort.by(Sort.Direction.DESC,"productId"));
-        return productRepository.findByCategory(category,page);
+        Pageable page = PageRequest.of(pageNo - 1, pageSize, Sort.by(Sort.Direction.DESC, "productId"));
+        return productRepository.findByCategory(category, page);
     }
 
     @Override
@@ -184,7 +154,6 @@ public class ProductServiceImp implements ProductService {
         product.setActiveStatus(ActiveStatus.BLOCKED);
 
         productRepository.save(product);
-
 
     }
 
@@ -200,28 +169,19 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public Page<Product> findAllProductsContainingActive(String keyword, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        // Fix: Convert 1-based page number to 0-based for Spring Data JPA
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
 
-        // Fetch products based on the provided keyword and pageable information
-        List<Product> products = new ArrayList<>();
-
-        for(Product product : productRepository.findByProductNameContaining(keyword)){
-            if(product.getActiveStatus() == ActiveStatus.ACTIVE){
-                products.add(product);
-            }
-        }
-
-        // Return the page with products and pageable information
-        return new PageImpl<>(products, pageable, products.size());
+        // Fetch paginated and filtered results directly from database
+        return productRepository.findByProductNameContainingIgnoreCaseAndActiveStatus(keyword, ActiveStatus.ACTIVE,
+                pageable);
     }
 
     @Override
     public Page<Product> findAllProductsInPageableActive(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-
         List<Product> products = productRepository.findAllByActiveStatus(ActiveStatus.ACTIVE);
-
 
         // Return the page with products and pageable information
         return new PageImpl<>(products, pageable, products.size());

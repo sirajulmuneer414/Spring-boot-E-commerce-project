@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product,Long> {
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Product findByProductName(String productName);
 
@@ -25,5 +25,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     Page<Product> findByCategory(Category category, Pageable page);
 
     List<Product> findAllByActiveStatus(ActiveStatus activeStatus);
-}
 
+    Page<Product> findByProductNameContainingIgnoreCaseAndActiveStatus(String keyword, ActiveStatus activeStatus,
+            Pageable pageable);
+}

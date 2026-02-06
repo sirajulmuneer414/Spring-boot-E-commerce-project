@@ -1,89 +1,307 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>Lenscraft-Order Confirmed</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css" rel="stylesheet" type="text/css" />
-    <link th:rel="stylesheet" th:href="@{/css/checkout.css}" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-    <link th:rel="stylesheet" th:href="@{/css/home.css}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenscraft - Order Confirmed</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
     <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338ca;
+            --success: #10B981;
+            --success-dark: #059669;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #f8f9fa;
-        }
-
-        section {
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        /* Animated Background Elements */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite;
         }
 
-        .bg-light {
-            background-color: #f8d7da;
+        body::before {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            left: -200px;
+        }
+
+        body::after {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            right: -150px;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        .success-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .success-card {
+            background: white;
+            border-radius: 32px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 32px;
+            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.5s ease-out 0.3s both;
+            position: relative;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid var(--success);
+            opacity: 0.3;
+            animation: ripple 2s ease-out infinite;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .success-icon i {
+            font-size: 60px;
+            color: white;
         }
 
         .checkmark {
-            color: #28a745;
+            animation: checkmark 0.5s ease-in-out 0.6s both;
+        }
+
+        @keyframes checkmark {
+            0% {
+                transform: scale(0) rotate(0deg);
+            }
+
+            50% {
+                transform: scale(1.2) rotate(15deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
         }
 
         h1 {
-            color: #28a745;
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 16px;
+            animation: fadeIn 0.5s ease-out 0.8s both;
         }
 
-        dt {
-            color: #495057;
+        .subtitle {
+            color: #64748b;
+            font-size: 1.125rem;
+            margin-bottom: 40px;
+            animation: fadeIn 0.5s ease-out 1s both;
         }
 
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .btn-success:hover {
-            background-color: #218838;
-            border-color: #218838;
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeIn 0.5s ease-out 1.2s both;
         }
 
-        .text-dark {
-            color: #343a40;
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .text-dark:hover {
-            text-decoration: underline;
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background: transparent;
+            border: 2px solid #e2e8f0;
+            padding: 16px 32px;
+            border-radius: 12px;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #f8fafc;
+            color: #0F172A;
+            border-color: #cbd5e1;
+        }
+
+        @media (max-width: 576px) {
+            .success-card {
+                padding: 40px 24px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary-custom,
+            .btn-secondary-custom {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="success-container">
+        <div class="success-card">
+            <div class="success-icon">
+                <i class='bx bx-check checkmark'></i>
+            </div>
 
-<section>
-    <div class="card p-5 mt-3 bg-white border-radius shadow d-inline-block text-center">
-        <div class="bg-light ms-5" style="border-radius: 50%; height: 100px; width: 100px; display: flex; align-items: center; justify-content: center;">
-            <i class="checkmark fas fa-check-circle text-success" style="font-size: 50px;"></i>
+            <h1>Order Confirmed!</h1>
+            <p class="subtitle">
+                We received your purchase request.<br>
+                You'll receive a confirmation email shortly.
+            </p>
+
+            <div class="btn-group">
+                <a th:href="@{/user/orders}" class="btn-primary-custom">
+                    <i class='bx bx-package me-2'></i>View My Orders
+                </a>
+                <a th:href="@{/shop}" class="btn-secondary-custom">
+                    <i class='bx bx-home me-2'></i>Continue Shopping
+                </a>
+            </div>
         </div>
-        <h1 class="text-success">Success</h1>
-        <dt>We received your purchase request;<br />we'll be in touch shortly!</dt>
-        <br>
-        <div>
-            <form th:action="@{/order}" method="get">
-                <input type="hidden" name="userId" th:value="${userId}">
-                <div>
-                    <button class="btn btn-success" type="submit" style="border-radius: 10px">GO TO ORDERS</button>
-                </div>
-            </form>
-        </div>
-        <br>
-        <a th:href="@{/shop}" class="text-dark fw-bold text-decoration-none">Go To Home</a>
     </div>
-</section>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

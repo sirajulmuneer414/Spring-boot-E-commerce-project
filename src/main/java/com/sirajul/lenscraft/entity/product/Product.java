@@ -15,92 +15,62 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Component
 public class Product {
-    @Id
-    @SequenceGenerator(
-            name = "product_id_generator",
-            sequenceName = "product_id",
-            initialValue = 1,
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY,
-            generator = "product_id_generator"
-    )
-    @Column(
-            name = "product_id"
-    )
-    Long productId;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "product_id")
+        Long productId;
 
-    @Column(
-            name = "stock_status"
-    )
-    @Enumerated(EnumType.STRING)
-    StockStatus stockStatus;
+        @Column(name = "stock_status")
+        @Enumerated(EnumType.STRING)
+        StockStatus stockStatus;
 
-    @Enumerated(EnumType.STRING)
-    ActiveStatus activeStatus;
+        @Enumerated(EnumType.STRING)
+        ActiveStatus activeStatus;
 
+        @Column(name = "product_name")
+        String productName;
 
-    @Column(
-            name = "product_name"
-    )
-    String productName;
+        @NotNull
+        @Column(name = "product_price", columnDefinition = "INTEGER")
+        Integer price;
 
-    @NotNull
-    @Column(
-            name = "product_price",
-            columnDefinition = "INTEGER"
-    )
-    Integer price;
+        @Column(columnDefinition = "boolean default false")
+        @Builder.Default
+        boolean isHavingOffer = false;
 
-    @Column(
-            columnDefinition = "boolean default false"
-    )
-    boolean isHavingOffer = false;
+        @Embedded
+        @Builder.Default
+        OfferEmbeddable offer = new OfferEmbeddable();
 
-    @Embedded
-    OfferEmbeddable offer;
+        @Column(name = "discount_price", columnDefinition = "INTEGER")
+        Integer discountedPrice;
 
-    @Column(
-            name = "discount_price",
-            columnDefinition = "INTEGER"
-    )
-    Integer discountedPrice;
+        String modelNo;
 
-    String modelNo;
+        @Column(columnDefinition = "TEXT")
+        String description;
 
-    @Column(
-            columnDefinition = "TEXT"
-    )
-    String description;
+        @Column(name = "frame_size")
 
-    @Column(
-            name = "frame_size"
-    )
+        @Enumerated(EnumType.STRING)
+        FrameSize frameSize;
 
-    @Enumerated(EnumType.STRING)
-    FrameSize frameSize;
+        @ManyToOne
+        Brand brand;
 
-    @ManyToOne
-    Brand brand;
+        @ManyToOne
+        Category category;
 
-
-    @ManyToOne
-    Category category;
-
-    @OneToMany(mappedBy = "product" , cascade = CascadeType.ALL)
-    List<Variables> variables;
-
-    public Product(){
-        offer = new OfferEmbeddable();
-        variables = new ArrayList<>();
-    }
-
+        @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+        @Builder.Default
+        List<Variables> variables = new ArrayList<>();
 
 }

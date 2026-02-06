@@ -60,7 +60,6 @@ public class OrderServiceImp implements OrderService {
 
         order.setAddress(addressService.findById(orderDto.getAddressId()));
 
-
         order.setCurrentStatus(FullOrderStatus.PENDING);
         if (orderDto.getCouponId() != null) {
 
@@ -89,7 +88,7 @@ public class OrderServiceImp implements OrderService {
 
             Variables variable = item.getVariable();
 
-            variable.setQuantity(variable.getQuantity()- item.getQuantity());
+            variable.setQuantity(variable.getQuantity() - item.getQuantity());
 
             variableService.saveVariable(variable);
 
@@ -105,17 +104,16 @@ public class OrderServiceImp implements OrderService {
 
             orderItem = orderedItemsService.saveAndReturn(orderItem);
 
-//            orderItem.getStatus().put(OrderStatus.PENDING,LocalDate.now());
-//
-//            orderItem = orderedItemsService.saveAndReturn(orderItem);
+            // orderItem.getStatus().put(OrderStatus.PENDING,LocalDate.now());
+            //
+            // orderItem = orderedItemsService.saveAndReturn(orderItem);
 
             order.getOrderItems().add(orderItem);
         }
 
-
         order.setOrderedTime(LocalDateTime.now());
 
-      order.getStatus().put(FullOrderStatus.PENDING,LocalDate.now());
+        order.getStatus().put(FullOrderStatus.PENDING, LocalDate.now());
 
         return orderRepository.save(order);
     }
@@ -151,7 +149,8 @@ public class OrderServiceImp implements OrderService {
                 Date weekStartDate = calendar.getTime();
                 LocalDate weekStart = weekStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 LocalDate weekEnd = weekEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                List<Order> list = orderRepository.getWeeklyFromStartToEnd(weekStart, weekEnd);
+                List<Order> list = orderRepository.getWeeklyFromStartToEnd(weekStart.atStartOfDay(),
+                        weekEnd.atTime(LocalTime.MAX));
 
                 double totalOrderAmount = list.stream().mapToDouble(Order::getTotalAmount).sum();
                 weeklySales.put(weekStart + "_" + weekEnd, totalOrderAmount);
@@ -174,11 +173,12 @@ public class OrderServiceImp implements OrderService {
                 Date weekStartDate = calendar.getTime();
                 LocalDate weekStart = weekStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 LocalDate weekEnd = weekEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                List<Order> list = orderRepository.getWeeklyFromStartToEnd(weekStart, weekEnd);
+                List<Order> list = orderRepository.getWeeklyFromStartToEnd(weekStart.atStartOfDay(),
+                        weekEnd.atTime(LocalTime.MAX));
 
                 Long count = 0L;
 
-                for(Order order : list){
+                for (Order order : list) {
                     count += Long.valueOf(order.getOrderItems().size());
                 }
 
@@ -200,7 +200,8 @@ public class OrderServiceImp implements OrderService {
             for (int i = 0; i < 7; i++) {
                 Date date = calendar.getTime();
                 LocalDate currentDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                List<Order> list = orderRepository.getDailyFromCurrentDay(currentDate);
+                List<Order> list = orderRepository.getDailyFromCurrentDay(currentDate.atStartOfDay(),
+                        currentDate.atTime(LocalTime.MAX));
                 orderTotalAmount = list.stream().mapToDouble(Order::getTotalAmount).sum();
                 dailySale.put(currentDate.toString(), orderTotalAmount);
                 calendar.add(Calendar.DAY_OF_YEAR, -1);
@@ -210,7 +211,6 @@ public class OrderServiceImp implements OrderService {
             throw new RuntimeException("An error Occurred");
         }
 
-
     }
 
     @Override
@@ -218,14 +218,14 @@ public class OrderServiceImp implements OrderService {
         try {
             Map<String, Long> dailySale = new LinkedHashMap<>();
             Calendar calendar = Calendar.getInstance();
-            Long count = 0L;
             for (int i = 0; i < 7; i++) {
                 Date date = calendar.getTime();
                 LocalDate currentDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                List<Order> list = orderRepository.getDailyFromCurrentDay(currentDate);
+                List<Order> list = orderRepository.getDailyFromCurrentDay(currentDate.atStartOfDay(),
+                        currentDate.atTime(LocalTime.MAX));
 
-
-                for(Order order : list){
+                Long count = 0L;
+                for (Order order : list) {
                     count += Long.valueOf(order.getOrderItems().size());
                 }
                 dailySale.put(currentDate.toString(), count);
@@ -235,7 +235,6 @@ public class OrderServiceImp implements OrderService {
         } catch (Exception e) {
             throw new RuntimeException("An error Occurred");
         }
-
 
     }
 
@@ -250,7 +249,8 @@ public class OrderServiceImp implements OrderService {
                 Month targetMonth = targetYearMonth.getMonth();
                 LocalDate monthStart = targetYearMonth.atDay(1);
                 LocalDate monthEnd = targetYearMonth.atEndOfMonth();
-                List<Order> list = orderRepository.getMonthlyFromStartToEnd(monthStart, monthEnd);
+                List<Order> list = orderRepository.getMonthlyFromStartToEnd(monthStart.atStartOfDay(),
+                        monthEnd.atTime(LocalTime.MAX));
                 double totalOrderAmount = list.stream().mapToDouble(Order::getTotalAmount).sum();
                 monthlySales.put(targetMonth.toString(), totalOrderAmount);
             }
@@ -266,16 +266,16 @@ public class OrderServiceImp implements OrderService {
             Map<String, Long> monthlySales = new LinkedHashMap<>();
             YearMonth currentYearMonth = YearMonth.now();
             Month currentMonth = currentYearMonth.getMonth();
-            Long count = 0L;
             for (int i = currentMonth.getValue() - 1; i >= 0; i--) {
                 YearMonth targetYearMonth = currentYearMonth.minusMonths(i);
                 Month targetMonth = targetYearMonth.getMonth();
                 LocalDate monthStart = targetYearMonth.atDay(1);
                 LocalDate monthEnd = targetYearMonth.atEndOfMonth();
-                List<Order> list = orderRepository.getMonthlyFromStartToEnd(monthStart, monthEnd);
+                List<Order> list = orderRepository.getMonthlyFromStartToEnd(monthStart.atStartOfDay(),
+                        monthEnd.atTime(LocalTime.MAX));
 
-
-                for(Order order : list){
+                Long count = 0L;
+                for (Order order : list) {
                     count += Long.valueOf(order.getOrderItems().size());
                 }
                 monthlySales.put(targetMonth.toString(), count);
@@ -296,12 +296,13 @@ public class OrderServiceImp implements OrderService {
                 Year targetYear = currentYear.minusYears(i);
                 LocalDate yearStart = targetYear.atDay(1);
                 LocalDate yearEnd = targetYear.atMonth(Month.DECEMBER).atEndOfMonth();
-                List<Order> list = orderRepository.getYearlyFromStartToEnd(yearStart, yearEnd);
+                List<Order> list = orderRepository.getYearlyFromStartToEnd(yearStart.atStartOfDay(),
+                        yearEnd.atTime(LocalTime.MAX));
                 double totalOrderAmount = list.stream().mapToDouble(Order::getTotalAmount).sum();
                 yearlySales.put(Integer.toString(targetYear.getValue()), totalOrderAmount);
             }
             return yearlySales;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("An error Occurred");
         }
     }
@@ -311,20 +312,21 @@ public class OrderServiceImp implements OrderService {
         try {
             Map<String, Long> yearlySales = new LinkedHashMap<>();
             Year currentYear = Year.now();
-            Long count=0L;
             for (int i = 4; i >= 0; i--) {
                 Year targetYear = currentYear.minusYears(i);
                 LocalDate yearStart = targetYear.atDay(1);
                 LocalDate yearEnd = targetYear.atMonth(Month.DECEMBER).atEndOfMonth();
-                List<Order> list = orderRepository.getYearlyFromStartToEnd(yearStart, yearEnd);
+                List<Order> list = orderRepository.getYearlyFromStartToEnd(yearStart.atStartOfDay(),
+                        yearEnd.atTime(LocalTime.MAX));
 
-                for(Order order : list){
+                Long count = 0L;
+                for (Order order : list) {
                     count += Long.valueOf(order.getOrderItems().size());
                 }
                 yearlySales.put(Integer.toString(targetYear.getValue()), count);
             }
             return yearlySales;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("An error Occurred");
         }
     }

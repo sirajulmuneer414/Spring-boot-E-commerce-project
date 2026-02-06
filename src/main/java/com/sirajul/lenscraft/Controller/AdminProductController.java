@@ -11,22 +11,15 @@ import com.sirajul.lenscraft.entity.product.Brand;
 import com.sirajul.lenscraft.entity.product.Category;
 import com.sirajul.lenscraft.entity.product.Product;
 import com.sirajul.lenscraft.entity.product.Variables;
-import com.sirajul.lenscraft.entity.product.enums.FrameSize;
 import com.sirajul.lenscraft.mapping.ProductMapping;
 import com.sirajul.lenscraft.mapping.VariableMapping;
-import com.sirajul.lenscraft.utils.FileUploadUtil;
-import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -50,18 +43,15 @@ public class AdminProductController {
     @Autowired
     VariableService variableService;
 
-
     @GetMapping()
-    public String getProductPage(Model model,@RequestParam(name = "keyword",required = false)String keyword) {
+    public String getProductPage(Model model, @RequestParam(name = "keyword", required = false) String keyword) {
         List<Product> productsIn = new ArrayList<>();
 
-        if(keyword!=null){
+        if (keyword != null) {
             productsIn = productService.findAllProductsContaining(keyword);
-        }
-        else {
+        } else {
             productsIn = productService.findAllProducts();
         }
-
 
         model.addAttribute("products", productsIn);
         return "admin/getProducts";
@@ -83,19 +73,27 @@ public class AdminProductController {
         return "admin/add-product";
     }
 
+    @Autowired
+    com.sirajul.lenscraft.Service.interfaces.CloudinaryService cloudinaryService;
+
     @PostMapping("/add")
     public String addProduct(@ModelAttribute ProductDto productDto,
-                             @RequestParam("brandId") Integer brandId,
-                             @RequestParam("categoryId") Long categoryId,
-                             @RequestParam("variable.image1")List<MultipartFile> image1,
-                             @RequestParam(name = "variable.image2",required = false) List<MultipartFile> image2,
-                             @RequestParam(name = "variable.image3",required = false) List<MultipartFile> image3,
-                             @RequestParam("variable.frameColor") List<String> frameColor,
-                             @RequestParam("variable.quantity") List<Long> quantity
-    ) {
+            @RequestParam("brandId") Integer brandId,
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("variable.image1") List<MultipartFile> image1,
+            @RequestParam(name = "variable.image2", required = false) List<MultipartFile> image2,
+            @RequestParam(name = "variable.image3", required = false) List<MultipartFile> image3,
+            @RequestParam("variable.frameColor") List<String> frameColor,
+            @RequestParam("variable.quantity") List<Long> quantity) {
         productDto.setBrandId(brandId);
         productDto.setCategoryId(categoryId);
         productDto.setVariables(new ArrayList<>());
+
+        // Save product first to get ID for folder structure (optional, but consistent
+        // with folder naming)
+        Product product = productService.saveProductAndGetProduct(productDto, image1, image2, image3);
+        String folder = "lenscraft/productImages/" + product.getProductId();
+
         List<VariablesDto> variablesDtos = new ArrayList<>();
 
         for (int i = 0; i < frameColor.size(); i++) {
@@ -105,28 +103,22 @@ public class AdminProductController {
             variablesDto.setQuantity(quantity.get(i));
 
             if (!image1.get(i).isEmpty()) {
-                String filename = StringUtils.cleanPath(image1.get(i).getOriginalFilename());
-                variablesDto.setImage1(filename);
+                String url = cloudinaryService.uploadFile(image1.get(i), folder);
+                variablesDto.setImage1(url);
             }
-            if (!image2.get(i).isEmpty()) {
-                String filename = StringUtils.cleanPath(image2.get(i).getOriginalFilename());
-                variablesDto.setImage2(filename);
+            if (image2 != null && i < image2.size() && !image2.get(i).isEmpty()) {
+                String url = cloudinaryService.uploadFile(image2.get(i), folder);
+                variablesDto.setImage2(url);
             }
-            if (!image3.get(i).isEmpty()) {
-                String filename = StringUtils.cleanPath(image3.get(i).getOriginalFilename());
-                variablesDto.setImage3(filename);
+            if (image3 != null && i < image3.size() && !image3.get(i).isEmpty()) {
+                String url = cloudinaryService.uploadFile(image3.get(i), folder);
+                variablesDto.setImage3(url);
             }
 
             variablesDtos.add(variablesDto);
         }
 
-
-
-
-
         List<Variables> variables = variableMapping.DtoListToVariable(variablesDtos);
-
-        Product product = productService.saveProductAndGetProduct(productDto, image1, image2, image3);
 
         for (Variables variables1 : variables) {
             variables1.setProduct(product);
@@ -137,12 +129,10 @@ public class AdminProductController {
 
         variableService.saveVariables(variables);
 
-
         return "redirect:/admin/products";
     }
 
-
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteProduct(@PathVariable("id") Long productId) {
 
         productService.deleteById(productId);
@@ -152,16 +142,14 @@ public class AdminProductController {
 
     @GetMapping("/block/{id}")
     public String blockProduct(
-            @PathVariable("id") Long productId
-    ){
+            @PathVariable("id") Long productId) {
         productService.blockById(productId);
         return "redirect:/admin/products";
     }
 
     @GetMapping("/unblock/{id}")
     public String unBlockProduct(
-            @PathVariable("id") Long productId
-    ){
+            @PathVariable("id") Long productId) {
         productService.unBlockById(productId);
         return "redirect:/admin/products";
     }
@@ -173,7 +161,6 @@ public class AdminProductController {
 
         List<Variables> variables = variableService.findVariablesByProduct(product);
         System.out.println(variables.isEmpty());
-
 
         for (Variables variables1 : variables) {
 
@@ -204,9 +191,9 @@ public class AdminProductController {
 
     @PostMapping("/edit/{id}")
     public String editProduct(@PathVariable("id") Long productId,
-                              @ModelAttribute("productDto") ProductDto productDto,
-                              @RequestParam("brandId") Integer brandId,
-                              @RequestParam("categoryId") Long categoryId
+            @ModelAttribute("productDto") ProductDto productDto,
+            @RequestParam("brandId") Integer brandId,
+            @RequestParam("categoryId") Long categoryId
 
     ) {
         productDto.setBrandId(brandId);
@@ -214,7 +201,6 @@ public class AdminProductController {
         productDto.setCategoryId(categoryId);
 
         productService.updateProduct(productDto);
-
 
         return "redirect:/admin/products/";
 
@@ -239,27 +225,27 @@ public class AdminProductController {
     }
 
     @GetMapping("/edit-variable/{id}")
-    public String getEditVariable(@PathVariable("id") Long variableId,Model model) {
+    public String getEditVariable(@PathVariable("id") Long variableId, Model model) {
         Variables variable = variableService.findVariableById(variableId);
 
         System.out.println(variable.getVariableId());
 
-        model.addAttribute("variable",variable);
+        model.addAttribute("variable", variable);
 
         return "admin/edit-variable";
     }
 
     @PostMapping("/edit-variable/{id}")
-    public String editVariable(@PathVariable("id")Long variableId,@ModelAttribute Variables variable,
-                               @RequestParam(name = "variable.image1", required = false) MultipartFile image1,
-                               @RequestParam(name = "variable.image2", required = false) MultipartFile image2,
-                               @RequestParam(name = "variable.image3", required = false) MultipartFile image3){
+    public String editVariable(@PathVariable("id") Long variableId, @ModelAttribute Variables variable,
+            @RequestParam(name = "variable.image1", required = false) MultipartFile image1,
+            @RequestParam(name = "variable.image2", required = false) MultipartFile image2,
+            @RequestParam(name = "variable.image3", required = false) MultipartFile image3) {
 
         Variables variableFromDB = variableService.findVariableById(variableId);
 
-        variableService.updateVariable(variable,variableFromDB,image1,image2,image3);
+        variableService.updateVariable(variable, variableFromDB, image1, image2, image3);
 
-        return "redirect:/admin/products/get-variables/"+variableFromDB.getProduct().getProductId();
+        return "redirect:/admin/products/get-variables/" + variableFromDB.getProduct().getProductId();
 
     }
 
@@ -289,15 +275,16 @@ public class AdminProductController {
 
     @PostMapping("/add-variables/{id}")
     public String addVariables(@PathVariable("id") Long productId,
-                               @RequestParam(name = "variable.frameColor",required = false) List<String> frameColor,
-                               @RequestParam(name = "variable.image1", required = false) List<MultipartFile> image1,
-                               @RequestParam(name = "variable.image2",required = false) List<MultipartFile> image2,
-                               @RequestParam(name = "variable.image3",required = false) List<MultipartFile> image3,
-                               @RequestParam(name = "variable.quantity",required = false) List<Long> quantity) {
+            @RequestParam(name = "variable.frameColor", required = false) List<String> frameColor,
+            @RequestParam(name = "variable.image1", required = false) List<MultipartFile> image1,
+            @RequestParam(name = "variable.image2", required = false) List<MultipartFile> image2,
+            @RequestParam(name = "variable.image3", required = false) List<MultipartFile> image3,
+            @RequestParam(name = "variable.quantity", required = false) List<Long> quantity) {
         Product product = productService.findProductById(productId);
 
         List<Variables> variablesList = new ArrayList<>();
-        if(frameColor!=null) {
+        if (frameColor != null) {
+            String folder = "lenscraft/productImages/" + product.getProductId();
             for (int i = 0; i < frameColor.size(); i++) {
                 Variables variable = new Variables();
 
@@ -305,16 +292,16 @@ public class AdminProductController {
                 variable.setQuantity(quantity.get(i));
 
                 if (!image1.get(i).isEmpty()) {
-                    String fileName = StringUtils.cleanPath(image1.get(i).getOriginalFilename());
-                    variable.setImage1(fileName);
+                    String url = cloudinaryService.uploadFile(image1.get(i), folder);
+                    variable.setImage1(url);
                 }
-                if (!image2.get(i).isEmpty()) {
-                    String fileName = StringUtils.cleanPath(image2.get(i).getOriginalFilename());
-                    variable.setImage2(fileName);
+                if (image2 != null && i < image2.size() && !image2.get(i).isEmpty()) {
+                    String url = cloudinaryService.uploadFile(image2.get(i), folder);
+                    variable.setImage2(url);
                 }
-                if (!image3.get(i).isEmpty()) {
-                    String fileName = StringUtils.cleanPath(image3.get(i).getOriginalFilename());
-                    variable.setImage3(fileName);
+                if (image3 != null && i < image3.size() && !image3.get(i).isEmpty()) {
+                    String url = cloudinaryService.uploadFile(image3.get(i), folder);
+                    variable.setImage3(url);
                 }
 
                 variable.setProduct(product);
@@ -325,18 +312,11 @@ public class AdminProductController {
             }
 
             product.getVariables().addAll(variablesList);
-
-
-            String uploadDir = "lenscraft/src/main/resources/static/productImages/" + product.getProductId();
-
-            variableService.saveNewVariablesFilesForProduct(uploadDir, image1, image2, image3);
-
+            // Removed redundant saveNewVariablesFilesForProduct call
             productService.save(product);
         }
 
-        return "redirect:/admin/products/get-variables/"+productId;
+        return "redirect:/admin/products/get-variables/" + productId;
     }
 
-
 }
-

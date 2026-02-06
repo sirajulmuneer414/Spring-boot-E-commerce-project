@@ -30,7 +30,7 @@ const paymentStart = (e) => {
                     console.log(response);
                     console.log(response.amount_due);
                     let options = {
-                        key: "rzp_test_3BnqGyxnP22wsH",
+                        key: response.key, // Use key from backend response
                         amount: response.amount,
                         currency: "INR",
                         name: "Lenscraft",

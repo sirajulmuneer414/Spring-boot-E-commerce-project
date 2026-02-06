@@ -1,142 +1,425 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta charset="UTF-8">
-    <title>Lenscraft-Product View</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-            crossorigin="anonymous"></script>
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
-  * {
-      padding: 0;
-      margin: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-  }
-  li{
-  margin-bottom: 20px;
-        }
-    </style>
-
+<head th:replace="~{fragment::head}">
+    <title th:text="${product.productName} + ' - Lenscraft'">Product View</title>
 </head>
-<body class="container-fluid">
-<div th:replace="~{fragment::navbar}"></div>
-<div class="row" style="margin-top: 100px; margin-bottom: 50px ">
-    <div class="col-6 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6 d-flex justify-content-center">
 
-        <div id="carouselExampleRide" class="carousel slide" data-bs-ride="true" style="height: 400px; width: 400px">
-            <div class="carousel-inner h-100">
-                <div class="carousel-item active">
-                    <img th:src="@{${'/productImages/'+product.productId+'/'+targetVariable.image1}}" class="d-block w-100" alt="...">
+<body class="bg-body">
+
+    <!-- Navbar -->
+    <div th:replace="~{fragment::navbar}"></div>
+
+    <!-- Main Content -->
+    <section class="py-5" style="margin-top: 60px;">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none text-secondary">Home</a>
+                    </li>
+                    <li class="breadcrumb-item"><a th:href="@{/shop}"
+                            class="text-decoration-none text-secondary">Shop</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${product.productName}">Product</li>
+                </ol>
+            </nav>
+
+            <div class="row g-5">
+
+                <!-- Product Images (Carousel) -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm p-3">
+                        <div id="productCarousel" class="carousel slide" data-bs-interval="false">
+                            <div class="carousel-inner rounded bg-light" style="max-height: 500px;">
+                                <div class="carousel-item active h-100">
+                                    <div
+                                        class="zoom-container w-100 h-100 d-flex align-items-center justify-content-center">
+                                        <img th:src="${#strings.startsWith(targetVariable.image1, 'http') ? targetVariable.image1 : '/productImages/'+product.productId+'/'+targetVariable.image1}"
+                                            class="d-block w-100 object-fit-contain zoom-img" style="max-height: 500px;"
+                                            alt="Product Image 1">
+                                    </div>
+                                </div>
+                                <div class="carousel-item h-100" th:if="${targetVariable.image2 != null}">
+                                    <div
+                                        class="zoom-container w-100 h-100 d-flex align-items-center justify-content-center">
+                                        <img th:src="${#strings.startsWith(targetVariable.image2, 'http') ? targetVariable.image2 : '/productImages/'+product.productId+'/'+targetVariable.image2}"
+                                            class="d-block w-100 object-fit-contain zoom-img" style="max-height: 500px;"
+                                            alt="Product Image 2">
+                                    </div>
+                                </div>
+                                <div class="carousel-item h-100" th:if="${targetVariable.image3 != null}">
+                                    <div
+                                        class="zoom-container w-100 h-100 d-flex align-items-center justify-content-center">
+                                        <img th:src="${#strings.startsWith(targetVariable.image3, 'http') ? targetVariable.image3 : '/productImages/'+product.productId+'/'+targetVariable.image3}"
+                                            class="d-block w-100 object-fit-contain zoom-img" style="max-height: 500px;"
+                                            alt="Product Image 3" onerror="this.style.display='none'">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel"
+                                data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon bg-dark rounded-circle p-2 bg-opacity-50"
+                                    aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel"
+                                data-bs-slide="next">
+                                <span class="carousel-control-next-icon bg-dark rounded-circle p-2 bg-opacity-50"
+                                    aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+
+                        <!-- Thumbnail Navigation -->
+                        <div class="row g-2 mt-2">
+                            <div class="col-3">
+                                <img th:src="${#strings.startsWith(targetVariable.image1, 'http') ? targetVariable.image1 : '/productImages/'+product.productId+'/'+targetVariable.image1}"
+                                    class="img-fluid rounded border cursor-pointer opacity-hover"
+                                    onclick="bsCarouselTo(0)">
+                            </div>
+                            <div class="col-3" th:if="${targetVariable.image2 != null}">
+                                <img th:src="${#strings.startsWith(targetVariable.image2, 'http') ? targetVariable.image2 : '/productImages/'+product.productId+'/'+targetVariable.image2}"
+                                    class="img-fluid rounded border cursor-pointer opacity-hover"
+                                    onclick="bsCarouselTo(1)">
+                            </div>
+                            <div class="col-3" th:if="${targetVariable.image3 != null}">
+                                <img th:src="${#strings.startsWith(targetVariable.image3, 'http') ? targetVariable.image3 : '/productImages/'+product.productId+'/'+targetVariable.image3}"
+                                    class="img-fluid rounded border cursor-pointer opacity-hover"
+                                    onclick="bsCarouselTo(2)">
+                            </div>
+                        </div>
+
+                        <style>
+                            .zoom-container {
+                                overflow: hidden;
+                                cursor: crosshair;
+                                position: relative;
+                            }
+
+                            .zoom-img {
+                                transition: transform 0.1s ease-out;
+                                transform-origin: center center;
+                                pointer-events: none;
+                                /* Let events pass to container */
+                            }
+
+                            .zoom-container:hover .zoom-img {
+                                transform: scale(2);
+                            }
+                        </style>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                document.querySelectorAll('.zoom-container').forEach(container => {
+                                    container.addEventListener('mousemove', function (e) {
+                                        const img = this.querySelector('img');
+                                        const rect = this.getBoundingClientRect();
+                                        const x = e.clientX - rect.left;
+                                        const y = e.clientY - rect.top;
+
+                                        const xPercent = (x / rect.width) * 100;
+                                        const yPercent = (y / rect.height) * 100;
+
+                                        img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+                                    });
+
+                                    container.addEventListener('mouseleave', function (e) {
+                                        const img = this.querySelector('img');
+                                        // Reset transform origin smoothly if needed, or just let CSS scale(1) handle it
+                                        // img.style.transformOrigin = "center center"; 
+                                    });
+                                });
+                            });
+                        </script>
+                    </div>
                 </div>
-                <div class="carousel-item">
-                    <img th:src="@{${'/productImages/'+product.productId+'/'+targetVariable.image2}}" class="d-block w-100" alt="...">
-                </div>
-                <div class="carousel-item">
-                    <img th:src="@{${'/productImages/'+product.productId+'/'+targetVariable.image2}}" class="d-block w-100" alt="...">
+
+                <!-- Product Details -->
+                <div class="col-lg-6">
+                    <div class="ps-lg-4">
+                        <small class="text-uppercase text-primary fw-bold tracking-wide"
+                            th:text="${product.brand.brandName}">Brand Name</small>
+                        <h1 class="display-5 fw-bold font-heading mt-2" th:text="${product.productName}">Product
+                            Name
+                        </h1>
+
+                        <!-- Ratings (Dynamic from Backend) -->
+                        <div class="mb-3"
+                            th:with="avgRating=${T(java.lang.Math).round(averageRating != null ? averageRating : 0)}">
+                            <span class="text-warning">
+                                <i th:class="${avgRating >= 1 ? 'bx bxs-star' : 'bx bx-star'}"></i>
+                                <i th:class="${avgRating >= 2 ? 'bx bxs-star' : 'bx bx-star'}"></i>
+                                <i th:class="${avgRating >= 3 ? 'bx bxs-star' : 'bx bx-star'}"></i>
+                                <i th:class="${avgRating >= 4 ? 'bx bxs-star' : 'bx bx-star'}"></i>
+                                <i th:class="${avgRating >= 5 ? 'bx bxs-star' : 'bx bx-star'}"></i>
+                            </span>
+                            <span class="text-secondary ms-2">(<span
+                                    th:text="${ratingsCount != null ? ratingsCount : 0}">0</span> Reviews)</span>
+                        </div>
+
+                        <!-- Price Section -->
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <h2 class="fw-bold text-dark mb-0" th:text="'₹' + ${product.discountedPrice}">₹0.00</h2>
+                            <div th:if="${product.isHavingOffer or product.category.isHavingOffer}"
+                                class="d-flex align-items-center gap-2">
+                                <span class="text-muted text-decoration-line-through fs-5"
+                                    th:text="'₹' + ${product.price}">₹0.00</span>
+                                <span class="badge bg-danger rounded-pill px-3"
+                                    th:text="${product.isHavingOffer ? product.offer.offerPercentage : product.category.offer.offerPercentage} + '% OFF'">
+                                    0% OFF
+                                </span>
+                            </div>
+                        </div>
+
+                        <p class="text-secondary lead mb-4" th:text="${product.description}">Product description
+                            goes
+                            here.</p>
+
+                        <hr class="border-secondary opacity-25 mb-4">
+
+                        <!-- Variants (Colors) -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-uppercase small mb-3">Available Colors</h6>
+                            <div class="d-flex gap-2">
+                                <!-- Target Variable (Selected) -->
+                                <a th:href="@{/shop/productView/{id}/{variableId}(id=${product.productId},variableId=${targetVariable.variableId})}"
+                                    class="rounded-circle border border-2 border-dark d-flex justify-content-center align-items-center"
+                                    style="width: 34px; height: 34px; padding: 2px;" title="Selected">
+                                    <div class="rounded-circle w-100 h-100 shadow-sm"
+                                        th:style="'background-color: ' + ${targetVariable.frameColor}"></div>
+                                </a>
+
+                                <!-- Other Variables -->
+                                <a th:each="variable : ${variables}"
+                                    th:unless="${variable.variableId == targetVariable.variableId}"
+                                    th:href="@{/shop/productView/{id}/{variableId}(id=${product.productId},variableId=${variable.variableId})}"
+                                    class="rounded-circle border d-flex justify-content-center align-items-center hover-scale"
+                                    style="width: 34px; height: 34px; padding: 2px;">
+                                    <div class="rounded-circle w-100 h-100 shadow-sm"
+                                        th:style="'background-color: ' + ${variable.frameColor}"></div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Specs Grid -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-sm-4">
+                                <div class="p-3 bg-light rounded text-center h-100">
+                                    <small class="text-secondary d-block">Model</small>
+                                    <span class="fw-bold" th:text="${product.modelNo}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-4">
+                                <div class="p-3 bg-light rounded text-center h-100">
+                                    <small class="text-secondary d-block">Size</small>
+                                    <span class="fw-bold" th:text="${product.frameSize.name()}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-4">
+                                <div class="p-3 bg-light rounded text-center h-100">
+                                    <small class="text-secondary d-block">Frame Length</small>
+                                    <span class="fw-bold" th:text="${product.frameSize.frameLength}">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-grid gap-2 d-md-flex mt-4">
+                            <!-- Wishlist Logic (Commented out in original, but added based on form structure if needed) -->
+                            <!-- Keeping Cart logic as primary -->
+
+                            <form
+                                th:action="@{/user/cart/add/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}"
+                                th:unless="${carted}" class="flex-grow-1">
+                                <input type="hidden" name="username" th:value="${username}" th:if="${username}">
+                                <button type="submit" class="btn btn-primary-custom btn-lg w-100 shadow-md">
+                                    <i class='bx bx-cart-alt me-2'></i> Add to Cart
+                                </button>
+                            </form>
+
+                            <form
+                                th:action="@{/user/cart/remove/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}"
+                                th:if="${carted}" class="flex-grow-1">
+                                <input type="hidden" name="userId" th:value="${userId}">
+                                <input type="hidden" name="cartedItemId" th:value="${cartedItemId}">
+                                <input type="hidden" name="fromProduct" th:value="yes">
+                                <button type="submit" class="btn btn-outline-danger btn-lg w-100">
+                                    <i class='bx bx-trash me-2'></i> Remove from Cart
+                                </button>
+                            </form>
+
+                            <!-- Wishlist (Optional if enabled in future) -->
+                            <!--
+                             <button class="btn btn-outline-secondary btn-lg" title="Add to Wishlist">
+                                <i class='bx bx-heart'></i>
+                             </button>
+                             -->
+                        </div>
+
+                    </div>
                 </div>
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
+
+            <!-- Rating Submission Section -->
+            <div class="row mt-5" th:if="${username != null}">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h4 class="mb-4" style="font-family: 'Outfit', sans-serif; font-weight: 600;">Rate This
+                                Product</h4>
+
+                            <!-- Star Rating Input -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Your Rating</label>
+                                <div class="star-rating-input d-flex gap-2" style="font-size: 2rem;">
+                                    <i class="bx bx-star rating-star" data-rating="1"
+                                        style="cursor: pointer; color: #cbd5e1;"></i>
+                                    <i class="bx bx-star rating-star" data-rating="2"
+                                        style="cursor: pointer; color: #cbd5e1;"></i>
+                                    <i class="bx bx-star rating-star" data-rating="3"
+                                        style="cursor: pointer; color: #cbd5e1;"></i>
+                                    <i class="bx bx-star rating-star" data-rating="4"
+                                        style="cursor: pointer; color: #cbd5e1;"></i>
+                                    <i class="bx bx-star rating-star" data-rating="5"
+                                        style="cursor: pointer; color: #cbd5e1;"></i>
+                                </div>
+                                <input type="hidden" id="selectedRating" value="0">
+                                <small class="text-muted d-block mt-2" id="ratingText">Click stars to rate</small>
+                            </div>
+
+                            <!-- Review Text -->
+                            <div class="mb-4">
+                                <label for="reviewDescription" class="form-label fw-bold">Your Review
+                                    (Optional)</label>
+                                <textarea class="form-control" id="reviewDescription" rows="4"
+                                    placeholder="Share your experience with this product..."
+                                    style="border: 2px solid #e2e8f0; border-radius: 10px; resize: none;"></textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="button" class="btn btn-primary px-5 py-2" id="submitRating"
+                                style="background: linear-gradient(135deg, #4F46E5 0%, #4338ca 100%); border: none; border-radius: 10px; font-weight: 600;">
+                                <i class='bx bx-send me-2'></i>Submit Rating
+                            </button>
+
+                            <!-- Feedback Messages -->
+                            <div id="ratingFeedback" class="mt-3" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="col-6 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6">
-        <ul class="list-unstyled">
-            <li>
-                <h4 th:text="${product.brand.brandName}" style="color: #d9d9d9"></h4>
-            </li>
-            <li>
-                <h2 th:text="${product.productName}" style="color: black"></h2>
-            </li>
-            <li>
-                <h6 th:text="${product.description}"></h6>
-            </li>
-            <li>
-                <h6 th:text="${'Size : '+product.frameSize.name()}" class="text-muted"></h6>
-            </li>
-            <li th:unless="${product.isHavingOffer or product.category.isHavingOffer}" >
-                <h3 th:text="${'&#8377;'+product.price}" style="color: #40A2E3"></h3>
-            </li>
+    </section>
 
-            <li th:if="${product.isHavingOffer}">
-                <h3 th:text="${'&#8377;'+product.price}" class="text-muted" style="text-decoration: line-through"></h3>
-                <h3 th:text="${'&#8377;'+product.discountedPrice}" style="color: #40A2E3"></h3><span class="rounded p-2" th:text="${product.offer.offerPercentage+'&#x25; OFF'}" style="color: white; background-color: green"></span>
-            </li>
-            <li th:if="${product.category.isHavingOffer and !product.isHavingOffer}">
-                <h3 th:text="${'&#8377;'+product.price}" class="text-muted" style="text-decoration: line-through"></h3>
-                <h3 th:text="${'&#8377;'+product.discountedPrice}" style="color: #40A2E3"></h3><span class="rounded p-2" th:text="${product.category.offer.offerPercentage+'&#x25; OFF'}" style="color: white; background-color: red"></span>
-            </li>
-            <li class="d-flex align-items-center">
-                <a th:href="@{/shop/productView/{id}/{variableId}(id=${product.productId},variableId=${targetVariable.variableId})}"><div th:style="| height: 30px; width: 30px;padding: 5px; border: 1px solid #000000; background-color: ${targetVariable.frameColor}"></div></a>
-                <div th:each="variable : ${variables}" class="d-flex">
+    <!-- Footer -->
+    <div th:replace="~{fragment::footer}"></div>
 
-                    <a th:unless="${variable eq targetVariable}" th:href="@{/shop/productView/{id}/{variableId}(id=${product.productId},variableId=${variable.variableId})}"><div th:style="| height: 30px; width: 30px; background-color: ${variable.frameColor}"></div></a>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Helper to switch carousel via thumbnails
+        function bsCarouselTo(index) {
+            var myCarousel = document.querySelector('#productCarousel')
+            var carousel = new bootstrap.Carousel(myCarousel)
+            carousel.to(index)
+        }
 
-                </div>
-            </li>
-            <li class="d-flex align-items-center">
-<!--                <div>-->
-<!--                    <form th:action="@{/user/wishlist/add/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:unless="${wishlisted}">-->
-<!--                        <input type="hidden" name="username" th:value="${username}">-->
-<!--                <button type="submit" class="btn" style="border-radius: 10px; background-color: #d9d9d9; color: #b43e8f">ADD TO WISHLIST</button>-->
-<!--                    </form>-->
-<!--                    <form th:action="@{/user/wishlist/remove/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:if="${wishlisted}">-->
-<!--                        <input type="hidden" name="username" th:value="${username}">-->
-<!--                        <input type="hidden" name="fromProduct" th:value="yes">-->
-<!--                <button type="submit" class="btn" style="border-radius: 10px; background-color: #d9d9d9; color: #b43e8f">REMOVE FROM WISHLIST</button>-->
-<!--                    </form>-->
-<!--                </div>-->
-                <div>
-                    <form th:action="@{/user/cart/add/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:unless="${carted}">
-                        <input type="hidden" name="username" th:value="${username}">
-                <button type="submit" class="btn" style="border-radius: 10px; background-color: #40A2E3; color: #fff">ADD TO CART</button>
-                    </form>
-                    <form th:action="@{/user/cart/remove/{productId}/{variableId}(productId=${product.productId},variableId=${targetVariable.variableId})}" th:if="${carted}">
-                        <input type="hidden" name="userId" th:value="${userId}">
-                        <input type="hidden" name="cartedItemId" th:value="${cartedItemId}">
-                        <input type="hidden" name="fromProduct" th:value="yes">
-                <button type="submit" class="btn" style="border-radius: 10px; background-color: #FF8080; color: #fff">REMOVE FROM CART</button>
-                    </form>
-                </div>
-            </li>
-        </ul>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6 d-flex justify-content-center">
-        <ul class="list-unstyled">
-            <li>
-                <h5 th:text="${'Product Id   :  '+product.productId}" class="text-muted"></h5>
-            </li>
-            <li>
-                <h5 th:text="${'Model No     :  '+product.modelNo}" class="text-muted"></h5>
-            </li>
-            <li>
-                <h5 th:text="${'Frame Size   :  '+product.frameSize.name()}" class="text-muted"></h5>
-            </li>
-            <li>
-                <h5 th:text="${'Frame Length :  '+product.frameSize.frameLength}" class="text-muted"></h5>
-            </li>
-        </ul>
+        // Rating System JavaScript
+        $(document).ready(function () {
+            let selectedRating = 0;
+            const stars = $('.rating-star');
+            const ratingInput = $('#selectedRating');
+            const ratingText = $('#ratingText');
+            const productId = [[${ product.productId }]];
 
-    </div>
-</div>
+            // Star hover effect
+            stars.hover(
+                function () {
+                    const rating = $(this).data('rating');
+                    highlightStars(rating);
+                },
+                function () {
+                    highlightStars(selectedRating);
+                }
+            );
 
-<div th:replace="~{fragment::footer}"></div>
+            // Star click to select
+            stars.click(function () {
+                selectedRating = $(this).data('rating');
+                ratingInput.val(selectedRating);
+                highlightStars(selectedRating);
+                updateRatingText(selectedRating);
+            });
+
+            function highlightStars(rating) {
+                stars.each(function (index) {
+                    if (index < rating) {
+                        $(this).removeClass('bx-star').addClass('bxs-star').css('color', '#fbbf24');
+                    } else {
+                        $(this).removeClass('bxs-star').addClass('bx-star').css('color', '#cbd5e1');
+                    }
+                });
+            }
+
+            function updateRatingText(rating) {
+                const texts = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+                ratingText.text(texts[rating] || 'Click stars to rate');
+            }
+
+            // Submit rating
+            $('#submitRating').click(function () {
+                const rating = ratingInput.val();
+                const description = $('#reviewDescription').val();
+
+                if (rating == 0) {
+                    showFeedback('Please select a rating by clicking on the stars', 'warning');
+                    return;
+                }
+
+                // Disable button during submission
+                $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Submitting...');
+
+                $.ajax({
+                    url: '/ratings/submit',
+                    type: 'POST',
+                    data: {
+                        productId: productId,
+                        rating: rating,
+                        description: description
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            showFeedback('Thank you! Your rating has been submitted successfully.', 'success');
+                            // Update the displayed ratings
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            showFeedback(response.message || 'Failed to submit rating', 'danger');
+                            $('#submitRating').prop('disabled', false).html('<i class="bx bx-send me-2"></i>Submit Rating');
+                        }
+                    },
+                    error: function (xhr) {
+                        let message = 'An error occurred. Please try again.';
+                        if (xhr.status === 401) {
+                            message = 'Please login to submit a rating.';
+                        }
+                        showFeedback(message, 'danger');
+                        $('#submitRating').prop('disabled', false).html('<i class="bx bx-send me-2"></i>Submit Rating');
+                    }
+                });
+            });
+
+            function showFeedback(message, type) {
+                const alertClass = `alert alert-${type}`;
+                $('#ratingFeedback')
+                    .removeClass()
+                    .addClass(alertClass)
+                    .html(message)
+                    .fadeIn();
+            }
+        });
+    </script>
 </body>
+
 </html>

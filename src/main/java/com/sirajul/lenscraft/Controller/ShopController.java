@@ -3,6 +3,7 @@ package com.sirajul.lenscraft.Controller;
 import com.sirajul.lenscraft.DTO.Product.ProductDto;
 import com.sirajul.lenscraft.Service.interfaces.CategoryService;
 import com.sirajul.lenscraft.Service.interfaces.ProductService;
+import com.sirajul.lenscraft.Service.interfaces.RatingsService;
 import com.sirajul.lenscraft.Service.interfaces.UserService;
 import com.sirajul.lenscraft.Service.interfaces.VariableService;
 import com.sirajul.lenscraft.entity.product.Category;
@@ -52,112 +53,129 @@ public class ShopController {
     @Autowired
     CategoryService categoryService;
 
+    @Autowired
+    RatingsService ratingsService;
+
     @GetMapping()
     public String getShop(
             Model model,
-            @RequestParam(name="keyword",required = false) String keyword,
-            @RequestParam(name="pageNo",defaultValue = "1",required = false) int pageNo,
-            @RequestParam(name="pageSize",defaultValue = "12",required = false) int pageSize
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "pageNo", defaultValue = "1", required = false) int pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "12", required = false) int pageSize
 
-    )
-    {
-
+    ) {
+        System.out.println("Entering ShopController.getShop()");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         String username = null;
 
         UserInformation user = null;
 
-    if(!(auth instanceof AnonymousAuthenticationToken)) {
-        username = auth.getName();
+        if (!(auth instanceof AnonymousAuthenticationToken)) {
+            username = auth.getName();
 
-        user = userService.findByEmailId(username);
+            user = userService.findByEmailId(username);
 
-        System.out.println(user.getPassword());
-    }
+            System.out.println(user.getPassword());
+        }
 
         Page<Product> products;
 
-        if(keyword !=null){
-            products = productService.findAllProductsContainingActive(keyword,pageNo,pageSize);
+        if (keyword != null) {
+            products = productService.findAllProductsContainingActive(keyword, pageNo, pageSize);
+        } else {
+            products = productService.findAllProductsInPageableActive(pageNo, pageSize);
         }
-        else {
-            products = productService.findAllProductsInPageableActive(pageNo,pageSize);
-        }
 
+        // OPTIMIZED: Batch fetch ratings data (fixes N+1 query issue)
+        List<Long> productIds = products.stream()
+                .map(Product::getProductId)
+                .collect(java.util.stream.Collectors.toList());
 
+        java.util.Map<Long, Double> ratingsMap = ratingsService.getAverageRatingsForProducts(productIds);
+        java.util.Map<Long, Long> ratingsCountMap = ratingsService.getRatingsCountsForProducts(productIds);
 
+        model.addAttribute("products", products);
+        model.addAttribute("ratingsMap", ratingsMap);
+        model.addAttribute("ratingsCountMap", ratingsCountMap);
 
-        model.addAttribute("products",products);
-        if(user != null) {
+        // Fetch active categories for sidebar
+        List<Category> categories = categoryService.findAllActiveCategories();
+        model.addAttribute("categories", categories);
+
+        if (user != null) {
             model.addAttribute("username", user.getFirstName());
             model.addAttribute("userId", user.getUserId());
         }
-        model.addAttribute("pageNo",pageNo);
-        model.addAttribute("totalPages",productService.totalPagesCount(pageSize));
-
+        model.addAttribute("pageNo", pageNo);
+        model.addAttribute("totalPages", productService.totalPagesCount(pageSize));
 
         return "shop/shop";
     }
-    @GetMapping("/category")
-public String getCategoryShop(
-            Model model,
-            @RequestParam(name="categoryId") Long categoryId,
-            @RequestParam(name="keyword",required = false) String keyword,
-            @RequestParam(name="pageNo",defaultValue = "1",required = false) int pageNo,
-            @RequestParam(name="pageSize",defaultValue = "12",required = false) int pageSize
 
-    )
-    {
+    @GetMapping("/category")
+    public String getCategoryShop(
+            Model model,
+            @RequestParam(name = "categoryId") Long categoryId,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "pageNo", defaultValue = "1", required = false) int pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "12", required = false) int pageSize
+
+    ) {
 
         Category category = categoryService.findCategoryById(categoryId);
 
         Page<Product> products;
 
+        List<Product> initialProducts = new ArrayList<>();
+        if (keyword != null) {
+            for (Product prod : productService.findAllProductsContaining(keyword)) {
 
-            List<Product> initialProducts = new ArrayList<>();
-        if(keyword !=null){
-            for(Product prod : productService.findAllProductsContaining(keyword)){
-
-                if(prod.getCategory() == category){
-                    if(prod.getActiveStatus()== ActiveStatus.ACTIVE) {
+                if (prod.getCategory() == category) {
+                    if (prod.getActiveStatus() == ActiveStatus.ACTIVE) {
                         initialProducts.add(prod);
                     }
                 }
 
             }
 
-        }
-        else {
+        } else {
             for (Product prod : productService.findAllProductByCategory(category)) {
-                if(prod.getActiveStatus()==ActiveStatus.ACTIVE){
+                if (prod.getActiveStatus() == ActiveStatus.ACTIVE) {
                     initialProducts.add(prod);
                 }
 
             }
         }
-            Pageable pageRequest = PageRequest.of(pageNo - 1, pageSize);
+        Pageable pageRequest = PageRequest.of(pageNo - 1, pageSize);
 
-            products = new PageImpl<>(initialProducts.subList((int) pageRequest.getOffset(), (int) Math.min((pageRequest.getOffset() + pageRequest.getPageSize()), initialProducts.size())), pageRequest, initialProducts.size());
+        products = new PageImpl<>(
+                initialProducts.subList((int) pageRequest.getOffset(),
+                        (int) Math.min((pageRequest.getOffset() + pageRequest.getPageSize()), initialProducts.size())),
+                pageRequest, initialProducts.size());
 
+        // OPTIMIZED: Batch fetch ratings data (fixes N+1 query issue)
+        List<Long> productIds = products.stream()
+                .map(Product::getProductId)
+                .collect(java.util.stream.Collectors.toList());
 
+        java.util.Map<Long, Double> ratingsMap = ratingsService.getAverageRatingsForProducts(productIds);
+        java.util.Map<Long, Long> ratingsCountMap = ratingsService.getRatingsCountsForProducts(productIds);
 
-
-
-
-        model.addAttribute("products",products);
-        model.addAttribute("categoryId",categoryId);
-        model.addAttribute("pageNo",pageNo);
-        model.addAttribute("totalPages",initialProducts.size()/pageSize);
-
+        model.addAttribute("products", products);
+        model.addAttribute("ratingsMap", ratingsMap);
+        model.addAttribute("ratingsCountMap", ratingsCountMap);
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("pageNo", pageNo);
+        model.addAttribute("totalPages", initialProducts.size() / pageSize);
 
         return "shop/category-shop";
     }
 
     @GetMapping("/productView/{productId}/{variableId}")
-    public String getProductView(@PathVariable("productId")Long productId,
-                                 @PathVariable("variableId")Long variableId,
-                                 Model model){
+    public String getProductView(@PathVariable("productId") Long productId,
+            @PathVariable("variableId") Long variableId,
+            Model model) {
 
         Product product = productService.findProductById(productId);
 
@@ -167,34 +185,34 @@ public String getCategoryShop(
 
         log.info(username);
 
-        model.addAttribute("username",username);
+        model.addAttribute("username", username);
 
         Variables targetVariable = variableService.findVariableById(variableId);
 
-        model.addAttribute("targetVariable",targetVariable);
+        model.addAttribute("targetVariable", targetVariable);
 
         List<Variables> variables = product.getVariables();
 
-        model.addAttribute("variables",variables);
+        model.addAttribute("variables", variables);
 
         boolean wishlisted = false;
 
         boolean carted = false;
 
-        if(!(auth instanceof AnonymousAuthenticationToken)) {
+        if (!(auth instanceof AnonymousAuthenticationToken)) {
 
             UserInformation user = userService.findByEmailId(username);
 
-            model.addAttribute("userId",user.getUserId());
+            model.addAttribute("userId", user.getUserId());
 
             Wishlist wishlist = user.getWishlist();
 
             Cart cart = user.getCart();
 
-            if(wishlist.getProducts().contains(product)){
+            if (wishlist.getProducts().contains(product)) {
                 wishlisted = true;
             }
-            if(cart != null) {
+            if (cart != null) {
 
                 for (CartedItems item : cart.getCartedItems()) {
 
@@ -211,13 +229,19 @@ public String getCategoryShop(
 
         model.addAttribute("carted", carted);
 
-        model.addAttribute("product",product);
+        model.addAttribute("product", product);
+
+        // Add ratings data
+        Double averageRating = ratingsService.getAverageRating(productId);
+        Long ratingsCount = ratingsService.getRatingsCount(productId);
+        model.addAttribute("averageRating", averageRating);
+        model.addAttribute("ratingsCount", ratingsCount);
 
         return "shop/product-view";
     }
 
     @GetMapping("/variableChange/{id}")
-    public String getVariableChange(@PathVariable("id")Long variableId){
+    public String getVariableChange(@PathVariable("id") Long variableId) {
         Variables variable = variableService.findVariableById(variableId);
 
         Product product = variable.getProduct();
@@ -235,8 +259,5 @@ public String getCategoryShop(
         return "shop/product-view";
 
     }
-
-
-
 
 }

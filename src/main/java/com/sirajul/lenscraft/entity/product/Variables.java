@@ -14,29 +14,21 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Variables {
 
-@Id
-@SequenceGenerator(
-        name = "variable_id",
-        sequenceName = "variable_id",
-        allocationSize = 1
-)
-@GeneratedValue(
-        strategy = GenerationType.IDENTITY,
-        generator = "variable_id"
-)
-Long variableId;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long variableId;
 
-String image1;
+        String image1;
 
-String image2;
+        String image2;
 
-String image3;
+        String image3;
 
-String frameColor;
+        String frameColor;
 
-Long quantity;
+        Long quantity;
 
-@ManyToOne
-Product product;
+        @ManyToOne
+        Product product;
 
 }

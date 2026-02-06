@@ -3,22 +3,19 @@ package com.sirajul.lenscraft.Controller;
 import ch.qos.logback.core.util.DefaultInvocationGate;
 import com.sirajul.lenscraft.DTO.ToPassBoolean;
 import com.sirajul.lenscraft.Service.interfaces.CategoryService;
+import com.sirajul.lenscraft.Service.interfaces.CloudinaryService;
 import com.sirajul.lenscraft.entity.product.Category;
 import com.sirajul.lenscraft.entity.product.Product;
 import com.sirajul.lenscraft.entity.product.enums.CategoryStatus;
 import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
-import com.sirajul.lenscraft.utils.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -29,49 +26,51 @@ public class AdminCategoryController {
     CategoryService categoryService;
 
     @GetMapping()
-    public String getCategories(Model model){
+    public String getCategories(Model model) {
 
         List<Category> categories = categoryService.findAllCategories();
 
-        model.addAttribute("categories",categories);
+        model.addAttribute("categories", categories);
 
         return "admin/categoriesPage";
     }
 
     @GetMapping("/edit/{id}")
-    public String editCategory(@PathVariable("id") Long categoryId, Model model){
+    public String editCategory(@PathVariable("id") Long categoryId, Model model) {
 
         Category category = categoryService.findCategoryById(categoryId);
 
-        model.addAttribute("category",category);
+        model.addAttribute("category", category);
 
         return "admin/editCategory";
     }
+
     @GetMapping("/check")
     @ResponseBody
-    public ResponseEntity<ToPassBoolean> addCategoryCheck(@RequestParam("brandName") String brandName){
+    public ResponseEntity<ToPassBoolean> addCategoryCheck(@RequestParam("brandName") String brandName) {
         ToPassBoolean checker = new ToPassBoolean();
-        if(categoryService.existsByCategoryName(brandName)){
+        if (categoryService.existsByCategoryName(brandName)) {
             checker.setCheck(false);
             return new ResponseEntity<>(checker, HttpStatus.IM_USED);
         }
         checker.setCheck(true);
-        return new ResponseEntity<>(checker,HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(checker, HttpStatus.ACCEPTED);
     }
-
 
     @PostMapping("/edit/{id}")
     public String editCategory(@PathVariable("id") Long categoryId,
-                               @ModelAttribute Category categoryFromEdit,
-                               Model model) {
+            @ModelAttribute Category categoryFromEdit,
+            Model model) {
 
         Category category = categoryService.findCategoryById(categoryId);
 
-        if(categoryFromEdit.getCategoryName() != "" && categoryFromEdit.getCategoryName() != category.getCategoryName() && categoryService.existsByCategoryName(categoryFromEdit.getCategoryName())){
+        if (categoryFromEdit.getCategoryName() != "" && categoryFromEdit.getCategoryName() != category.getCategoryName()
+                && categoryService.existsByCategoryName(categoryFromEdit.getCategoryName())) {
             category.setCategoryName(categoryFromEdit.getCategoryName());
         }
 
-        if(categoryFromEdit.getCategoryDescription() != "" && categoryFromEdit.getCategoryDescription() != category.getCategoryDescription()){
+        if (categoryFromEdit.getCategoryDescription() != ""
+                && categoryFromEdit.getCategoryDescription() != category.getCategoryDescription()) {
             category.setCategoryDescription(categoryFromEdit.getCategoryDescription());
         }
         categoryService.addCategory(category);
@@ -79,43 +78,41 @@ public class AdminCategoryController {
         return "redirect:/admin/category";
     }
 
-        @GetMapping("/add")
-    public String getAddCategory(Model model){
+    @GetMapping("/add")
+    public String getAddCategory(Model model) {
 
         Category category = new Category();
-        model.addAttribute("categoryToAdd",category);
+        model.addAttribute("categoryToAdd", category);
 
         return "admin/addCategory";
 
     }
 
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
     @PostMapping("/add")
     public String addCategory(
             @ModelAttribute("categoryToAdd") Category category,
-            @RequestParam(name="image",required = false)MultipartFile image
-            ) throws IOException {
+            @RequestParam(name = "image", required = false) MultipartFile image) {
 
         category.setCategoryStatus(CategoryStatus.ACTIVE);
-        if (!image.isEmpty()) {
-            String fileName = StringUtils.cleanPath(image.getOriginalFilename());
-
-
-            String upload = "lenscraft/src/main/resources/static/categoryImage";
-
-            FileUploadUtil.saveFile(upload, fileName, image);
-
-            category.setCategoryImage(fileName);
-
+        if (image != null && !image.isEmpty()) {
+            String folder = "lenscraft/categoryImages";
+            // Note: Category ID might not be available yet if it's auto-generated, so using
+            // a specific folder or name might be tricky.
+            // Using a general folder for categories.
+            String url = cloudinaryService.uploadFile(image, folder);
+            category.setCategoryImage(url);
         }
 
         categoryService.addCategory(category);
-
 
         return "redirect:/admin/category";
     }
 
     @GetMapping("/block/{id}")
-    public String blockCategory(@PathVariable("id")Long categoryId){
+    public String blockCategory(@PathVariable("id") Long categoryId) {
 
         Category category = categoryService.getCategoryById(categoryId);
 
@@ -123,7 +120,7 @@ public class AdminCategoryController {
 
         List<Product> products = category.getProducts();
 
-        for(Product product : products){
+        for (Product product : products) {
 
             product.setActiveStatus(ActiveStatus.BLOCKED);
 
@@ -135,8 +132,9 @@ public class AdminCategoryController {
         return "redirect:/admin/category";
 
     }
+
     @GetMapping("/unblock/{id}")
-    public String unBlockCategory(@PathVariable("id")Long categoryId){
+    public String unBlockCategory(@PathVariable("id") Long categoryId) {
 
         Category category = categoryService.getCategoryById(categoryId);
 
@@ -144,7 +142,7 @@ public class AdminCategoryController {
 
         List<Product> products = category.getProducts();
 
-        for(Product product : products){
+        for (Product product : products) {
 
             product.setActiveStatus(ActiveStatus.ACTIVE);
 
@@ -158,19 +156,18 @@ public class AdminCategoryController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteCategory(@PathVariable("id")Long categoryId,
-                                 RedirectAttributes redirectAttributes){
+    public String deleteCategory(@PathVariable("id") Long categoryId,
+            RedirectAttributes redirectAttributes) {
 
         Category category = categoryService.findCategoryById(categoryId);
 
-        if(category.getProducts().isEmpty()){
+        if (category.getProducts().isEmpty()) {
             categoryService.deleteCategory(category);
             return "redirect:/admin/category";
         }
-        redirectAttributes.addFlashAttribute("error","The category already in use");
+        redirectAttributes.addFlashAttribute("error", "The category already in use");
         return "redirect:/admin/category";
 
     }
-
 
 }

@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Application Files ###
+productImages/
+profileImages/
+src/main/resources/static/productImages/
+src/main/resources/static/profilePic/

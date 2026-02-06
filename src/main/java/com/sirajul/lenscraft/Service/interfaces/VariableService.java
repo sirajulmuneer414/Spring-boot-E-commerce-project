@@ -17,9 +17,8 @@ public interface VariableService {
 
     void deleteVariable(Variables variable);
 
-    void saveNewVariablesFilesForProduct(String uploadDir, List<MultipartFile> image1, List<MultipartFile> image2, List<MultipartFile> image3);
-
     void saveVariable(Variables variable);
 
-    void updateVariable(Variables variable, Variables variableFromDB, MultipartFile image1, MultipartFile image2, MultipartFile image3);
+    void updateVariable(Variables variable, Variables variableFromDB, MultipartFile image1, MultipartFile image2,
+            MultipartFile image3);
 }

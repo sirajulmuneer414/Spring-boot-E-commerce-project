@@ -1,143 +1,566 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lenscraft - Order Item</title>
+    <title>Lenscraft - Order Details</title>
     <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-            crossorigin="anonymous"
-    /> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-             integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-             crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link th:rel="stylesheet" th:href="@{/css/home.css}" />
-    <link th:rel="stylesheet" th:href="@{/css/shop.css}" />
-    <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous"
-    ></script>
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338ca;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --dark: #0F172A;
+            --light: #F8FAFC;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
 
-* {
-padding: 0;
-margin: 0;
-box-sizing: border-box;
-font-family: 'Poppins', sans-serif;
-}
-* a{
-text-decoration: none;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-heading);
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-header h1 {
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-section {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .product-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 16px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 12px;
+        }
+
+        .product-meta {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-item i {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .meta-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .price-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .price-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .price-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: var(--font-heading);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-top: 12px;
+        }
+
+        .status-PENDING {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-PROCESSING {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-SHIPPED {
+            background: #E0E7FF;
+            color: #4338CA;
+        }
+
+        .status-OUT_FOR_DELIVERY {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .status-DELIVERED {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-CANCELLED {
+            background: #F3F4F6;
+            color: #4B5563;
+        }
+
+        .status-RETURNED {
+            background: #FEE2E2;
+            color: #7F1D1D;
+        }
+
+        /* Order Timeline */
+        .timeline-section {
+            margin: 40px 0;
+        }
+
+        .timeline-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .timeline-title i {
+            color: var(--primary);
+            font-size: 1.75rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 24px;
+            position: relative;
+            padding-bottom: 40px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 27px;
+            top: 56px;
+            width: 3px;
+            height: calc(100% - 40px);
+            background: #E2E8F0;
+        }
+
+        .timeline-item.completed:not(:last-child)::before {
+            background: linear-gradient(180deg, var(--success) 0%, var(--primary) 100%);
+        }
+
+        .timeline-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-item.completed .timeline-icon {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+        }
+
+        .timeline-item.active .timeline-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-item.pending .timeline-icon {
+            background: #F1F5F9;
+            color: #94A3B8;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(79, 70, 229, 0.7);
+            }
+
+            50% {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 12px rgba(79, 70, 229, 0);
+            }
+        }
+
+        .timeline-content {
+            flex: 1;
+            padding-top: 6px;
+        }
+
+        .timeline-status {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .timeline-item.completed .timeline-status {
+            color: var(--success);
+        }
+
+        .timeline-item.active .timeline-status {
+            color: var(--primary);
+        }
+
+        .timeline-item.pending .timeline-status {
+            color: #94A3B8;
+        }
+
+        .timeline-description {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* Action Buttons */
+        .action-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #f1f5f9;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+            color: white;
+        }
+
+        .btn-back {
+            background: white;
+            color: var(--primary);
+            padding: 14px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid var(--primary);
+            font-size: 1rem;
+        }
+
+        .btn-back:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .cancelled-message {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .product-section {
+                flex-direction: column;
+            }
+
+            .product-image {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+
+            .price-section {
+                min-width: 100%;
+            }
+
+            .page-header,
+            .order-card {
+                padding: 24px;
+            }
+        }
     </style>
 </head>
 
 <body>
-<nav
-        class="navbar bg-body-tertiary p-3"
-        style="border-bottom: 1px solid black"
->
-    <div
-            class="container-fluid d-flex justify-content-between align-items-middle"
-            style="background-color: white"
-    >
-        <div class="align-self-start">
-            <a class="navbar-brand" href="/">
-                <img
-                        th:src="@{/images/Mainlogo.png}"
-                        style="height: auto; width: 250px"
-                        alt=""
-                />
-            </a>
-        </div>
-        <h6 class="text=danger fw-bold" th:text="${empty}"></h6>
-        <div class="me-5">
-            <div class="d-flex gap-5 align-items-center">
-                <div>
-                    <a class="text-decoration-none text-dark" th:href="@{/user/cart}">
-                        <i class="fa-solid fa-cart-shopping"></i><span> Cart</span>
-                    </a>
-                </div>
-                <div>
-                    <a class="text-decoration-none text-dark" th:href="@{/shop}">
-                        <i class="fa-brands fa-shopify"></i><span> Shop</span>
-                    </a>
-                </div>
-                <div>
-                    <a class="text-decoration-none text-dark" th:href="@{/user/profile}">
-                        <i class="fa-solid fa-user"></i><span> Profile</span>
-                    </a>
-                </div>
-                <div>
-                    <form
-                            th:if=" ${#authorization.expression('isAuthenticated()')}"
-                            th:method="post"
-                            th:action="@{/logout}"
-                    >
-                        <label for="sign-out"><i class="fa-solid fa-right-from-bracket"></i>Logout</label>
-                        <input hidden type="submit" id="sign-out">
-                    </form>
-                    <a   class="btn btn-info"   th:href="@{/login}" th:if="not ${#authorization.expression('isAuthenticated()')}" >Sign in</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</nav>
-<div class="row container-fluid d-flex  justify-content-center " style=" margin-top: 80px; max-width: 100vw">
+    <div th:replace="~{fragment::navbar}"></div>
 
-    <div class="col-8 border shadow rounded container-fluid p-2 row">
-        <div class="col-12 container-fluid row d-flex justify-content-center">
-            <div class="col-6">
-            <img
-                    th:src="@{${'/productImages/'+item.product.productId+'/'+item.variable.image1}}"
-                    class="img-fluid rounded-3" alt="Product Image">
-            </div>
+    <div class="container">
+        <div class="page-header">
+            <h1><i class='bx bx-package me-3'></i>Order Details</h1>
         </div>
-        <div class="col-12 container-fluid row d-flex justify-content-center">
-        <div class="col-9 mt-3">
-            <ul class="list-unstyled">
-                <li class="pl-2">
-                    <p th:text="${item.product.brand.brandName}" style="color: #40A2E3"></p>
-                </li>
-                <li class=pl-2>
-                    <p th:text="${item.product.productName}" style="color: black"></p>
-                </li>
 
-                <li class="mt-1 pl-2">
-                    <p th:text="${'Size : '+item.product.frameSize.name()}" class="text-muted"></p>
-                </li>
-                <li class="mt-1 pl-2">
-                    <p th:text="${'Quantity : '+item.quantity}" class="text-muted"></p>
-                </li>
-                <li class="d-flex justify-content-start  mt-1 pl-2">
-                    <p>Color : </p>
-                    <div  th:style="| height: 20px; width: 20px; background-color: ${item.variable.frameColor}">
+        <div class="order-card">
+            <!-- Product Section -->
+            <div class="product-section">
+                <img th:src="${#strings.startsWith(item.variable.image1, 'http') ? item.variable.image1 : '/productImages/'+item.product.productId+'/'+item.variable.image1}"
+                    class="product-image" alt="Product">
 
+                <div class="product-details">
+                    <h2 class="product-name" th:text="${item.product.productName}">Product Name</h2>
+
+                    <span class="status-badge" th:classappend="'status-' + ${item.currentStatus.name()}"
+                        th:text="${item.currentStatus.name().replace('_', ' ')}">
+                        Status
+                    </span>
+
+                    <div class="product-meta">
+                        <div class="meta-item">
+                            <i class='bx bx-box'></i>
+                            <div>
+                                <div class="meta-label">Quantity</div>
+                                <div class="meta-value" th:text="${item.quantity}">1</div>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class='bx bx-palette'></i>
+                            <div>
+                                <div class="meta-label">Color</div>
+                                <div class="meta-value" th:text="${item.variable.frameColor}">Black</div>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class='bx bx-expand'></i>
+                            <div>
+                                <div class="meta-label">Frame Size</div>
+                                <div class="meta-value" th:text="${item.product.frameSize}">Medium</div>
+                            </div>
+                        </div>
                     </div>
-                </li>
-                <li class="d-flex justify-content-start  mt-1 pl-2">
-                    <p >Current Status : </p>
-                    <p class="text-warning fw-bold" th:text="${item.currentStatus.name()}" >
+                </div>
 
-                    </p>
-                </li>
-                <li class="mt-1" th:unless="${item.currentStatus.name == 'CANCELLED' || item.currentStatus.name =='DELIVERED' || item.currentStatus.name =='REJECTED'}">
-                    <form th:action="@{/order/item/cancel/{orderItemId}(orderItemId = ${item.orderItemId})}">
-                        <button type="submit" class="btn btn-danger">CANCEL</button>
-                    </form>
-                </li>
-            </ul>
+                <div class="price-section">
+                    <div class="price-label">Total Price</div>
+                    <div class="price-value" th:text="'₹' + ${item.currentPrice}">₹0</div>
+                </div>
+            </div>
 
-        </div>
+            <!-- Order Timeline -->
+            <div class="timeline-section">
+                <h3 class="timeline-title">
+                    <i class='bx bx-time-five'></i>
+                    Order Journey
+                </h3>
+
+                <div class="timeline">
+                    <!-- Pending -->
+                    <div class="timeline-item completed">
+                        <div class="timeline-icon">
+                            <i class='bx bx-check'></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-status">Order Placed</div>
+                            <div class="timeline-description">Your order has been received and confirmed</div>
+                        </div>
+                    </div>
+
+                    <!-- Processing -->
+                    <div class="timeline-item"
+                        th:classappend="${item.currentStatus.name() == 'CANCELLED' ? 'pending' : (item.currentStatus.name() == 'PROCESSING' ? 'active' : (item.currentStatus.name() == 'PENDING' ? 'pending' : 'completed'))}">
+                        <div class="timeline-icon">
+                            <i class='bx bx-package'></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-status">Processing</div>
+                            <div class="timeline-description">Order is being prepared for shipment</div>
+                        </div>
+                    </div>
+
+                    <!-- Shipped -->
+                    <div class="timeline-item"
+                        th:classappend="${item.currentStatus.name() == 'CANCELLED' ? 'pending' : (item.currentStatus.name() == 'SHIPPED' ? 'active' : (item.currentStatus.name() == 'PENDING' || item.currentStatus.name() == 'PROCESSING' ? 'pending' : 'completed'))}">
+                        <div class="timeline-icon">
+                            <i class='bx bx-bus'></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-status">Shipped</div>
+                            <div class="timeline-description">Order has been dispatched from warehouse</div>
+                        </div>
+                    </div>
+
+                    <!-- Out for Delivery -->
+                    <div class="timeline-item"
+                        th:classappend="${item.currentStatus.name() == 'CANCELLED' ? 'pending' : (item.currentStatus.name() == 'OUT_FOR_DELIVERY' ? 'active' : (item.currentStatus.name() == 'DELIVERED' ? 'completed' : 'pending'))}">
+                        <div class="timeline-icon">
+                            <i class='bx bx-cycling'></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-status">Out for Delivery</div>
+                            <div class="timeline-description">Order is on its way to your location</div>
+                        </div>
+                    </div>
+
+                    <!-- Delivered -->
+                    <div class="timeline-item"
+                        th:classappend="${item.currentStatus.name() == 'CANCELLED' ? 'pending' : (item.currentStatus.name() == 'DELIVERED' ? 'completed' : 'pending')}">
+                        <div class="timeline-icon">
+                            <i class='bx bx-home-heart'></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-status">Delivered</div>
+                            <div class="timeline-description">Order has been successfully delivered</div>
+                        </div>
+                    </div>
+
+                    <!-- Cancelled (shown only if status is CANCELLED) -->
+                    <div class="timeline-item cancelled"
+                        th:if="${item.currentStatus.name() == 'CANCELLED' or item.currentStatus.name() == 'RETURNED'}">
+                        <div class="timeline-icon"
+                            style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white;">
+                            <i class='bx bx-x-circle'></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-status" style="color: #EF4444;">Order Cancelled</div>
+                            <div class="timeline-description">Your order has been cancelled and refund has been
+                                processed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-section">
+                <a th:href="@{/user/orders}" class="btn-back">
+                    <i class='bx bx-arrow-back'></i>
+                    Back to Orders
+                </a>
+
+                <a th:href="@{/user/orders/item/cancel/{orderItemId}(orderItemId = ${item.orderItemId})}"
+                    class="btn-cancel"
+                    th:if="${item.currentStatus.name() != 'CANCELLED' and item.currentStatus.name() != 'RETURNED' and item.currentStatus.name() != 'DELIVERED'}">
+                    <i class='bx bx-x-circle'></i>
+                    Cancel Order
+                </a>
+
+                <div class="cancelled-message"
+                    th:if="${item.currentStatus.name() == 'CANCELLED' or item.currentStatus.name() == 'RETURNED'}">
+                    <i class='bx bx-info-circle'></i>
+                    This order has been cancelled
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6">
 
-    </div>
-</div>
-<div th:replace="~{fragment::footer}"></div>
+    <div th:replace="~{fragment::footer}"></div>
 </body>
+
 </html>

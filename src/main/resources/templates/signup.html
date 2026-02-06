@@ -4,213 +4,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up User</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <title>Lenscraft - Create Account</title>
 
-    <link th:href="@{/css/signupstyles.css}" type="text/css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" type="text/css"
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700&display=swap"
         rel="stylesheet">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <!-- Cropper.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+
     <style>
-        img {
-            display: block;
-            max-width: 100%;
+        /* Internal Premium Design System */
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338ca;
+            --secondary: #10B981;
+            --dark: #0F172A;
+            --light: #F8FAFC;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
         }
 
-        .image_area {
-            position: relative;
+        body {
+            font-family: var(--font-body);
+            color: var(--dark);
+            background-color: #F8FAFC;
+            overflow-x: hidden;
         }
 
-        .preview {
-            overflow: hidden;
-            width: 160px;
-            height: 160px;
-            margin: 10px;
-            border: 1px solid red;
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-heading);
         }
 
-        .overlay {
-            position: absolute;
-            bottom: 10px;
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .form-control {
+            padding: 0.8rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #E2E8F0;
+            background-color: #F8FAFC;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background-color: white;
+        }
+
+        .input-group-text {
+            border: 1px solid #E2E8F0;
+            background-color: #F8FAFC;
+        }
+
+        .split-layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .left-side {
+            width: 40%;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            position: fixed;
+            top: 0;
+            bottom: 0;
             left: 0;
-            right: 0;
-            background-color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             overflow: hidden;
-            height: 0;
-            transition: .5s ease;
-            width: 100%;
         }
 
-        .image_area:hover .overlay {
-            height: 50%;
+        .left-side img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            mix-blend-mode: overlay;
+            opacity: 0.2;
+        }
+
+        .right-side {
+            width: 60%;
+            margin-left: 40%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .signup-card {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .nav-back {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .nav-back:hover {
+            color: var(--primary);
+        }
+
+        /* Profile Pic Upload */
+        .profile-upload {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .profile-upload:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px 0;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .profile-upload:hover .profile-overlay {
+            opacity: 1;
+        }
+
+        @media (max-width: 992px) {
+            .left-side {
+                display: none;
+            }
+
+            .right-side {
+                width: 100%;
+                margin-left: 0;
+            }
         }
     </style>
 </head>
 
-<body class="container-fluid">
-    <nav class="row navDiv">
-        <div class="row container h-auto navBox">
-            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 col-xxl-2 navLogo d-flex align-items-center">
-                <img th:src="@{/images/Mainlogo.png}" class="w-100 h-auto">
-            </div>
-            <div class="col-3 d-flex justify-content-center align-items-center">
+<body>
 
-                <a class="btn navBtn" th:href="@{/login}">LOG IN</a>
-
+    <div class="split-layout">
+        <!-- Left Side (Visual) -->
+        <div class="left-side">
+            <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?q=80&w=2000&auto=format&fit=crop"
+                alt="Background">
+            <div class="position-relative text-center p-5">
+                <h1 class="display-3 fw-bold mb-3">Join Us.</h1>
+                <p class="fs-4 fw-light opacity-75">Start your journey with Lenscraft today.</p>
             </div>
         </div>
-    </nav>
-    <div class="row formMain container-fluid">
 
-        <div class="col-sm-8 col-md-5 col-lg-4 col-xl-4 formBox">
-            <span th:unless="${EmailError == null}" th:text="${EmailError}" class="text-danger"></span>
+        <!-- Right Side (Form) -->
+        <div class="right-side position-relative">
+            <a href="/" class="nav-back d-none d-lg-flex"><i class='bx bx-arrow-back'></i> Home</a>
 
-            <form th:action="@{/register}" method="post" th:object="${user}" id="signupForm" enctype="multipart/form-data">
-                <div class="formPart">
-                    <div class="image_area" style="height: 100px; width: 100px">
-                        <label for="upload_image">
-                            <img th:src="@{profilePic/default/profile.webp}" id="uploaded_image"
-                                class="img-responsive img-circle">
-                            <div class="overlay">
-                                <div class="text">Click to Change Profile Image</div>
-                            </div>
-                            <input type="file" name="image" class="image" id="upload_image" style="display:none"
-                                accept="image/*" />
+            <div class="signup-card fade-in-up">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold mb-2">Create Account</h2>
+                    <p class="text-secondary text-base">Fill in the details below to register.</p>
+                </div>
+
+                <form th:action="@{/register}" method="post" th:object="${user}" id="signupForm"
+                    enctype="multipart/form-data">
+
+                    <!-- Error Alert -->
+                    <div th:if="${EmailError}" class="alert alert-danger mb-4 shadow-sm border-0" role="alert">
+                        <i class='bx bx-error-circle me-2'></i> <span th:text="${EmailError}">Error</span>
+                    </div>
+
+                    <!-- Profile Image -->
+                    <div class="d-flex justify-content-center mb-5">
+                        <label for="upload_image" class="profile-upload">
+                            <img th:src="@{/profilePic/default/profile.webp}" id="uploaded_image"
+                                class="w-100 h-100 object-fit-cover">
+                            <div class="profile-overlay">Change</div>
+                            <input type="file" name="image" id="upload_image" class="d-none" accept="image/*" />
                         </label>
                     </div>
 
-                    <div class="form-group">
-                        <label for="firstName">First Name</label>
-                        <input type="text" class="form-control" id="firstName" placeholder="Enter First Name"
-                            th:field="*{firstName}" required autofocus maxlength="30">
-                    </div>
-                    <div class="form-group ">
-                        <label for="lastName">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" placeholder="Enter Last Name"
-                            th:field="*{lastName}" maxlength="30">
-                        </input>
-                        <div class="form-group">
-                            <label for="Email">Email address</label>
-                            <input type="email" class="form-control" id="Email" aria-describedby="emailHelp"
-                                placeholder="Enter email" th:field="*{emailId}" required>
-                            <small id="emailHelp" class="form-text text-muted">We'll never share your email with
-                                anyone
-                                else.</small>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase fw-bold text-secondary tracking-wide">First
+                                Name</label>
+                            <input type="text" class="form-control" th:field="*{firstName}" placeholder="John" required
+                                maxlength="30">
                         </div>
-                        <div class="form-group">
-                            <label for="exampleInputPassword1">Password</label>
-                            <input type="password" class="form-control" id="exampleInputPassword1"
-                                placeholder="Password" th:field="*{password}" required minlength="8" maxlength="20">
-                        </div>
-                        <div class="form-group" th:if="${referIsThere}">
-                            <label for="referralCode">Enter a referralCode</label>
-                            <p id="warningReferral" for="referralCode" style="color: red">Enter a valid one</p>
-                            <input type="text" class="form-control" id="referralCode" placeholder="Eg :- ABU653989"
-                                th:field="*{referralCode}" minlength="9" maxlength="9">
-                        </div>
-                        <div class="form-group">
-                            <label for="adminPassword">If you are an Admin enter the passkey</label>
-                            <input type="password" class="form-control" id="adminPassword" placeholder="Enter Here"
-                                name="adminPassword">
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase fw-bold text-secondary tracking-wide">Last
+                                Name</label>
+                            <input type="text" class="form-control" th:field="*{lastName}" placeholder="Doe"
+                                maxlength="30">
                         </div>
 
+                        <div class="col-12">
+                            <label class="form-label small text-uppercase fw-bold text-secondary tracking-wide">Email
+                                Address</label>
+                            <input type="email" class="form-control" th:field="*{emailId}"
+                                placeholder="name@example.com" required>
+                        </div>
 
-                        <button type="submit" class="btn mt-3" id="submitBtn"
-                            style="border: none; border-radius: 3px; background-color: #b43e8f; color: white">Submit</button>
+                        <div class="col-12">
+                            <label
+                                class="form-label small text-uppercase fw-bold text-secondary tracking-wide">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control border-end-0" id="password"
+                                    th:field="*{password}" placeholder="Create password" required minlength="8"
+                                    maxlength="20">
+                                <button class="btn btn-light border border-start-0 bg-light" type="button"
+                                    id="togglePassword">
+                                    <i class='bx bx-show'></i>
+                                </button>
+                            </div>
+                            <div class="form-text text-muted small">Must be 8-20 characters long.</div>
+                        </div>
+
+                        <div class="col-12" th:if="${referIsThere}">
+                            <label class="form-label small text-uppercase fw-bold text-secondary tracking-wide">Referral
+                                Code <span class="text-muted fw-normal text-lowercase">(Optional)</span></label>
+                            <input type="text" class="form-control" id="referralCode" th:field="*{referralCode}"
+                                placeholder="Enter code" maxlength="9">
+                            <div id="warningReferral" class="text-danger small mt-1" style="display: none;">Invalid
+                                referral code</div>
+                        </div>
+
+                        <div class="col-12">
+                            <a class="text-secondary small text-decoration-none dropdown-toggle"
+                                data-bs-toggle="collapse" href="#adminSection" role="button">
+                                Have an Admin Key?
+                            </a>
+                            <div class="collapse mt-2" id="adminSection">
+                                <input type="password" class="form-control bg-light" id="adminPassword"
+                                    name="adminPassword" placeholder="Enter Admin Key">
+                            </div>
+                        </div>
                     </div>
-                </div>
-        </form>
+
+                    <div class="d-grid mt-5">
+                        <button type="submit" class="btn btn-primary shadow-sm py-3">Create Free Account</button>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <p class="text-secondary small">Already have an account? <a href="/login"
+                                class="text-primary fw-bold text-decoration-none">Sign In</a></p>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel">Crop image</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+
+    <!-- Image Crop Modal -->
+    <div class="modal fade" id="modal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title fw-bold">Adjust Profile Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="img-container">
-                        <div class="row">
-                            <div class="col-8">
-                                <!--  default image where we will set the src via jquery-->
-                                <img src="" id="sample_image" />
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="img-container"
+                                style="max-height: 400px; overflow: hidden; background: #f8f9fa;">
+                                <img src="" id="sample_image" style="max-width: 100%; display: block;" />
                             </div>
-                            <div class="col-4">
-                                <div class="preview"></div>
-                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="preview rounded-circle overflow-hidden border mx-auto mb-2"
+                                style="width: 160px; height: 160px; background: #eee;"></div>
+                            <small class="text-muted">Preview</small>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="crop">Crop</button>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="crop">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-            integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"
-        integrity="sha512-9KkIqdfN7ipEW6B6k+Aq20PV31bjODg4AA52W+tYtAE0jE0kMx49bjJ3FgvS56wzmyfMUHbQ4Km2b7l9+Y/+Eg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <script th:src="@{/js/imageCropping.js}" type="text/javascript"></script>
+    <!-- Custom Scripts -->
+    <script th:src="@{/js/imageCropping.js}"></script>
     <script>
         $(document).ready(function () {
-
-            var warning = document.getElementById("warningReferral");
-              var csrfToken = $("meta[name='_csrf']").attr("content");
-
-            warning.style.display = "none";
-
-            $('#referralCode').on('input',function (e) {
-
-                var referralCode = $(this).val();
-
-                console.log(referralCode);
-
-               $.ajax({
-    url: '/checker/referralCode',
-    type: 'GET',
-    dataType: 'json',
-    data: {
-        referralCode: referralCode
-    },
-    success: function (response) {
-        if (response.check == true) {
-            var inputRefer = document.getElementById("referralCode");
-            inputRefer.style.color = "green";
-            warning.style.display = "none";
-        } else if (response.check == false) {
-            var inputRefer = document.getElementById("referralCode");
-            inputRefer.style.color = "red";
-            warning.style.display = "inline";
-
-        }
-    },
-    error: function (xhr, status, error) {
-        console.error("AJAX Error:", status, error);
-    }
-});
-
+            // Toggle Password
+            $('#togglePassword').click(function () {
+                const input = $('#password');
+                const icon = $(this).find('i');
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('bx-show').addClass('bx-hide');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('bx-hide').addClass('bx-show');
+                }
             });
 
+            // Referral Check
+            $('#referralCode').on('input', function () {
+                var code = $(this).val();
+                var warning = $('#warningReferral');
+
+                if (code.length < 9) {
+                    $(this).removeClass('is-valid is-invalid');
+                    warning.hide();
+                    return;
+                }
+
+                $.ajax({
+                    url: '/checker/referralCode',
+                    type: 'GET',
+                    data: { referralCode: code },
+                    success: function (res) {
+                        if (res.check) {
+                            $('#referralCode').removeClass('is-invalid').addClass('is-valid');
+                            warning.hide();
+                        } else {
+                            $('#referralCode').removeClass('is-valid').addClass('is-invalid');
+                            warning.show();
+                        }
+                    }
+                });
+            });
         });
     </script>
-
 </body>
 
 </html>

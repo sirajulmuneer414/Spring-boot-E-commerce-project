@@ -1,94 +1,403 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lenscraft - Admin Orders</title>
-    <link th:rel="stylesheet" th:href="@{/css/product-list.css}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <title>Lenscraft Admin - Orders</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338ca;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #0F172A;
+            --light: #F8FAFC;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
 
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.navDiv {
-    background-color: #b43e8f;
-}
+        body {
+            font-family: var(--font-body);
+            background: var(--light);
+            padding-left: 250px;
+        }
 
-.navBox {
-    display: flex;
-    justify-content: space-between;
-}
+        .page-header {
+            background: white;
+            padding: 32px 0;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
 
-nav {
-    background-color: #b43e8f;
-    height: 80px;
-    position: fixed;
-}
+        .page-header h1 {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0;
+        }
 
-.navBtn {
-    background-color: #fff;
-    border-radius: 5px;
-    color: #b43e8f;
-}
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
 
-.navBtn:hover {
-    border: 2px solid #fff;
-    color: #fff;
-    background-color: #b43e8f;
-}
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid;
+        }
 
-.navlogo {
-    height: auto;
-    width: 100%;
-}
+        .stat-card.pending {
+            border-color: #3B82F6;
+        }
 
+        .stat-card.processing {
+            border-color: #F59E0B;
+        }
+
+        .stat-card.completed {
+            border-color: #10B981;
+        }
+
+        .stat-card.cancelled {
+            border-color: #EF4444;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-bar i {
+            color: #94A3B8;
+            font-size: 1.2rem;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #F1F5F9;
+        }
+
+        .order-id {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .order-date {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-item i {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .detail-label {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .detail-value {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-PENDING {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-PROCESSING {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-COMPLETED {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-CANCELLED {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .status-PENDING::before {
+            content: '⏱️';
+        }
+
+        .status-PROCESSING::before {
+            content: '📦';
+        }
+
+        .status-COMPLETED::before {
+            content: '✅';
+        }
+
+        .status-CANCELLED::before {
+            content: '❌';
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid #F1F5F9;
+        }
+
+        .order-total {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .btn-view {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state i {
+            font-size: 80px;
+            color: #CBD5E1;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-left: 0;
+            }
+
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .order-footer {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .btn-view {
+                justify-content: center;
+                width: 100%;
+            }
+        }
     </style>
 </head>
+
 <body>
-<div th:replace="~{fragment::admin-navbar}" >
+    <div th:replace="~{fragment::admin-navbar}"></div>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
 
-</div>
-<div class="container-fluid row d-flex flex-column justify-content-center align-items-center" style="height: calc(100vh - 70px)">
-
-    <div class="col-11 col-sm-11 col-md-11 col-lg-11 col-xl-11 col-xxl-11 container-fluid w-100 overflow-auto">
-        <table class="table text-center col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-            <thead class="thead-dark bg-secondary  text-white">
-            <tr>
-
-                <th>Order Id</th>
-                <th>User Name</th>
-                <th>Total Prize</th>
-                <th>Payment Type</th>
-                <th>Order Status</th>
-                <th>Date Booked</th>
-                <th></th>
-
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="order : ${orders}" class="table-info">
-                   <td th:text="${order.orderId}"></td>
-                <td th:text="${order.user.firstName}"></td>
-                <td th:text="${order.totalAmount}"></td>
-                <td th:text="${order.paymentDetails.paymentType.name()}"></td>
-                <td th:text="${order.currentStatus.name()}" style="text-info">
-                </td>
-                <td>
-                    <a th:href="@{/admin/order/items/{orderId}(orderId = ${order.orderId})}" class="btn btn-info" style="text-decoration: none">VIEW DETAILS</a>
-                </td>
-                <td th:text="${order.orderedTime.toLocalDate()}"></td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="page-header">
+        <div class="container-fluid px-4">
+            <h1><i class='bx bx-shopping-bag me-3'></i>Order Management</h1>
+        </div>
     </div>
-</div>
+
+    <div class="container-fluid px-4 pb-5">
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <i class='bx bx-search'></i>
+            <input type="text" placeholder="Search orders by ID, customer name..." id="searchInput">
+        </div>
+
+        <!-- Orders List -->
+        <div th:if="${orders != null and !orders.isEmpty()}">
+            <div th:each="order : ${orders}" class="order-card">
+                <div class="order-header">
+                    <div>
+                        <div class="order-id">Order #<span
+                                th:text="${#strings.substring(order.orderId, 0, 8)}">12345</span></div>
+                        <div class="order-date" th:text="${#temporals.format(order.orderedTime, 'dd MMM yyyy, HH:mm')}">
+                            Date</div>
+                    </div>
+                    <span class="status-badge" th:classappend="'status-' + ${order.currentStatus.name()}"
+                        th:text="${order.currentStatus.name()}">
+                        Status
+                    </span>
+                </div>
+
+                <div class="order-details">
+                    <div class="detail-item">
+                        <i class='bx bx-user'></i>
+                        <div>
+                            <div class="detail-label">Customer</div>
+                            <div class="detail-value" th:text="${order.user.firstName + ' ' + order.user.lastName}">Name
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class='bx bx-credit-card'></i>
+                        <div>
+                            <div class="detail-label">Payment</div>
+                            <div class="detail-value" th:text="${order.paymentDetails.paymentType}">COD</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class='bx bx-package'></i>
+                        <div>
+                            <div class="detail-label">Items</div>
+                            <div class="detail-value" th:text="${order.orderItems.size()} + ' item(s)'">0</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class='bx bx-map'></i>
+                        <div>
+                            <div class="detail-label">Location</div>
+                            <div class="detail-value" th:text="${order.address.district + ', ' + order.address.state}">
+                                Location</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-footer">
+                    <div class="order-total">₹<span th:text="${order.totalAmount}">0</span></div>
+                    <a th:href="@{/admin/order/items/{orderId}(orderId=${order.orderId})}" class="btn-view">
+                        <i class='bx bx-show'></i>
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${orders == null or orders.isEmpty()}" class="empty-state">
+            <i class='bx bx-cart'></i>
+            <h4>No orders yet</h4>
+            <p class="text-secondary">Orders will appear here once customers start placing them</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple search functionality
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const orderCards = document.querySelectorAll('.order-card');
+
+            orderCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>

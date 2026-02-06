@@ -22,61 +22,64 @@ public class AdminBrandController {
 
     @Autowired
     BrandService brandService;
+
     @GetMapping()
-    public String getBrands(Model model){
+    public String getBrands(Model model) {
 
         List<Brand> brands = brandService.findAllBrands();
 
-        model.addAttribute("brands",brands);
+        model.addAttribute("brands", brands);
 
         return "admin/get-brands";
     }
 
     @GetMapping("/add")
-    public String getAddBrands(){
+    public String getAddBrands() {
         return "admin/add-brand";
+    }
+
+    @PostMapping("/add")
+    public String addBrand(@RequestParam("brandName") String brandName) {
+        brandService.addBrand(brandName);
+        return "redirect:/admin/brand";
     }
 
     @GetMapping("/editCheck")
     @ResponseBody
     public ResponseEntity<ToPassBoolean> editBrand(@RequestParam("brandName") String brandName,
-    @RequestParam("brandId") Integer brandId
-    ){
+            @RequestParam("brandId") Integer brandId) {
         ToPassBoolean checker = new ToPassBoolean();
         Brand brand = brandService.findBrandById(brandId);
 
-        if(brand.getBrandName().toLowerCase().matches(brandName.toLowerCase())){
+        if (brand.getBrandName().toLowerCase().matches(brandName.toLowerCase())) {
             brandService.addBrand(brandName);
             checker.setCheck(true);
-            return new ResponseEntity<>(checker,HttpStatus.OK);
-        }
-        else if(brandService.existByBrandName(brandName)){
-                checker.setCheck(false);
-                return new ResponseEntity<>(checker,HttpStatus.OK);
+            return new ResponseEntity<>(checker, HttpStatus.OK);
+        } else if (brandService.existByBrandName(brandName)) {
+            checker.setCheck(false);
+            return new ResponseEntity<>(checker, HttpStatus.OK);
 
         }
 
-       brand.setBrandName(brandName);
+        brand.setBrandName(brandName);
         brandService.update(brand);
         checker.setCheck(true);
-        return new ResponseEntity<>(checker,HttpStatus.OK);
+        return new ResponseEntity<>(checker, HttpStatus.OK);
     }
 
-
     @GetMapping("/edit/{id}")
-    public String editCategory(@PathVariable("id") Integer brandId, Model model){
+    public String editCategory(@PathVariable("id") Integer brandId, Model model) {
 
         Brand brand = brandService.findBrandById(brandId);
 
-        model.addAttribute("brand",brand);
+        model.addAttribute("brand", brand);
 
         return "admin/edit-brand";
     }
 
     @GetMapping("/block/{id}")
     public String blockBrand(
-            @PathVariable("id")Integer brandId
-    ){
+            @PathVariable("id") Integer brandId) {
 
         Brand brand = brandService.findBrandById(brandId);
 
@@ -84,7 +87,7 @@ public class AdminBrandController {
 
         List<Product> products = brand.getProducts();
 
-        for(Product product : products){
+        for (Product product : products) {
 
             product.setActiveStatus(ActiveStatus.BLOCKED);
 
@@ -96,17 +99,17 @@ public class AdminBrandController {
         return "redirect:/admin/brand";
 
     }
+
     @GetMapping("/unblock/{id}")
     public String unblockBrand(
-            @PathVariable("id")Integer brandId
-    ){
+            @PathVariable("id") Integer brandId) {
 
         Brand brand = brandService.findBrandById(brandId);
 
         brand.setBrandStatus(BrandStatus.ACTIVE);
         List<Product> products = brand.getProducts();
 
-        for(Product product : products){
+        for (Product product : products) {
 
             product.setActiveStatus(ActiveStatus.ACTIVE);
 
@@ -118,15 +121,13 @@ public class AdminBrandController {
         return "redirect:/admin/brand";
 
     }
+
     @GetMapping("/delete/{id}")
     public String deleteBrand(
-            @PathVariable("id")Integer brandId
-    ){
+            @PathVariable("id") Integer brandId) {
         brandService.deleteById(brandId);
 
         return "redirect:/admin/brand";
     }
-
-
 
 }

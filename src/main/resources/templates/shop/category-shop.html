@@ -1,180 +1,210 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lenscraft-Shop</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link th:rel="stylesheet" th:href="@{/css/shop.css}" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
-* {
-padding: 0;
-margin: 0;
-box-sizing: border-box;
-font-family: 'Poppins', sans-serif;
-}
-* a{
-text-decoration: none;
-}
-
-.navDiv {
-background-color: #b43e8f;
-}
-
-.navBox {
-display: flex;
-justify-content: space-between;
-}
-
-nav {
-background-color: #b43e8f;
-height: 80px;
-position: fixed;
-}
-
-.navBtn {
-background-color: #fff;
-border-radius: 5px;
-color: #b43e8f;
-}
-
-.navBtn:hover {
-border: 2px solid #fff;
-color: #fff;
-background-color: #b43e8f;
-}
-
-.navlogo {
-height: auto;
-width: 100%;
-}
-
-  </style>
+<head th:replace="~{fragment::head}">
+  <title>Shop by Category - Lenscraft</title>
 </head>
-<body>
-<nav class="navbar navbar-expand-lg d-flex justify-content-between col-lg-12 navbar-light bg-light mx-auto">
-  <div>
-    <a class="navbar-brand" th:href="@{/}">
-      <img th:src="@{/images/Mainlogo.png}" style="height: auto; width: 250px" alt="" />
-    </a>
-  </div>
 
-  <button class="navbar-toggler " type="button" id="hamburger-icon"  data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-          <span class="material-symbols-outlined navbar-toggler-icon" id="tog" >
-            </span>
-    <span class="btn-close btn-close-black" id="close-button" style="display: none;">
+<body class="bg-body">
 
-            </span>
-  </button>
+  <!-- Navbar -->
+  <div th:replace="~{fragment::navbar}"></div>
 
-  <div class="collapse navbar-collapse md-d-flex justify-content-end" id="navbarSupportedContent">
-    <div class="  me-5">
-      <form class="form-inline d-flex my-2 my-lg-0" th:action="@{/shop/category}" method="get">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="keyword">
-        <input type="hidden" name="categoryId" th:value="${categoryId}">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-      </form>
-    </div>
-    <ul class="navbar-nav ms-5 mr-auto">
-      <li class="nav-item active mt-2 mt-lg-0  me-5">
-        <a class="text-decoration-none text-dark" th:href="@{/user/cart}">
-          <i class="fa-solid fa-cart-shopping"></i><span> Cart</span>
-        </a>
-      </li>
-      <li class="nav-item mt-2 mt-lg-0 me-5">
-        <a class="text-decoration-none text-dark" th:href="@{/shop}">
-          <i class="fa-brands fa-shopify"></i><span> Shop</span>
-        </a>
-      </li>
-      <li class="nav-item dropdown mt-2 mt-lg-0 me-5">
-        <a class="text-decoration-none text-dark" th:href="@{/user/profile}">
-          <i class="fa-solid fa-user"></i><span> Profile</span>
-        </a>
-      </li>
-      <li class="nav-item mt-2 mt-lg-0 me-5">
-        <form
-                th:if=" ${#authorization.expression('isAuthenticated()')}"
-                th:method="post"
-                th:action="@{/logout}"
-        >
-          <label for="sign-out"><i class="fa-solid fa-right-from-bracket"></i></label>
-          <input hidden type="submit" id="sign-out">
-        </form>
-        <a   class="btn btn-info"   th:href="@{/login}" th:if="not ${#authorization.expression('isAuthenticated()')}" >Sign in</a>
-      </li>
-    </ul>
-  </div>
+  <!-- Main Content -->
+  <section class="py-5" style="margin-top: 60px;">
+    <div class="container">
 
-</nav>
-<br>
-<div class="container row" >
-  <div class="col-11">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4" style="height: auto">
-      <div class="col-md-4" th:each="product :${products}">
+      <!-- Page Header -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h1 class="display-5 fw-bold font-heading" th:text="${categoryName} ?: 'Shop'">Category</h1>
+          <p class="text-secondary lead">Discover premium eyewear that fits your style</p>
+        </div>
+      </div>
 
-        <div class="card col-12 col-sm-12 col-md-6 col-lg-3 col-xl-2" style="width: 210px; height: 320px">
-          <a th:href="@{/shop/productView/{id}/{variableId}(id=${product.productId},variableId=${product.variables[0].variableId})}">
-            <img th:src="@{${'/productImages/'+product.productId+'/'+product.variables[0].image1}}"
-                 class="card-img-top" alt="Product Image">
-            <div class="card-body">
-              <h6 class="card-subtitle text-muted" th:text="${product.brand.brandName}"></h6>
-              <h5 class="card-title" th:text="${product.productName}" style="color: black;"></h5>
-              <h5 th:text="${'&#8377;'+product.discountedPrice}" style="color: #40A2E3"></h5>
+      <!-- Search Bar -->
+      <div class="row mb-4">
+        <div class="col-lg-6 col-md-8">
+          <form th:action="@{/shop/category}" method="get" class="d-flex gap-2">
+            <input type="hidden" name="categoryId" th:value="${categoryId}">
+            <input class="form-control form-control-lg" type="search" placeholder="Search products..." name="keyword"
+              th:value="${keyword}">
+            <button class="btn btn-primary-custom px-4" type="submit">
+              <i class='bx bx-search'></i> Search
+            </button>
+          </form>
+        </div>
+      </div>
 
+      <!-- Products Grid -->
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mb-5">
+        <div class="col" th:each="product : ${products}">
+          <a th:href="@{/shop/productView/{id}/{variableId}(id=${product.productId},variableId=${product.variables[0].variableId})}"
+            class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100 product-card">
+              <!-- Product Image -->
+              <div class="card-img-wrapper position-relative overflow-hidden" style="height: 250px;">
+                <img
+                  th:src="${#strings.startsWith(product.variables[0].image1, 'http')} ? ${product.variables[0].image1} : @{/productImages/__${product.productId}__/__${product.variables[0].image1}__}"
+                  class="card-img-top object-fit-cover h-100 w-100" alt="Product Image"
+                  onerror="this.src='/images/default-product.jpg'">
+
+                <!-- Discount Badge -->
+                <span th:if="${product.isHavingOffer or product.category.isHavingOffer}"
+                  class="badge bg-danger position-absolute top-0 end-0 m-3">
+                  <span
+                    th:text="${product.isHavingOffer ? product.offer.offerPercentage : product.category.offer.offerPercentage} + '% OFF'">
+                    OFF
+                  </span>
+                </span>
+              </div>
+
+              <!-- Product Details -->
+              <div class="card-body">
+                <p class="text-uppercase text-primary small fw-bold mb-1" th:text="${product.brand.brandName}">Brand</p>
+                <h6 class="card-title text-dark fw-bold mb-2" th:text="${product.productName}">Product Name</h6>
+
+                <!-- Price -->
+                <div class="d-flex align-items-center gap-2">
+                  <h5 class="fw-bold text-dark mb-0" th:text="'₹' + ${product.discountedPrice}">₹0</h5>
+                  <small class="text-muted text-decoration-line-through"
+                    th:if="${product.isHavingOffer or product.category.isHavingOffer}"
+                    th:text="'₹' + ${product.price}">₹0</small>
+                </div>
+
+                <!-- Stock Status -->
+                <p class="small mt-2 mb-0"
+                  th:classappend="${product.stockStatus == 'OUT_OF_STOCK' ? 'text-danger' : 'text-success'}"
+                  th:text="${product.stockStatus == 'OUT_OF_STOCK' ? 'Out of Stock' : 'In Stock'}">
+                  In Stock
+                </p>
+              </div>
             </div>
           </a>
         </div>
-
       </div>
+
+      <!-- Empty State -->
+      <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
+        <div class="bg-white rounded-circle shadow-lg d-inline-flex align-items-center justify-content-center mb-4"
+          style="width: 150px; height: 150px;">
+          <i class='bx bx-package text-secondary opacity-50' style="font-size: 5rem;"></i>
+        </div>
+        <h3 class="fw-bold mb-2">No Products Found</h3>
+        <p class="text-secondary lead mb-4">Try adjusting your search or filters</p>
+        <a th:href="@{/shop}" class="btn btn-primary-custom px-5 py-2">Browse All Products</a>
+      </div>
+
+      <!-- Pagination -->
+      <nav th:if="${totalPages > 1}" aria-label="Product pagination" class="mt-5">
+        <ul class="pagination pagination-lg justify-content-center">
+          <!-- First Page -->
+          <li class="page-item" th:classappend="${pageNo == 1 ? 'disabled' : ''}">
+            <a class="page-link"
+              th:href="@{/shop/category(pageNo=1,pageSize=12,categoryId=${categoryId},keyword=${keyword})}">
+              <i class='bx bx-chevrons-left'></i>
+            </a>
+          </li>
+
+          <!-- Previous Page -->
+          <li class="page-item" th:classappend="${pageNo == 1 ? 'disabled' : ''}">
+            <a class="page-link"
+              th:href="@{/shop/category(pageNo=${pageNo - 1},pageSize=12,categoryId=${categoryId},keyword=${keyword})}">
+              <i class='bx bx-chevron-left'></i> Previous
+            </a>
+          </li>
+
+          <!-- Page Numbers -->
+          <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+            th:classappend="${i == pageNo ? 'active' : ''}">
+            <a class="page-link"
+              th:href="@{/shop/category(pageNo=${i},pageSize=12,categoryId=${categoryId},keyword=${keyword})}"
+              th:text="${i}">1</a>
+          </li>
+
+          <!-- Next Page -->
+          <li class="page-item" th:classappend="${pageNo == totalPages ? 'disabled' : ''}">
+            <a class="page-link"
+              th:href="@{/shop/category(pageNo=${pageNo + 1},pageSize=12,categoryId=${categoryId},keyword=${keyword})}">
+              Next <i class='bx bx-chevron-right'></i>
+            </a>
+          </li>
+
+          <!-- Last Page -->
+          <li class="page-item" th:classappend="${pageNo == totalPages ? 'disabled' : ''}">
+            <a class="page-link"
+              th:href="@{/shop/category(pageNo=${totalPages},pageSize=12,categoryId=${categoryId},keyword=${keyword})}">
+              <i class='bx bx-chevrons-right'></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
     </div>
+  </section>
 
+  <!-- Footer -->
+  <div th:replace="~{fragment::footer}"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  </div>
+  <style>
+    /* Product Card Hover Effects */
+    .product-card {
+      transition: all 0.3s ease;
+    }
 
-</div>
-<div class="d-flex justify-content-center" th:if="${totalPages > 1}">
-  <ul class="pagination">
-    <li class="page-item" th:if="${pageNo > 1}">
-      <form th:action="@{/shop/category}" class="page-link" style="color:#b43e8f;">
-        <input type="hidden" name="pageNo" value="1">
-        <input type="hidden" name="pageSize" value="12">
-        <input type="hidden" name="categoryId" th:value="${categoryId}">
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+    }
 
-        <button type="submit">Previous</button>
-      </form>
-    </li>
-    <li class="page-item" th:class="${i} == ${pageNo}+1 ? 'page-item custom-active' : 'page-item'"
-        th:each="i : ${#numbers.sequence(1, totalPages)}">
-      <form th:action="@{/shop/category}" class="page-link" style="color:#b43e8f;">
-        <input type="hidden" name="pageNo" th:value="${i}">
-        <input type="hidden" name="pageSize" value="12">
-        <input type="hidden" name="categoryId" th:value="${categoryId}">
+    .product-card img {
+      transition: transform 0.3s ease;
+    }
 
-        <button type="submit">[[${i}]]</button>
-      </form>
-    </li>
-    <li class="page-item" th:if="${pageNo < totalPages}">
-      <form th:action="@{/shop/category}" class="page-link" style="color:#b43e8f;">
-        <input type="hidden" name="pageNo" th:value="${totalPages}">
-        <input type="hidden" name="pageSize" value="12">
-        <input type="hidden" name="categoryId" th:value="${categoryId}">
-        <button type="submit">Last</button>
-      </form>
-    </li>
-  </ul>
-</div>
-<div th:replace="~{fragment::footer}"></div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    .product-card:hover img {
+      transform: scale(1.05);
+    }
 
+    /* Custom primary button styling */
+    .btn-primary-custom {
+      background: linear-gradient(135deg, #4F46E5 0%, #4338ca 100%);
+      border: none;
+      color: white;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+      color: white;
+    }
+
+    /* Pagination styling */
+    .pagination .page-link {
+      border: none;
+      color: #4F46E5;
+      font-weight: 500;
+      margin: 0 4px;
+      border-radius: 8px;
+    }
+
+    .pagination .page-item.active .page-link {
+      background: linear-gradient(135deg, #4F46E5 0%, #4338ca 100%);
+      color: white;
+    }
+
+    .pagination .page-link:hover {
+      background-color: #f3f4f6;
+      color: #4F46E5;
+    }
+
+    .pagination .page-item.disabled .page-link {
+      color: #9ca3af;
+    }
+  </style>
 </body>
+
 </html>

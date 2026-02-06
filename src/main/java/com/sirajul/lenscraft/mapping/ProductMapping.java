@@ -21,45 +21,57 @@ public class ProductMapping {
     @Autowired
     CategoryRepository categoryRepository;
 
-    public Product DtoToProduct(ProductDto productDto){
+    public Product DtoToProduct(ProductDto productDto) {
 
         Product product = new Product();
-        if(productDto.getProductId() != null){
+        if (productDto.getProductId() != null) {
             product.setProductId(productDto.getProductId());
         }
         product.setHavingOffer(false);
         product.setProductName(productDto.getProductName());
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
-        switch (productDto.getStockStatus()){
-            case "OUT_OF_STOCK":
-                product.setStockStatus(StockStatus.OUT_OF_STOCK);
-                break;
-            case "LOW_STOCK":
-                product.setStockStatus(StockStatus.LOW_STOCK);
-                break;
+        if (productDto.getStockStatus() != null) {
+            switch (productDto.getStockStatus()) {
+                case "OUT_OF_STOCK":
+                    product.setStockStatus(StockStatus.OUT_OF_STOCK);
+                    break;
+                case "LOW_STOCK":
+                    product.setStockStatus(StockStatus.LOW_STOCK);
+                    break;
 
-            default:
-                product.setStockStatus(StockStatus.IN_STOCK);
-                break;
-
+                default:
+                    product.setStockStatus(StockStatus.IN_STOCK);
+                    break;
+            }
+        } else {
+            product.setStockStatus(StockStatus.IN_STOCK);
         }
-        switch (productDto.getFrameSize()){
-            case "SMALL":
-                product.setFrameSize(FrameSize.SMALL);
-                break;
-            case "MEDIUM":
-                product.setFrameSize(FrameSize.MEDIUM);
-                break;
-            case "LARGE":
-                product.setFrameSize(FrameSize.LARGE);
-                break;
+        if (productDto.getFrameSize() != null) {
+            switch (productDto.getFrameSize()) {
+                case "SMALL":
+                    product.setFrameSize(FrameSize.SMALL);
+                    break;
+                case "MEDIUM":
+                    product.setFrameSize(FrameSize.MEDIUM);
+                    break;
+                case "LARGE":
+                    product.setFrameSize(FrameSize.LARGE);
+                    break;
+                default:
+                    product.setFrameSize(FrameSize.MEDIUM);
+                    break;
+            }
+        } else {
+            product.setFrameSize(FrameSize.MEDIUM);
         }
 
-        Brand brand = brandRepository.findById(productDto.getBrandId()).get();
+        Brand brand = brandRepository.findById(productDto.getBrandId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Brand ID: " + productDto.getBrandId()));
         product.setBrand(brand);
 
-        Category category = categoryRepository.findById(productDto.getCategoryId()).get();
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Category ID: " + productDto.getCategoryId()));
         product.setCategory(category);
 
         product.setModelNo(productDto.getModelNo());

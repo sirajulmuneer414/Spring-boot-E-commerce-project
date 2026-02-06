@@ -1,94 +1,367 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lenscraft - Admin Order Items</title>
-    <link th:rel="stylesheet" th:href="@{/css/product-list.css}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <title>Admin - Order Details</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+        :root {
+            --primary: #4F46E5;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #0F172A;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
 
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.navDiv {
-    background-color: #b43e8f;
-}
+        body {
+            font-family: var(--font-body);
+            background-color: #f8fafc;
+            padding-left: 250px;
+        }
 
-.navBox {
-    display: flex;
-    justify-content: space-between;
-}
+        .page-header {
+            background: white;
+            padding: 32px 0;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
 
-nav {
-    background-color: #b43e8f;
-    height: 80px;
-    position: fixed;
-}
+        .page-header h1 {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0;
+        }
 
-.navBtn {
-    background-color: #fff;
-    border-radius: 5px;
-    color: #b43e8f;
-}
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
 
-.navBtn:hover {
-    border: 2px solid #fff;
-    color: #fff;
-    background-color: #b43e8f;
-}
+        .breadcrumb-nav a {
+            color: var(--primary);
+            text-decoration: none;
+        }
 
-.navlogo {
-    height: auto;
-    width: 100%;
-}
+        .order-summary-card {
+            background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%);
+            border-radius: 16px;
+            padding: 32px;
+            color: white;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+        }
 
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .summary-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+        }
+
+        .summary-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-content {
+            display: grid;
+            grid-template-columns: 100px 1fr auto auto;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .product-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #F1F5F9;
+        }
+
+        .product-info h6 {
+            color: var(--dark);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .product-meta {
+            display: flex;
+            gap: 16px;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .product-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .price-info {
+            text-align: right;
+        }
+
+        .price-label {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .price-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-PENDING {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-PROCESSING {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-SHIPPED {
+            background: #E0E7FF;
+            color: #4338CA;
+        }
+
+        .status-OUT_FOR_DELIVERY {
+            background: #FED7AA;
+            color: #9A3412;
+        }
+
+        .status-DELIVERED {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-CANCELLED {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .status-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-select {
+            min-width: 180px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid #E2E8F0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .status-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state i {
+            font-size: 80px;
+            color: #CBD5E1;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 992px) {
+            body {
+                padding-left: 0;
+            }
+
+            .item-content {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .product-img {
+                margin: 0 auto;
+            }
+
+            .price-info,
+            .status-control {
+                justify-content: center;
+                text-align: center;
+            }
+        }
     </style>
 </head>
+
 <body>
-<div th:replace="~{fragment::admin-navbar}" >
+    <div th:replace="~{fragment::admin-navbar}"></div>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
 
-</div>
-<div class="container-fluid row d-flex flex-column justify-content-center align-items-center" style="height: calc(100vh - 70px)">
+    <div class="page-header">
+        <div class="container-fluid px-4">
+            <h1><i class='bx bx-receipt me-3'></i>Order Details</h1>
+            <div class="breadcrumb-nav">
+                <a href="/admin/order"><i class='bx bx-arrow-back'></i> Back to Orders</a>
+            </div>
+        </div>
+    </div>
 
-    <td class="col-11 col-sm-11 col-md-11 col-lg-11 col-xl-11 col-xxl-11 container-fluid w-100 overflow-auto">
-        <table class="table text-center col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-            <thead class="thead-dark bg-secondary  text-white">
-            <tr>
+    <div class="container-fluid px-4 pb-5">
+        <!-- Order Summary Card -->
+        <div class="order-summary-card" th:if="${order != null}">
+            <div class="summary-row">
+                <div class="summary-item">
+                    <div class="summary-label">Order ID</div>
+                    <div class="summary-value" th:text="'#' + ${#strings.substring(order.orderId, 0, 8)}">12345</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Customer</div>
+                    <div class="summary-value" th:text="${order.user.firstName + ' ' + order.user.lastName}">Name</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Order Date</div>
+                    <div class="summary-value" th:text="${#temporals.format(order.orderedTime, 'dd MMM yyyy')}">Date
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Amount</div>
+                    <div class="summary-value">₹<span th:text="${order.totalAmount}">0</span></div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Payment Method</div>
+                    <div class="summary-value" th:text="${order.paymentDetails.paymentType}">COD</div>
+                </div>
+            </div>
+        </div>
 
-                <th>Order Item Id</th>
-                <th>Product Name</th>
-                <th>Prize</th>
-                <th>Quantity</th>
-                <th>Item Status</th>
-                <th></th>
+        <!-- Order Items -->
+        <div th:if="${items != null and !items.isEmpty()}">
+            <div th:each="item : ${items}" class="item-card">
+                <div class="item-content">
+                    <img th:src="${#strings.startsWith(item.variable.image1, 'http') ? item.variable.image1 : '/productImages/'+item.product.productId+'/'+item.variable.image1}"
+                        class="product-img" alt="Product" onerror="this.src='https://via.placeholder.com/100'">
 
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="item : ${items}" class="table-info">
-                <td th:text="${item.orderItemId}" ></td>
-                <td th:text="${item.product.productName}"></td>
-                <td th:text="${item.product.discountedPrice}"></td>
-                <td th:text="${item.quantity}"></td>
-                <td th:text="${item.currentStatus.name()}" style="text-info">
-                </td>
-                <td>
-                    <a th:href="@{/admin/order/items/item-view/{orderItemId}(orderItemId = ${item.orderItemId})}" class="btn btn-info" style="text-decoration: none">VIEW DETAILS</a>
-                </td>
+                    <div class="product-info">
+                        <h6 th:text="${item.product.productName}">Product Name</h6>
+                        <div class="product-meta">
+                            <span>
+                                <i class='bx bx-palette'></i>
+                                <span th:text="${item.variable.frameColor}">Color</span>
+                            </span>
+                            <span>
+                                <i class='bx bx-package'></i>
+                                Qty: <span th:text="${item.quantity}">1</span>
+                            </span>
+                        </div>
+                    </div>
 
-            </tr>
-            </tbody>
-        </table>
-</div>
+                    <div class="price-info">
+                        <div class="price-label">Price</div>
+                        <div class="price-value">₹<span th:text="${item.currentPrice}">0</span></div>
+                    </div>
 
+                    <div class="status-control">
+                        <select class="status-select" th:data-order-item-id="${item.orderItemId}"
+                            onchange="updateStatus(this)">
+                            <option disabled selected>Update Status</option>
+                            <option value="PENDING" th:selected="${item.currentStatus.name() == 'PENDING'}">Pending
+                            </option>
+                            <option value="PROCESSING" th:selected="${item.currentStatus.name() == 'PROCESSING'}">
+                                Processing</option>
+                            <option value="SHIPPED" th:selected="${item.currentStatus.name() == 'SHIPPED'}">Shipped
+                            </option>
+                            <option value="OUT_FOR_DELIVERY"
+                                th:selected="${item.currentStatus.name() == 'OUT_FOR_DELIVERY'}">Out for Delivery
+                            </option>
+                            <option value="DELIVERED" th:selected="${item.currentStatus.name() == 'DELIVERED'}">
+                                Delivered</option>
+                            <option value="CANCELLED" th:selected="${item.currentStatus.name() == 'CANCELLED'}">
+                                Cancelled</option>
+                        </select>
+                        <span class="status-badge" th:classappend="'status-' + ${item.currentStatus.name()}"
+                            th:text="${item.currentStatus.name()}">
+                            Status
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Empty State -->
+        <div th:if="${items == null or items.isEmpty()}" class="empty-state">
+            <i class='bx bx-box'></i>
+            <h4>No items in this order</h4>
+            <p class="text-secondary">This order doesn't contain any items</p>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus(selectElement) {
+            const orderItemId = selectElement.getAttribute('data-order-item-id');
+            const newStatus = selectElement.value;
+            if (newStatus && newStatus !== 'Update Status') {
+                window.location.href = `/admin/order/items/item/status-change/${orderItemId}?status=${newStatus}`;
+            }
+        }
+    </script>
 </body>
+
 </html>

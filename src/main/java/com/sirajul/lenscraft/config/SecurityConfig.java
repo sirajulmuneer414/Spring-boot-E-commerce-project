@@ -23,72 +23,75 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 @Slf4j
 public class SecurityConfig {
 
+        @Autowired
+        UserDetailsService userDetailsService;
+        @Autowired
+        SuccessHandler successHandler;
+        @Autowired
+        CustomAuthenticationFailureHandler failureHandler;
 
-    @Autowired UserDetailsService userDetailsService;
-    @Autowired
-    SuccessHandler successHandler;
-    @Bean
-    PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http, UserDetailsService userDetailsService)
+                        throws Exception {
+                log.info("inside security filter chain");
+                http.authorizeHttpRequests(
+                                auth -> auth.requestMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
+                                                .requestMatchers("/user/**", "/order/**")
+                                                .hasAnyAuthority(Role.ADMIN.name(), Role.USER.name(),
+                                                                Role.SELLER.name())
+                                                .requestMatchers("/**", "/register", "/verification",
+                                                                "/forgot-password/**", "/temp")
+                                                .permitAll()
+                                                .anyRequest().authenticated())
+                                .formLogin(
+                                                form -> form.loginPage("/login")
+                                                                .successHandler(successHandler)
+                                                                .failureHandler(failureHandler)
+                                                                .permitAll())
+                                .logout(
+                                                logout -> logout
+                                                                .logoutUrl("/logout")
+                                                                .logoutSuccessUrl("/")
+                                                                .invalidateHttpSession(true)
+                                                                .deleteCookies("JSESSIONID"))
+                                .rememberMe(
+                                                me -> me
+                                                                .rememberMeServices(
+                                                                                rememberMeServices(userDetailsService))
+                                                                .key("Token").userDetailsService(userDetailsService));
+                return http.build();
+        }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
-        log.info("inside security filter chain");
-        http.authorizeHttpRequests(
-                auth ->
-                        auth.requestMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
-                                .requestMatchers("/user/**","/order/**").hasAnyAuthority(Role.ADMIN.name(),Role.USER.name(),Role.SELLER.name())
-                                .requestMatchers("/**","/register","/verification","/forgot-password/**","/temp").permitAll()
-                                .anyRequest().authenticated()
-        )
-                .formLogin(
-                        form ->
-                                form.loginPage("/login")
-                                        .successHandler(successHandler)
-                                        .permitAll()
-                )
-                .logout(
-                        logout ->
-                                logout
-                                        .logoutUrl("/logout")
-                                        .logoutSuccessUrl("/")
-                                        .invalidateHttpSession(true)
-                                        .deleteCookies("JSESSIONID")
-                )
-                .rememberMe(
-                        me ->
-                                me
-                                        .rememberMeServices(rememberMeServices(userDetailsService))
-                                        .key("Token").userDetailsService(userDetailsService)
-                );
-        return http.build();
-    }
-    @Bean
-    public WebSecurityCustomizer ignoreWebSecurity(){
-        return (web -> web.ignoring().requestMatchers("/images/**","/css/**","/profilePic/**"));
-    }
-    @Bean
-    public RememberMeServices rememberMeServices(UserDetailsService userDetailsService){
-        TokenBasedRememberMeServices tokenBasedRememberMeServices =
-                new TokenBasedRememberMeServices("Token",userDetailsService);
+        @Bean
+        public WebSecurityCustomizer ignoreWebSecurity() {
+                return (web -> web.ignoring().requestMatchers("/images/**", "/css/**", "/profilePic/**"));
+        }
 
-        tokenBasedRememberMeServices.setAlwaysRemember(true);
+        @Bean
+        public RememberMeServices rememberMeServices(UserDetailsService userDetailsService) {
+                TokenBasedRememberMeServices tokenBasedRememberMeServices = new TokenBasedRememberMeServices("Token",
+                                userDetailsService);
 
-        return tokenBasedRememberMeServices;
-    }
+                tokenBasedRememberMeServices.setAlwaysRemember(true);
 
-    @Bean
-    public AuthenticationProvider authenticationProvider(UserInformation user){
-        log.info("inside dao authentication provider");
+                return tokenBasedRememberMeServices;
+        }
 
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        @Bean
+        public AuthenticationProvider authenticationProvider() {
+                log.info("inside dao authentication provider");
 
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
+                DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
 
-        return authenticationProvider;
+                authenticationProvider.setUserDetailsService(userDetailsService);
+                authenticationProvider.setPasswordEncoder(passwordEncoder());
 
-    }
+                return authenticationProvider;
+
+        }
 }

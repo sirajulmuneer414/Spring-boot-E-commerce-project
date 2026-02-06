@@ -35,7 +35,8 @@ public class UserServiceImp implements UserService {
     @Autowired
     ReferralOfferService referralOfferService;
 
-    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     UserInformationMapping userInformationMapping;
@@ -46,8 +47,7 @@ public class UserServiceImp implements UserService {
     @Autowired
     CartService cartService;
 
-    public boolean userExistsByEmail(String emailId){
-
+    public boolean userExistsByEmail(String emailId) {
 
         return userRepository.existsByEmailId(emailId);
 
@@ -56,8 +56,15 @@ public class UserServiceImp implements UserService {
     @Override
     public boolean verifyOtpAndSave(SignupDto signupDto, String otp) {
 
+        if (signupDto != null && otpUtil.isOtpValid(signupDto, otp)) {
 
-        if(signupDto != null && otpUtil.isOtpValid(signupDto, otp)){
+            // Fix for duplicate submission: If user already exists, treat as success
+            // This prevents DataIntegrityViolationException on double-click/refresh
+            if (userRepository.existsByEmailId(signupDto.getEmailId())) {
+                log.info("User with email {} already exists. Skipping duplicate save during verification.",
+                        signupDto.getEmailId());
+                return true;
+            }
 
             UserInformation user = userInformationMapping.signupDtoMapping(signupDto);
 
@@ -65,15 +72,16 @@ public class UserServiceImp implements UserService {
 
             Random rand = new Random();
 
-            String referralCodeNumPart = String.valueOf(rand.nextInt(999999)+100000);
+            String referralCodeNumPart = String.valueOf(rand.nextInt(999999) + 100000);
 
-            String referralFirstPart = user.getFirstName().substring(0,3).toUpperCase();
+            String referralFirstPart = user.getFirstName().substring(0, 3).toUpperCase();
 
-            user.setReferralCode(referralFirstPart+referralCodeNumPart);
+            user.setReferralCode(referralFirstPart + referralCodeNumPart);
 
-            if(signupDto.getRole()==Role.ADMIN.name())
+            if (signupDto.getRole() == Role.ADMIN.name())
                 user.setRole(Role.ADMIN);
-            else user.setRole(Role.USER);
+            else
+                user.setRole(Role.USER);
 
             user = userRepository.save(user);
 
@@ -97,14 +105,14 @@ public class UserServiceImp implements UserService {
 
             user = userRepository.save(user);
 
-            if(userRepository.existsByReferralCodeIgnoreCase(signupDto.getReferralCode())) {
+            if (userRepository.existsByReferralCodeIgnoreCase(signupDto.getReferralCode())) {
                 UserInformation userReferred = userRepository.findByReferralCodeIgnoreCase(signupDto.getReferralCode());
                 referralOfferService.assignMoneyToWallets(user, userReferred);
             }
 
             otpUtil.sendEmail(signupDto.getEmailId());
             return true;
-        }else{
+        } else {
             throw new InvalidOtpException("Invalid OTP Entry");
         }
 
@@ -131,11 +139,11 @@ public class UserServiceImp implements UserService {
     public void updateUserById(UserInformationDto userDto) {
         UserInformation user = userRepository.findById(userDto.getId()).get();
 
-        if(user != null){
+        if (user != null) {
             log.info("user is found from the repository");
         }
 
-        user = userInformationMapping.adminToRepoUpdateMapping(userDto,user);
+        user = userInformationMapping.adminToRepoUpdateMapping(userDto, user);
 
         System.out.println(user.getLastName());
 
@@ -180,7 +188,7 @@ public class UserServiceImp implements UserService {
     @Override
     public Long countOfUsers() {
 
-       return userRepository.countByRole(Role.USER);
+        return userRepository.countByRole(Role.USER);
 
     }
 

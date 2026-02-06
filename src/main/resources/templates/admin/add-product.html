@@ -2,251 +2,251 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lenscraft-Admin add product</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link th:href="@{/css/formStyles.css}" rel="stylesheet" type="text/css">
+    <title>Admin - Add Product</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
-        * {
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+        :root {
+            --primary: #4F46E5;
+            --dark: #0F172A;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif
         }
 
-        nav {
-            background-color: #b43e8f;
-            height: 80px;
-            position: fixed;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: #f8fafc
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%);
+            padding: 32px 0;
+            color: white;
+            margin-bottom: 32px
+        }
+
+        .admin-header h1 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            margin: 0
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            max-width: 800px;
+            margin: 0 auto
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px
+        }
+
+        .form-control,
+        .form-select {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            transition: all 0.3s
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1)
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3)
+        }
+
+        .variant-section {
+            background-color: #f1f5f9;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .variant-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--dark);
         }
     </style>
 </head>
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
-
-    <div class="container-fluid row formMain" style="height: calc(100vh - 0px); margin-top: 70px; width: 100vw">
-        <div class="col-sm-8 col-md-6 col-lg-5 col-xl-5 col-5 formBox">
-
-            <div class="d-flex justify-content-center">
-                <h1 class="">Add Product</h1>
-            </div>
-
-            <div class="w-100 d-flex justify-content-center align-items-center formPart">
-
-                <form th:action="@{/admin/products/add}" th:object="${productDto}" method="post"
-                    enctype="multipart/form-data">
-                    <div class="form-group ">
-                        <label class="" for="productName">Product Name:</label>
-                        <input type="text" id="productName" class="form-control" th:field="*{productName}"
-                            required="required" />
-                    </div>
-
-                    <div class="form-group ">
-                        <label class="" for="description">Description:</label>
-                        <textarea type="text" class="form-control" id="description" th:field="*{description}"
-                            required="required" rows="4" />
-                    </div>
-
-                    <div class="form-group ">
-                        <label class="" for="price">Price:</label>
-                        <input type="text" id="price" th:field="*{price}" class="form-control" required="required" />
-                    </div>
-
-                    <div class="form-group ">
-                        <label class="" for="model">Model No:</label>
-                        <input type="text" class="form-control" id="model" th:field="*{modelNo}" required="required" />
-                    </div>
-
-                    <div class="form-group ">
-                        <label class="" for="frameSize">Frame Size:</label>
-                        <select id="frameSize" class="form-control" th:field="*{frameSize}">
-                            <option value="">Select a Size</option>
-                            <option value="SMALL">SMALL</option>
-                            <option value="MEDIUM">MEDIUM</option>
-                            <option value="LARGE">LARGE</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group ">
-                        <label class="" for="Stockstatus">Stock Status:</label>
-                        <select id="Stockstatus" class="form-control" th:field="*{stockStatus}">
-                            <option value="">Select Status</option>
-                            <option value="IN_STOCK">IN STOCK</option>
-                            <option value="LOW_STOCK">LOW STOCK</option>
-                            <option value="OUT_OF_STOCK">OUT OF STOCK</option>
-
-                        </select>
-
-                    </div>
-
-                    <div class="form-group ">
-                        <label for="brand">Brand:</label>
-                        <select id="brand" class="form-control" name="brandId">
-                            <option value="">Select a Brand</option>
-                            <block th:each="brand : ${brands}">
-                                <option th:value="${brand.brandId}" th:text="${brand.brandName}"></option>
-                            </block>
-                        </select>
-                        <div class="d-flex justify-content-center">
-                            <a type="button" class="btn btn-primary " th:href="@{/admin/products/add-brand}">Add
-                                brand</a>
-                        </div>
-                    </div>
-
-
-                    <div class="form-group ">
-                        <label for="category">Category:</label>
-                        <select id="category" class="form-control" name="categoryId">
-                            <option value="">Select a Category</option>
-                            <block th:each="cat : ${categories}">
-                                <option th:value="${cat.categoryId}" th:text="${cat.categoryName}"></option>
-                            </block>
-                        </select>
-                        <div class="d-flex justify-content-end">
-                            <a type="button" class="btn btn-primary" th:href="@{/admin/products/add-category}">Add
-                                Category</a>
-                        </div>
-                    </div>
-
-                    <div class="form-group ">
-                        <h3>Select Variant</h3>
-                        <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-primary" onclick="addVariant()">Add Variant</button>
-                        </div>
-                    </div>
-                    <div id="variables">
-                        <!-- This is where we will dynamically add variants -->
-                    </div>
-
-
-                    <div class="d-flex justify-content-start">
-                        <button type="submit" class="btn submitBtn">Continue</button>
-                    </div>
-
-
-                    <script>
-                        function addVariant() {
-                            var variableDiv = document.createElement('div');
-                            variableDiv.className = 'mb-3';
-
-                            variableDiv.innerHTML = `
-              <div class="form-group">
-                  <label for="color">Frame Color:</label>
-                  <input type="text" class="form-control" name="variable.frameColor" required="required">
-              </div>
-              <div class="form-group">
-                  <label for="image1">Image 1 :</label>
-                    <img src="" id="uploaded_image1"
-                                class="img-responsive img-circle">
-                  <input type="file" class="form-control" name="variable.images1" id="image1" required="required" accept="image/*">
-              </div>
-
-              <div class="form-group">
-                  <label for="image2">Image 2:</label>
-                   <img src="" id="uploaded_image2"
-                                class="img-responsive img-circle">
-                  <input type="file" class="form-control" name="variable.image2" id="image2">
-              </div>
-              <div class="form-group">
-                  <label for="image3">Image 3:</label>
-                   <img src="" id="uploaded_image3"
-                                class="img-responsive img-circle">
-                  <input type="file" class="form-control" name="variable.image3" id="image3">
-              </div>
-              <div>
-              </div>
-              <div class="form-group">
-                  <label for="variantQuantity">Quantity:</label>
-                  <input type="text" class="form-control" name="variable.quantity" required="required">
-              </div>
-              `;
-
-                            document.getElementById('variables').appendChild(variableDiv);
-                        }
-                    </script>
-                </form>
-
-            </div>
+    <div class="admin-header">
+        <div class="container">
+            <h1><i class='bx bx-plus me-2'></i>Add Product</h1>
         </div>
     </div>
+    <div class="container pb-5">
+        <div class="form-card">
+            <form th:action="@{/admin/products/add}" method="post" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <!-- Basic Product Info -->
+                    <div class="col-md-6"><label class="form-label">Product Name</label><input type="text"
+                            name="productName" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label">Model Number</label><input type="text"
+                            name="modelNo" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label">Brand</label><select name="brandId"
+                            class="form-select" required>
+                            <option value="">Select Brand</option>
+                            <option th:each="brand : ${brands}" th:value="${brand.brandId}"
+                                th:text="${brand.brandName}"></option>
+                        </select></div>
+                    <div class="col-md-6"><label class="form-label">Category</label><select name="categoryId"
+                            class="form-select" required>
+                            <option value="">Select Category</option>
+                            <option th:each="category : ${categories}" th:value="${category.categoryId}"
+                                th:text="${category.categoryName}"></option>
+                        </select></div>
+                    <div class="col-md-6"><label class="form-label">Price</label><input type="number" name="price"
+                            class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label">Frame Size</label><select name="frameSize"
+                            class="form-select" required>
+                            <option value="">Select Frame Size</option>
+                            <option value="SMALL">Small</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="LARGE">Large</option>
+                        </select></div>
+
+                    <!-- Description -->
+                    <div class="col-12"><label class="form-label">Description</label><textarea name="description"
+                            class="form-control" rows="4" required></textarea></div>
+
+                    <!-- Variant Section -->
+                    <div class="col-12">
+                        <div id="variants-container">
+                            <div class="variant-section">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="variant-title mb-0">Product Variant 1</div>
+                                    <button type="button" class="btn btn-sm btn-danger remove-variant"
+                                        style="display: none;">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Frame Color</label>
+                                        <input type="text" name="variable.frameColor" class="form-control" required
+                                            placeholder="e.g. Black, Gold">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Quantity</label>
+                                        <input type="number" name="variable.quantity" class="form-control" required
+                                            min="0">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Image 1 (Front)</label>
+                                        <input type="file" name="variable.image1" class="form-control" accept="image/*"
+                                            required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Image 2 (Side)</label>
+                                        <input type="file" name="variable.image2" class="form-control" accept="image/*">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Image 3 (Other)</label>
+                                        <input type="file" name="variable.image3" class="form-control" accept="image/*">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <button type="button" class="btn btn-secondary" id="add-variant-btn">
+                                <i class='bx bx-plus me-2'></i>Add Another Variant
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-12"><button type="submit" class="btn-submit w-100"><i
+                                class='bx bx-save me-2'></i>Add Product</button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        $(document).ready(function () {
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('variants-container');
+            const addBtn = document.getElementById('add-variant-btn');
 
-            $('#image1').change(function (e) {
+            // Function to update variant numbers and attach remove listeners
+            function updateVariantNumbersAndListeners() {
+                const variants = container.children;
+                for (let i = 0; i < variants.length; i++) {
+                    const variant = variants[i];
+                    variant.querySelector('.variant-title').textContent = `Product Variant ${i + 1}`;
 
-                var image = document.getElementById('uploaded_image1')
-                var files = e.target.files;
+                    const removeBtn = variant.querySelector('.remove-variant');
+                    // Show remove button for all but the first variant
+                    if (i === 0) {
+                        removeBtn.style.display = 'none';
+                    } else {
+                        removeBtn.style.display = 'block';
+                    }
 
-                var done = function (url) {
+                    // Remove existing listener to prevent duplicates
+                    const oldRemoveBtn = removeBtn.cloneNode(true);
+                    removeBtn.parentNode.replaceChild(oldRemoveBtn, removeBtn);
 
-                    image.src = url;
-
-                };
-
-                if (files && files.length > 0) {
-                    reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        done(reader.result)
-                    };
-
-                    reader.readAsDataURL(files[0]);
-
+                    oldRemoveBtn.addEventListener('click', function () {
+                        variant.remove();
+                        updateVariantNumbersAndListeners(); // Re-index after removal
+                    });
                 }
+            }
 
+            // Initial setup for the first variant
+            updateVariantNumbersAndListeners();
+
+            addBtn.addEventListener('click', function () {
+                const template = container.firstElementChild.cloneNode(true);
+
+                // Reset inputs and file inputs
+                const inputs = template.querySelectorAll('input:not([type="hidden"])'); // Exclude hidden inputs if any
+                inputs.forEach(input => {
+                    if (input.type === 'file') {
+                        input.value = ''; // Clear file input
+                    } else {
+                        input.value = ''; // Clear text/number inputs
+                    }
+                });
+
+                container.appendChild(template);
+                updateVariantNumbersAndListeners(); // Update numbers and attach listener for new variant
             });
-
-            $('#image2').change(function (e) {
-
-                var image = document.getElementById('uploaded_image2');
-
-                var file = e.target.files;
-
-                var done = function (url) {
-                    image.src = url;
-                };
-
-                if (files && files.length > 0) {
-                    reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        done(reader.result)
-                    };
-
-                    reader.readAsDataURL(files[0]);
-                };
-
-            });
-
-            $('#image3').change(function (e) {
-
-                var image = document.getElementById('uploaded_images3');
-
-                var file = e.target.files;
-                var done = function (url) {
-                    image.src = url;
-                };
-                if (files && files.length > 0) {
-                    reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        done(reader.result)
-                    };
-
-                    reader.readAsDataURL(files[0]);
-                };
-            });
-
         });
     </script>
 </body>
