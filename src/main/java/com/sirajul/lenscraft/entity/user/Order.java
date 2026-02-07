@@ -21,11 +21,8 @@ import java.util.*;
 public class Order {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.UUID
-    )
+    @GeneratedValue(strategy = GenerationType.UUID)
     UUID orderId;
-
 
     @ManyToOne
     UserInformation user;
@@ -59,7 +56,10 @@ public class Order {
 
     @ManyToOne
     Coupon couponApplied;
-    public Order(){
+
+    Double walletAmount;
+
+    public Order() {
         orderItems = new ArrayList<>();
         deliveryDate = LocalDateTime.now().plusDays(7);
         paymentDetails = new OrderPaymentDetails();

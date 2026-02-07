@@ -46,6 +46,9 @@ public class OrderServiceImp implements OrderService {
     @Autowired
     OrderedItemsRepository orderedItemsRepository;
 
+    @Autowired
+    com.sirajul.lenscraft.Repository.WalletRepository walletRepository;
+
     @Override
     public Order saveAndReturn(OrderDto orderDto) {
         List<OrderItem> orderItems = new ArrayList<>();
@@ -71,10 +74,16 @@ public class OrderServiceImp implements OrderService {
 
             order.setCouponApplied(coupon);
         }
-        switch (orderDto.getPaymentType()) {
-            case "CASH ON DELIVERY" -> order.getPaymentDetails().setPaymentType(PaymentType.CASH_ON_DELIVERY);
 
-            case "UPI PAYMENT" -> order.getPaymentDetails().setPaymentType(PaymentType.UPI_PAYMENT);
+        // Set payment type based on orderDto - wallet processing is now done in
+        // PaymentService
+        if (orderDto.getPaymentType() != null) {
+            switch (orderDto.getPaymentType()) {
+                case "WALLET" -> order.getPaymentDetails().setPaymentType(PaymentType.WALLET);
+                case "CASH ON DELIVERY" -> order.getPaymentDetails().setPaymentType(PaymentType.CASH_ON_DELIVERY);
+                case "UPI PAYMENT" -> order.getPaymentDetails().setPaymentType(PaymentType.UPI_PAYMENT);
+                case "WALLET_PLUS_UPI" -> order.getPaymentDetails().setPaymentType(PaymentType.WALLET_PLUS_UPI);
+            }
         }
 
         order = orderRepository.save(order);

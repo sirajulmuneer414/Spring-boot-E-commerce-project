@@ -109,52 +109,54 @@
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
-    <div class="admin-header">
-        <div class="container">
-            <h1><i class='bx bx-user me-2'></i>Customer Management</h1>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
+    <div class="body-pd" id="body-pd">
+        <div class="admin-header">
+            <div class="container">
+                <h1><i class='bx bx-user me-2'></i>Customer Management</h1>
+            </div>
         </div>
-    </div>
-    <div class="container pb-5">
-        <div class="table-card">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="customer : ${userList}">
-                        <td th:text="${customer.id}">1</td>
-                        <td th:text="${customer.firstName + ' ' + customer.lastName}">Name</td>
-                        <td th:text="${customer.emailId}">Email</td>
-                        <td th:text="${customer.role}">Role</td>
-                        <td>
-                            <span class="status-active" th:if="${customer.userStatus == 'ACTIVE'}">Active</span>
-                            <span class="status-blocked" th:if="${customer.userStatus == 'BLOCKED'}">Blocked</span>
-                        </td>
-                        <td>
-                            <div class="d-flex gap-2">
-                                <a th:href="@{/admin/customers/update/{id}(id=${customer.id})}"
-                                    class="btn-action btn-edit text-decoration-none">Edit</a>
-                                <a th:href="@{/admin/customers/block/{id}(id=${customer.id})}"
-                                    th:if="${customer.userStatus == 'ACTIVE'}"
-                                    class="btn-action btn-block text-decoration-none">Block</a>
-                                <a th:href="@{/admin/customers/unblock/{id}(id=${customer.id})}"
-                                    th:if="${customer.userStatus == 'BLOCKED'}"
-                                    class="btn-action btn-block text-decoration-none"
-                                    style="background: #10b981;">Unblock</a>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="container pb-5">
+            <div class="table-card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="customer : ${userList}">
+                            <td th:text="${customer.id}">1</td>
+                            <td th:text="${customer.firstName + ' ' + customer.lastName}">Name</td>
+                            <td th:text="${customer.emailId}">Email</td>
+                            <td th:text="${customer.role}">Role</td>
+                            <td>
+                                <span class="status-active" th:if="${customer.userStatus == 'ACTIVE'}">Active</span>
+                                <span class="status-blocked" th:if="${customer.userStatus == 'BLOCKED'}">Blocked</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a th:href="@{/admin/customers/update/{id}(id=${customer.id})}"
+                                        class="btn-action btn-edit text-decoration-none">Edit</a>
+                                    <a th:href="@{/admin/customers/block/{id}(id=${customer.id})}"
+                                        th:if="${customer.userStatus == 'ACTIVE'}"
+                                        class="btn-action btn-block text-decoration-none">Block</a>
+                                    <a th:href="@{/admin/customers/unblock/{id}(id=${customer.id})}"
+                                        th:if="${customer.userStatus == 'BLOCKED'}"
+                                        class="btn-action btn-block text-decoration-none"
+                                        style="background: #10b981;">Unblock</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 </body>
 
 </html>

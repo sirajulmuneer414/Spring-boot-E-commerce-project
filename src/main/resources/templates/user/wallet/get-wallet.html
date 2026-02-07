@@ -313,8 +313,8 @@
                   </td>
                   <td class="text-end">
                     <span
-                      th:classappend="${transaction.transactionStatus.name() == 'DEBIT' ? 'amount-credit' : 'amount-debit'}"
-                      th:text="${transaction.transactionStatus.name() == 'DEBIT' ? '+₹' + transaction.amount : '-₹' + transaction.amount}">
+                      th:classappend="${transaction.transactionStatus.name() == 'DEBIT' ? 'amount-debit' : 'amount-credit'}"
+                      th:text="${transaction.transactionStatus.name() == 'DEBIT' ? '-₹' + transaction.amount : '+₹' + transaction.amount}">
                       ₹0
                     </span>
                   </td>
@@ -341,7 +341,8 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" style="padding: 24px;">
-          <form th:action="@{/user/addMoney}" method="post" id="payment-form" onsubmit="paymentStart(event)">
+          <form th:action="@{/wallet/addMoney}" method="post" id="payment-form" onsubmit="paymentStart(event)">
+            <input type="hidden" name="userId" th:value="${user.userId}">
             <div class="mb-3">
               <label for="amount" class="form-label fw-600">Amount (₹)</label>
               <input type="text" class="form-control" id="amount" name="amount" placeholder="Enter amount" required

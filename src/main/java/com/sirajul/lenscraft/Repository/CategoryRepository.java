@@ -8,10 +8,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category,Long> {
-
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     boolean existsByCategoryNameIgnoreCase(String categoryName);
 
     List<Category> findAllByCategoryStatus(CategoryStatus name);
+
+    List<Category> findAllByIsHavingOfferTrue();
 }

@@ -1,41 +1,33 @@
 package com.sirajul.lenscraft.Controller.User;
 
-import com.razorpay.RazorpayClient;
-import com.sirajul.lenscraft.DTO.Product.CouponDto;
-import com.sirajul.lenscraft.DTO.ToPassBoolean;
-import com.sirajul.lenscraft.DTO.order.OrderDto;
 import com.sirajul.lenscraft.Service.interfaces.*;
 import com.sirajul.lenscraft.comparator.CartedItemComparator;
 import com.sirajul.lenscraft.entity.product.Product;
 import com.sirajul.lenscraft.entity.product.Variables;
 import com.sirajul.lenscraft.entity.user.*;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Var;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Controller handling user-related operations: wishlist, cart, and address
+ * management.
+ * Checkout and payment operations are in UserCheckoutController.
+ */
 @Controller
 @RequestMapping("/user")
 @Slf4j
 public class UserController {
-    @Autowired
-    UserService userService;
 
     @Autowired
-    ReferralOfferService referralOfferService;
+    UserService userService;
 
     @Autowired
     ProductService productService;
@@ -47,25 +39,10 @@ public class UserController {
     AddressService addressService;
 
     @Autowired
-    WishlistService wishlistService;
-
-    @Autowired
     CartedItemsService cartedItemsService;
 
     @Autowired
     CartService cartService;
-
-    @Autowired
-    OrderService orderService;
-
-    @Autowired
-    CouponService couponService;
-
-    @Value("${razorpay.key.id}")
-    private String razorpayKeyId;
-
-    @Value("${razorpay.key.secret}")
-    private String razorpayKeySecret;
 
     @GetMapping("/wishlist")
     public String getWishlist(Model model) {
@@ -159,7 +136,11 @@ public class UserController {
         Integer totalAmount = 0;
 
         for (CartedItems item : cartedItems) {
-
+            // Sync price with product's current discounted price
+            if (!item.getCurrentPrice().equals(item.getProduct().getDiscountedPrice() * item.getQuantity())) {
+                item.setCurrentPrice(item.getProduct().getDiscountedPrice() * item.getQuantity());
+                cartedItemsService.saveCartedItem(item);
+            }
             totalAmount += item.getCurrentPrice();
 
         }
@@ -238,32 +219,6 @@ public class UserController {
 
     }
 
-    @PostMapping("/cart/offer/apply")
-    public String applyOffer(
-            @RequestParam("couponId") UUID couponId,
-            @RequestParam("userId") UUID userId,
-            HttpSession session
-
-    ) {
-
-        Integer discount = (Integer) session.getAttribute("discount");
-
-        Coupon coupon = couponService.findCouponById(couponId);
-
-        discount = coupon.getDiscountPercentage();
-
-        session.setAttribute("discount", discount);
-
-        UUID couponIdDto = (UUID) session.getAttribute("couponId");
-
-        couponIdDto = couponId;
-
-        session.setAttribute("couponId", couponId);
-
-        return "redirect:/user/cart/buy/" + userId;
-
-    }
-
     @GetMapping("/cart/quantity/add/{cartedItemId}")
     public String addQuantityInCart(
             @PathVariable("cartedItemId") Long cartedItemId,
@@ -309,225 +264,6 @@ public class UserController {
         return "redirect:/user/cart";
     }
 
-    @GetMapping("/cart/buy/{userId}")
-    public String buyFromCart(
-            HttpSession session,
-            Model model,
-            @PathVariable("userId") UUID userId) {
-        UserInformation user = userService.findById(userId);
-        Cart cart = user.getCart();
-        List<CartedItems> items = cart.getCartedItems();
-
-        Integer discount = (Integer) session.getAttribute("discount");
-
-        model.addAttribute("delivery", 40);
-        model.addAttribute("username", user.getEmailId());
-        model.addAttribute("userId", userId);
-        model.addAttribute("items", items);
-
-        UUID couponIdDto = (UUID) session.getAttribute("couponId");
-
-        OrderDto orderDto = new OrderDto();
-        orderDto.setUserId(user.getUserId());
-        orderDto.setItemsToBuy(items);
-        Integer totalAmount = 0;
-
-        for (CartedItems item : items) {
-
-            totalAmount += item.getCurrentPrice();
-
-        }
-        totalAmount += 40;
-
-        int discountedPrice = 0;
-        if (couponIdDto != null) {
-            orderDto.setCouponId(couponIdDto);
-
-            CouponDto coupon = couponService.findCouponByIdDto(couponIdDto);
-
-            model.addAttribute("couponSelected", coupon);
-
-            discountedPrice = (totalAmount * coupon.getDiscountPercentage()) / 100;
-        } else {
-            model.addAttribute("couponSelected", null);
-        }
-
-        totalAmount -= discountedPrice;
-
-        model.addAttribute("discount", discountedPrice);
-
-        orderDto.setTotalAmount(totalAmount);
-
-        session.setAttribute("order", orderDto);
-
-        List<CouponDto> couponDtos = couponService.findCouponsForUser(user, totalAmount);
-
-        model.addAttribute("orderDto", orderDto);
-        model.addAttribute("coupons", couponDtos);
-
-        return "buy/order-summary";
-    }
-
-    @PostMapping("/payment/razor")
-    @ResponseBody
-    public ResponseEntity<String> createOrder(HttpSession session) throws Exception {
-
-        OrderDto dto = (OrderDto) session.getAttribute("order");
-        if (dto == null) {
-            JSONObject errorResponse = new JSONObject();
-            errorResponse.put("status", "error");
-            errorResponse.put("message", "Session expired or invalid order.");
-            return new ResponseEntity<>(errorResponse.toString(), HttpStatus.BAD_REQUEST);
-        }
-
-        int amount = dto.getTotalAmount();
-
-        session.setAttribute("order", dto);
-        var client = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
-        JSONObject orderRequest = new JSONObject();
-        orderRequest.put("amount", amount * 100);
-        orderRequest.put("currency", "INR");
-        orderRequest.put("receipt", "txn_2345433");
-        com.razorpay.Order order = client.orders.create(orderRequest);
-
-        // Add the Razorpay key to the response
-        JSONObject response = new JSONObject(order.toString());
-        response.put("key", razorpayKeyId);
-
-        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
-    }
-
-    @GetMapping("/buy/address/change")
-    public String addAddressToOrder(
-            Model model,
-            HttpSession session
-
-    ) {
-
-        OrderDto orderDto = (OrderDto) session.getAttribute("order");
-
-        if (orderDto == null) {
-            return "redirect:/user/cart";
-        }
-
-        UserInformation user = userService.findById(orderDto.getUserId());
-
-        List<Address> addresses = user.getAddresses();
-
-        List<Address> addressToShow = new ArrayList<>();
-
-        for (Address add : addresses) {
-            if (add.isActive()) {
-                addressToShow.add(add);
-            }
-        }
-
-        String username = user.getEmailId();
-
-        model.addAttribute("username", username);
-
-        model.addAttribute("addresses", addressToShow);
-
-        session.setAttribute("order", orderDto);
-
-        return "buy/change-address";
-    }
-
-    @PostMapping("/buy/address/change")
-    public String postChangeAddress(
-            HttpSession session,
-            @RequestParam("addressId") Long addressId,
-            @RequestParam("username") String username) {
-
-        OrderDto orderDto = (OrderDto) session.getAttribute("order");
-        if (orderDto == null) {
-            return "redirect:/user/cart";
-        }
-
-        orderDto.setAddressId(addressId);
-
-        session.setAttribute("order", orderDto);
-
-        return "redirect:/user/cart/buy/payment";
-    }
-
-    @GetMapping("/cart/buy/payment")
-    public String getPayment(Model model,
-            HttpSession session) {
-
-        OrderDto dto = (OrderDto) session.getAttribute("order");
-        if (dto == null) {
-            return "redirect:/user/cart";
-        }
-
-        Integer totalAmount = dto.getTotalAmount();
-
-        model.addAttribute("totalAmount", totalAmount);
-
-        session.setAttribute("order", dto);
-        return "buy/payment";
-    }
-
-    @PostMapping("/cart/buy/payment")
-    public String postPayment(
-            @RequestParam("paymentType") String paymentType,
-            HttpSession session) {
-        OrderDto orderDto = (OrderDto) session.getAttribute("order");
-        if (orderDto == null) {
-            return "redirect:/user/cart";
-        }
-
-        orderDto.setPaymentType(paymentType);
-
-        session.setAttribute("order", orderDto);
-
-        return "redirect:/user/cart/buy/confirm";
-    }
-
-    @GetMapping("/cart/buy/confirm")
-    public String confirmOrder(
-            Model model,
-            HttpSession session) {
-
-        OrderDto orderDto = (OrderDto) session.getAttribute("order");
-        if (orderDto == null) {
-            return "redirect:/user/cart";
-        }
-
-        System.out.println(orderDto.getAddressId());
-        System.out.println(orderDto.getPaymentType());
-        System.out.println(orderDto.getTotalAmount());
-
-        Order order = orderService.saveAndReturn(orderDto);
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        UserInformation user = userService.findByEmailId(auth.getName());
-
-        user.getOrders().add(order);
-
-        Cart cart = user.getCart();
-
-        List<CartedItems> cartedItems = new ArrayList<>(cart.getCartedItems());
-        Iterator<CartedItems> iterator = cartedItems.iterator();
-
-        while (iterator.hasNext()) {
-            CartedItems items = iterator.next();
-            cartedItemsService.deleteCartedItem(items);
-            iterator.remove(); // Use iterator's remove method to avoid ConcurrentModificationException
-        }
-
-        cart.setCartedItems(cartedItems); // Update the cart with the modified list
-
-        user.setCart(cart);
-
-        userService.save(user);
-
-        model.addAttribute("userId", user.getUserId());
-        model.addAttribute("username", auth.getName());
-
-        return "buy/order-confirmed";
-    }
     // @GetMapping("/address")
     // public String getAddress(
     // Model model,

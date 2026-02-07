@@ -161,39 +161,6 @@ public class MainController {
         return "login";
     }
 
-    // @GetMapping("/signup")
-    // public String loginProcessing(){
-    // Authentication securityAuthentication =
-    // SecurityContextHolder.getContext().getAuthentication();
-    // Set<String> roles =
-    // AuthorityUtils.authorityListToSet(securityAuthentication.getAuthorities());
-    // if(!(securityAuthentication instanceof AnonymousAuthenticationToken)) {
-    // if (roles.contains(Role.ADMIN.name())) {
-    // return "redirect:/admin/dashboard";
-    // }
-    // }
-    // return "redirect:/shop";
-    // }
-
-    // @GetMapping("/signup")
-    // public String Login(){
-    // Authentication securityAuthentication =
-    // SecurityContextHolder.getContext().getAuthentication();
-    // Set<String> roles =
-    // AuthorityUtils.authorityListToSet(securityAuthentication.getAuthorities());
-    //
-    // System.out.println(roles);
-    //
-    // if(!(securityAuthentication instanceof AnonymousAuthenticationToken)){
-    // if(roles.contains(Role.ADMIN.name())){
-    // return "redirect:/admin/dashboard";
-    // }
-    // else{
-    // return "redirect:/shop";
-    // }
-    // }
-    // return "redirect:/login";
-    // }
     @GetMapping("/")
     public String getShop(Model model) {
         System.out.println("Entering root mapping /");

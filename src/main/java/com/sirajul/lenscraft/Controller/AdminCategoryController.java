@@ -165,7 +165,7 @@ public class AdminCategoryController {
             categoryService.deleteCategory(category);
             return "redirect:/admin/category";
         }
-        redirectAttributes.addFlashAttribute("error", "The category already in use");
+        redirectAttributes.addFlashAttribute("error", "Cannot delete category with existing products");
         return "redirect:/admin/category";
 
     }

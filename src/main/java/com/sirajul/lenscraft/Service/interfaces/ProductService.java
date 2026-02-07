@@ -11,7 +11,8 @@ import java.util.List;
 public interface ProductService {
     List<Product> findAllProducts();
 
-    Product saveProductAndGetProduct(ProductDto productDto, List<MultipartFile> image1, List<MultipartFile> image2, List<MultipartFile> image3);
+    Product saveProductAndGetProduct(ProductDto productDto, List<MultipartFile> image1, List<MultipartFile> image2,
+            List<MultipartFile> image3);
 
     List<String> getFrameColorsById(Product product);
 
@@ -22,7 +23,6 @@ public interface ProductService {
     void updateProduct(ProductDto productDto);
 
     void save(Product product);
-
 
     List<Product> findAllProductsContaining(String keyword);
 
@@ -43,4 +43,6 @@ public interface ProductService {
     Page<Product> findAllProductsContainingActive(String keyword, int pageNo, int pageSize);
 
     Page<Product> findAllProductsInPageableActive(int pageNo, int pageSize);
+
+    List<Product> findAllProductsWithOffers();
 }

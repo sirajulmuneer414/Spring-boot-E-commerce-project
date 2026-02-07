@@ -20,4 +20,10 @@ public class OrderPaymentDetails {
     @Column(nullable = true)
     String paymentId;
 
+    @Column(nullable = true)
+    String razorpayOrderId;
+
+    @Column(nullable = true)
+    String razorpaySignature;
+
 }

@@ -75,17 +75,17 @@ public class VariableServiceImp implements VariableService {
 
         String folder = "lenscraft/productImages/" + variableFromDB.getProduct().getProductId();
 
-        if (!image1.isEmpty()) {
+        if (image1 != null && !image1.isEmpty()) {
             log.info("image 1 changed");
             String url = cloudinaryService.uploadFile(image1, folder);
             variableFromDB.setImage1(url);
         }
-        if (!image2.isEmpty()) {
+        if (image2 != null && !image2.isEmpty()) {
             log.info("image 2 changed");
             String url = cloudinaryService.uploadFile(image2, folder);
             variableFromDB.setImage2(url);
         }
-        if (!image3.isEmpty()) {
+        if (image3 != null && !image3.isEmpty()) {
             log.info("image 3 changed");
             String url = cloudinaryService.uploadFile(image3, folder);
             variableFromDB.setImage3(url);

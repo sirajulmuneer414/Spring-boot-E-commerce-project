@@ -47,7 +47,7 @@
             border-radius: 16px;
             padding: 32px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto
         }
 
@@ -83,27 +83,150 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3)
         }
+
+        .color-display {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 12px
+        }
+
+        .image-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px
+        }
+
+        .current-image {
+            width: 100%;
+            height: 180px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px
+        }
+
+        .current-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain
+        }
+
+        .current-image .no-image {
+            color: #94a3b8;
+            font-size: 0.9rem
+        }
+
+        .image-label {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .image-label .badge {
+            font-size: 0.7rem;
+            font-weight: 500
+        }
     </style>
 </head>
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
     <div class="admin-header">
         <div class="container">
             <h1><i class='bx bx-edit me-2'></i>Edit Product Variant</h1>
         </div>
     </div>
-    <div class="container pb-5">
+    <div class="container pb-5 body-pd" id="body-pd">
         <div class="form-card">
-            <form th:action="@{/admin/variables/edit}" method="post" th:object="${variable}">
+            <form th:action="@{/admin/products/edit-variable/{id}(id=${variable.variableId})}" method="post"
+                th:object="${variable}" enctype="multipart/form-data">
                 <input type="hidden" th:field="*{variableId}">
-                <div class="row g-3">
-                    <div class="col-md-6"><label class="form-label">Frame Color</label><input type="color"
-                            th:field="*{frameColor}" class="form-control" required></div>
-                    <div class="col-md-6"><label class="form-label">Stock</label><input type="number"
-                            th:field="*{stock}" class="form-control" required></div>
-                    <div class="col-12"><button type="submit" class="btn-submit w-100"><i
-                                class='bx bx-save me-2'></i>Update Variant</button></div>
+
+                <!-- Color Display (Read-only) and Quantity -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Frame Color</label>
+                        <div class="d-flex align-items-center">
+                            <div class="color-display" th:style="'background-color:' + *{frameColor}"></div>
+                            <span th:text="*{frameColor}" class="text-muted">Color</span>
+                        </div>
+                        <input type="hidden" th:field="*{frameColor}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Stock Quantity</label>
+                        <input type="number" th:field="*{quantity}" class="form-control" min="0" required>
+                    </div>
+                </div>
+
+                <!-- Images Section -->
+                <h5 class="mb-3"><i class='bx bx-images me-2'></i>Product Images</h5>
+                <p class="text-muted small mb-4">Leave image field empty to keep the current image. Upload a new file to
+                    replace it.</p>
+
+                <div class="row g-4">
+                    <!-- Primary Image -->
+                    <div class="col-md-4">
+                        <div class="image-section">
+                            <div class="image-label">
+                                <span>Primary Image</span>
+                                <span class="badge bg-primary">Required</span>
+                            </div>
+                            <div class="current-image">
+                                <img th:if="${variable.image1 != null}" th:src="${variable.image1}" alt="Primary Image">
+                                <span th:unless="${variable.image1 != null}" class="no-image">No image</span>
+                            </div>
+                            <input type="file" name="variable.image1" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+
+                    <!-- 2nd Image -->
+                    <div class="col-md-4">
+                        <div class="image-section">
+                            <div class="image-label">
+                                <span>2nd Image</span>
+                                <span class="badge bg-secondary">Optional</span>
+                            </div>
+                            <div class="current-image">
+                                <img th:if="${variable.image2 != null}" th:src="${variable.image2}" alt="2nd Image">
+                                <span th:unless="${variable.image2 != null}" class="no-image">No image</span>
+                            </div>
+                            <input type="file" name="variable.image2" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+
+                    <!-- 3rd Image -->
+                    <div class="col-md-4">
+                        <div class="image-section">
+                            <div class="image-label">
+                                <span>3rd Image</span>
+                                <span class="badge bg-secondary">Optional</span>
+                            </div>
+                            <div class="current-image">
+                                <img th:if="${variable.image3 != null}" th:src="${variable.image3}" alt="3rd Image">
+                                <span th:unless="${variable.image3 != null}" class="no-image">No image</span>
+                            </div>
+                            <input type="file" name="variable.image3" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn-submit w-100">
+                        <i class='bx bx-save me-2'></i>Update Variant
+                    </button>
                 </div>
             </form>
         </div>

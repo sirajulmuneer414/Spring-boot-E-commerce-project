@@ -98,48 +98,62 @@
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
-    <div class="admin-header">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h1><i class='bx bx-box me-2'></i>Products</h1>
-            <a th:href="@{/admin/products/add}" class="btn-add"><i class='bx bx-plus me-2'></i>Add Product</a>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
+    <div class="body-pd" id="body-pd">
+        <div class="admin-header">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h1><i class='bx bx-box me-2'></i>Products</h1>
+                <a th:href="@{/admin/products/add}" class="btn-add"><i class='bx bx-plus me-2'></i>Add Product</a>
+            </div>
         </div>
-    </div>
-    <div class="container pb-5">
-        <div class="table-card">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Brand</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Stock</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="product : ${products}">
-                        <td th:text="${product.productId}">1</td>
-                        <td><img th:src="${#strings.startsWith(product.variables[0].image1, 'http') ? product.variables[0].image1 : '/productImages/'+product.productId+'/'+product.variables[0].image1}"
-                                style="width:50px;height:50px;border-radius:8px;object-fit:cover" alt="Product"></td>
-                        <td th:text="${product.productName}">Name</td>
-                        <td th:text="${product.brand.brandName}">Brand</td>
-                        <td th:text="${product.category.categoryName}">Category</td>
-                        <td th:text="'₹' + ${product.price}">Price</td>
-                        <td th:text="${product.stockStatus}">Stock</td>
-                        <td>
-                            <a th:href="@{/admin/products/edit/{id}(id=${product.productId})}"
-                                class="btn-action btn-edit">Edit</a>
-                            <form th:action="@{/admin/products/delete/{id}(id=${product.productId})}" method="post"
-                                style="display:inline">
-                                <button type="submit" class="btn-action btn-delete">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="container pb-5">
+            <div class="table-card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Brand</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${products}">
+                            <td th:text="${product.productId}">1</td>
+                            <td><img th:src="${#strings.startsWith(product.variables[0].image1, 'http') ? product.variables[0].image1 : '/productImages/'+product.productId+'/'+product.variables[0].image1}"
+                                    style="width:50px;height:50px;border-radius:8px;object-fit:cover" alt="Product">
+                            </td>
+                            <td th:text="${product.productName}">Name</td>
+                            <td th:text="${product.brand.brandName}">Brand</td>
+                            <td th:text="${product.category.categoryName}">Category</td>
+                            <td th:text="'₹' + ${product.price}">Price</td>
+                            <td th:text="${product.stockStatus}">Stock</td>
+                            <td>
+                                <a th:href="@{/admin/products/edit/{id}(id=${product.productId})}"
+                                    class="btn-action btn-edit">Edit</a>
+
+                                <!-- Offer Buttons -->
+                                <a th:if="${product.isHavingOffer}"
+                                    th:href="@{/admin/offer/product/edit/{id}(id=${product.productId})}"
+                                    class="btn-action" style="background: #f59e0b; text-decoration: none;">Edit
+                                    Offer</a>
+                                <a th:unless="${product.isHavingOffer}"
+                                    th:href="@{/admin/offer/product/add/{id}(id=${product.productId})}"
+                                    class="btn-action" style="background: #10b981; text-decoration: none;">Add Offer</a>
+
+                                <form th:action="@{/admin/products/delete/{id}(id=${product.productId})}" method="post"
+                                    style="display:inline">
+                                    <button type="submit" class="btn-action btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>

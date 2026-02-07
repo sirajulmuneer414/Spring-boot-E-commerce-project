@@ -98,46 +98,48 @@
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
-    <div class="admin-header">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h1><i class='bx bx-money me-2'></i>Coupons</h1>
-            <a th:href="@{/admin/coupons/add}" class="btn-add"><i class='bx bx-plus me-2'></i>Add Coupon</a>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
+    <div class="body-pd" id="body-pd">
+        <div class="admin-header">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h1><i class='bx bx-money me-2'></i>Coupons</h1>
+                <a th:href="@{/admin/coupons/add}" class="btn-add"><i class='bx bx-plus me-2'></i>Add Coupon</a>
+            </div>
         </div>
-    </div>
-    <div class="container pb-5">
-        <div class="table-card">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Discount %</th>
-                        <th>Min Amount</th>
+        <div class="container pb-5">
+            <div class="table-card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Discount %</th>
+                            <th>Min Amount</th>
 
-                        <th>Valid Until</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="coupon : ${coupons}">
-                        <td th:text="${coupon.couponId}">1</td>
-                        <td><code th:text="${coupon.couponCode}">CODE</code></td>
-                        <td th:text="${coupon.couponName}">Name</td>
-                        <td th:text="${coupon.discountPercentage + '%'}">10%</td>
-                        <td th:text="'₹' + ${coupon.minimumAmount}">₹500</td>
-                        <td th:text="${coupon.endDate}">Date</td>
-                        <td>
-                            <form th:action="@{/admin/coupons/delete/{id}(id=${coupon.couponId})}" method="post"
-                                style="display:inline">
-                                <button type="submit" class="btn-action btn-delete">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            <th>Valid Until</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="coupon : ${coupons}">
+                            <td th:text="${coupon.couponId}">1</td>
+                            <td><code th:text="${coupon.couponCode}">CODE</code></td>
+                            <td th:text="${coupon.couponName}">Name</td>
+                            <td th:text="${coupon.discountPercentage + '%'}">10%</td>
+                            <td th:text="'₹' + ${coupon.minimumAmount}">₹500</td>
+                            <td th:text="${coupon.endDate}">Date</td>
+                            <td>
+                                <form th:action="@{/admin/coupons/delete/{id}(id=${coupon.couponId})}" method="post"
+                                    style="display:inline">
+                                    <button type="submit" class="btn-action btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 </body>
 
 </html>

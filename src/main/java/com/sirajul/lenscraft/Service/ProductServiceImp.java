@@ -186,4 +186,9 @@ public class ProductServiceImp implements ProductService {
         // Return the page with products and pageable information
         return new PageImpl<>(products, pageable, products.size());
     }
+
+    @Override
+    public List<Product> findAllProductsWithOffers() {
+        return productRepository.findAllByIsHavingOfferTrue();
+    }
 }

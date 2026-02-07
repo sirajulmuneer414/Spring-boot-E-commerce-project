@@ -26,4 +26,6 @@ public interface CategoryService {
     void update(Category prod);
 
     void saveProductFromCategory(Product product);
+
+    List<Category> findAllCategoriesWithOffers();
 }

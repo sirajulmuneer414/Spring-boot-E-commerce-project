@@ -160,7 +160,7 @@
                         <!-- Price Section -->
                         <div class="d-flex align-items-center gap-3 mb-4">
                             <h2 class="fw-bold text-dark mb-0" th:text="'₹' + ${product.discountedPrice}">₹0.00</h2>
-                            <div th:if="${product.isHavingOffer or product.category.isHavingOffer}"
+                            <div th:if="${(product.isHavingOffer or product.category.isHavingOffer) and product.discountedPrice != null and product.discountedPrice > 0 and product.discountedPrice < product.price}"
                                 class="d-flex align-items-center gap-2">
                                 <span class="text-muted text-decoration-line-through fs-5"
                                     th:text="'₹' + ${product.price}">₹0.00</span>

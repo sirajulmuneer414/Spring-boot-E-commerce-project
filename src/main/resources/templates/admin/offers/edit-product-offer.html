@@ -90,6 +90,7 @@
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
     <div class="admin-header">
         <div class="container">
             <h1><i class='bx bx-edit me-2'></i>Edit Product Offer</h1>
@@ -97,21 +98,47 @@
     </div>
     <div class="container pb-5">
         <div class="form-card">
-            <form th:action="@{/admin/offers/edit-product}" method="post" th:object="${offer}">
-                <input type="hidden" th:field="*{offerId}">
-                <div class="row g-3">
-                    <div class="col-md-12"><label class="form-label">Offer Name</label><input type="text"
-                            th:field="*{offerName}" class="form-control" required></div>
-                    <div class="col-md-6"><label class="form-label">Discount %</label><input type="number"
-                            th:field="*{offerPercentage}" class="form-control" min="1" max="100" required></div>
-                    <div class="col-md-6"><label class="form-label">Expiry Date</label><input type="date"
-                            th:field="*{expiryDate}" class="form-control" required></div>
-                    <div class="col-12"><button type="submit" class="btn-submit w-100"><i
-                                class='bx bx-save me-2'></i>Update Offer</button></div>
+            <form th:action="@{/admin/offer/product/edit/{id}(id=${productId})}" method="post" th:object="${offer}">
+                <!-- Removed invalid offerId field -->
+                <div class="col-md-12"><label class="form-label">Offer Name</label><input type="text"
+                        th:field="*{offerDescription}" class="form-control" required></div>
+                <div class="col-md-6"><label class="form-label">Discount %</label><input type="number"
+                        th:field="*{offerPercentage}" class="form-control" min="1" max="100" required></div>
+                <div class="col-md-6"><label class="form-label">Expiry Date</label>
+                    <input type="date" th:field="*{endDate}" class="form-control">
+                    <small class="text-muted" th:if="${offer.endDate != null}">Current: <span
+                            th:text="${offer.endDate}"></span></small>
                 </div>
-            </form>
+                <div class="col-12"><button type="submit" class="btn-submit w-100"><i class='bx bx-save me-2'></i>Update
+                        Offer</button></div>
         </div>
+        </form>
     </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const expiryDateInput = document.querySelector('input[name="endDate"]');
+            const form = document.querySelector('form');
+
+            // Set min expiry date to tomorrow (or kept as is if already in future)
+            const today = new Date();
+            today.setDate(today.getDate() + 1);
+            const tomorrow = today.toISOString().split('T')[0];
+            expiryDateInput.setAttribute('min', tomorrow);
+
+            form.addEventListener('submit', function (e) {
+                const expiryDate = new Date(expiryDateInput.value);
+                const todayDate = new Date();
+                todayDate.setHours(0, 0, 0, 0);
+
+                if (expiryDate <= todayDate) {
+                    e.preventDefault();
+                    alert('Expiry date must be in the future');
+                    return;
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

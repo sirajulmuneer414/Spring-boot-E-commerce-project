@@ -84,4 +84,35 @@ public class WalletController {
             return new ResponseEntity<>(errorResponse.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/addMoney")
+    public String addMoney(
+            @RequestParam("userId") UUID userId,
+            @RequestParam("amount") Integer amount) {
+
+        UserInformation user = userService.findById(userId);
+        Wallet wallet = user.getWallet();
+
+        if (wallet == null) {
+            wallet = new Wallet();
+            wallet.setUser(user);
+            wallet.setBalance(0);
+        }
+
+        wallet.setBalance(wallet.getBalance() + amount);
+
+        Transactions transaction = new Transactions();
+        transaction.setWallet(wallet);
+        transaction.setAmount(amount);
+        transaction.setTransactionType(com.sirajul.lenscraft.entity.wallet.enums.TypeOfTransaction.ADD_MONEY);
+        transaction.setTransactionStatus(com.sirajul.lenscraft.entity.wallet.enums.TransactionStatus.CREDIT);
+        transaction.setTransactionTime(java.time.LocalDateTime.now());
+
+        wallet.getTransactions().add(transaction);
+
+        user.setWallet(wallet);
+        userService.save(user); // This should cascade save wallet and transactions
+
+        return "redirect:/wallet?userId=" + userId;
+    }
 }

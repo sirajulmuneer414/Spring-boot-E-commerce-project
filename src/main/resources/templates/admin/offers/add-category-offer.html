@@ -90,6 +90,7 @@
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
     <div class="admin-header">
         <div class="container">
             <h1><i class='bx bx-plus me-2'></i>Add Category Offer</h1>
@@ -97,26 +98,62 @@
     </div>
     <div class="container pb-5">
         <div class="form-card">
-            <form th:action="@{/admin/offers/add-category}" method="post">
+            <form th:action="@{/admin/offer/category/add/{id}(id=${categoryId})}" method="post">
                 <div class="row g-3">
                     <div class="col-md-12"><label class="form-label">Offer Name</label><input type="text"
-                            name="offerName" class="form-control" required></div>
-                    <div class="col-md-6"><label class="form-label">Category</label><select name="categoryId"
-                            class="form-select" required>
-                            <option value="">Select Category</option>
-                        </select></div>
+                            name="offerDescription" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label">Category</label><input type="text"
+                            class="form-control" th:value="${categoryName}" disabled></div>
                     <div class="col-md-6"><label class="form-label">Discount %</label><input type="number"
                             name="offerPercentage" class="form-control" min="1" max="100" required></div>
                     <div class="col-md-6"><label class="form-label">Start Date</label><input type="date"
                             name="startDate" class="form-control" required></div>
-                    <div class="col-md-6"><label class="form-label">Expiry Date</label><input type="date"
-                            name="expiryDate" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label">Expiry Date</label><input type="date" name="endDate"
+                            class="form-control" required></div>
                     <div class="col-12"><button type="submit" class="btn-submit w-100"><i
                                 class='bx bx-save me-2'></i>Create Offer</button></div>
                 </div>
             </form>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const startDateInput = document.querySelector('input[name="startDate"]');
+            const expiryDateInput = document.querySelector('input[name="endDate"]');
+            const form = document.querySelector('form');
+
+            // Set min start date to today
+            const today = new Date().toISOString().split('T')[0];
+            startDateInput.setAttribute('min', today);
+
+            // Update expiry min date when start date changes
+            startDateInput.addEventListener('change', function () {
+                expiryDateInput.setAttribute('min', this.value);
+                if (expiryDateInput.value && expiryDateInput.value <= this.value) {
+                    expiryDateInput.value = '';
+                }
+            });
+
+            form.addEventListener('submit', function (e) {
+                const startDate = new Date(startDateInput.value);
+                const expiryDate = new Date(expiryDateInput.value);
+                const todayDate = new Date();
+                todayDate.setHours(0, 0, 0, 0);
+
+                if (startDate < todayDate) {
+                    e.preventDefault();
+                    alert('Start date cannot be in the past');
+                    return;
+                }
+
+                if (expiryDate <= startDate) {
+                    e.preventDefault();
+                    alert('Expiry date must be after the start date');
+                    return;
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -10,29 +10,29 @@ import java.util.Objects;
 @Service
 public class OfferDtoMapping {
 
-
     public OfferEmbeddable editCheckingAndAdding(OfferDto dto, OfferEmbeddable offer) {
 
-
-        if(dto.getOfferDescription() != null && dto.getOfferDescription() != offer.getOfferDescription()){
+        if (dto.getOfferDescription() != null && !dto.getOfferDescription().equals(offer.getOfferDescription())) {
             offer.setOfferDescription(dto.getOfferDescription());
-
         }
 
-        if(dto.getOfferPercentage() != null && dto.getOfferPercentage() != 0 && dto.getOfferPercentage() != offer.getOfferPercentage()) {
+        if (dto.getOfferPercentage() != null && dto.getOfferPercentage() != 0
+                && !dto.getOfferPercentage().equals(offer.getOfferPercentage())) {
             offer.setOfferPercentage(dto.getOfferPercentage());
         }
-        if(dto.getStartDate() != offer.getStartDate()) {
+
+        if (dto.getStartDate() != null && !dto.getStartDate().equals(offer.getStartDate())) {
             offer.setStartDate(dto.getStartDate());
         }
-        if(dto.getEndDate() != offer.getEndDate()) {
+
+        if (dto.getEndDate() != null && !dto.getEndDate().equals(offer.getEndDate())) {
             offer.setEndDate(dto.getEndDate());
         }
 
         return offer;
     }
 
-    public OfferDto offerToDto(OfferEmbeddable offer){
+    public OfferDto offerToDto(OfferEmbeddable offer) {
 
         OfferDto dto = new OfferDto();
 

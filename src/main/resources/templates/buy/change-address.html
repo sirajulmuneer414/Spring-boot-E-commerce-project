@@ -128,7 +128,11 @@
         <div class="page-header">
             <h1><i class='bx bx-map me-2'></i>Select Delivery Address</h1>
         </div>
-        <form th:action="@{/user/buy/address/change}" method="post">
+        <div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class='bx bx-error-circle me-2'></i><span th:text="${error}">Error message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <form th:action="@{/user/buy/address/change}" method="post" onsubmit="return validateAddressSelection()">
             <input type="hidden" name="username" th:value="${username}">
             <div th:if="${addresses.isEmpty()}" class="empty-state">
                 <i class='bx bx-map-pin' style="font-size: 64px; color: #cbd5e1;"></i>
@@ -193,6 +197,25 @@
             </div>
         </form>
     </div>
+    <script>
+        function validateAddressSelection() {
+            const radios = document.getElementsByName('addressId');
+            let formValid = false;
+
+            for (let i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    formValid = true;
+                    break;
+                }
+            }
+
+            if (!formValid) {
+                alert("Please select a delivery address to proceed.");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </body>
 
 </html>

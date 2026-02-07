@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@org.springframework.scheduling.annotation.EnableScheduling
 public class LenscraftApplication {
 
 	public static void main(String[] args) {

@@ -202,7 +202,7 @@ public class AdminProductController {
 
         productService.updateProduct(productDto);
 
-        return "redirect:/admin/products/";
+        return "redirect:/admin/products";
 
     }
 
@@ -211,15 +211,10 @@ public class AdminProductController {
         Product product = productService.findProductById(productId);
         ProductDto productDto = productMapping.ProductToDto(product);
 
-        for (Variables variable : productDto.getVariables()) {
-            System.out.println(variable.getFrameColor());
-            System.out.println(variable.getImage1());
-            System.out.println(variable.getImage2());
-            System.out.println(variable.getImage3());
-
-        }
+        List<Variables> variables = variableService.findVariablesByProduct(product);
 
         model.addAttribute("product", productDto);
+        model.addAttribute("variables", variables);
 
         return "admin/get-variables";
     }
@@ -271,6 +266,14 @@ public class AdminProductController {
     @GetMapping("/add-category")
     public String addCat() {
         return "redirect:/admin/category/add";
+    }
+
+    @GetMapping("/add-variable/{id}")
+    public String getAddVariable(@PathVariable("id") Long productId, Model model) {
+        Product product = productService.findProductById(productId);
+        model.addAttribute("productId", productId);
+        model.addAttribute("productName", product.getProductName());
+        return "admin/add-variable";
     }
 
     @PostMapping("/add-variables/{id}")

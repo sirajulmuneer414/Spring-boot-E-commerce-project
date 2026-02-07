@@ -15,8 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CategoryServiceImp implements CategoryService
-{
+public class CategoryServiceImp implements CategoryService {
 
     @Autowired
     CategoryRepository categoryRepository;
@@ -48,24 +47,21 @@ public class CategoryServiceImp implements CategoryService
     public List<CategoryHomeDto> findAllCategoriesConvertedToDto() {
         List<CategoryHomeDto> categoriesDto = new ArrayList<>();
 
-        for(Category category : categoryRepository.findAll()){
+        for (Category category : categoryRepository.findAll()) {
             CategoryHomeDto dto = new CategoryHomeDto();
 
             dto.setCategoryId(category.getCategoryId());
             dto.setCategoryName(category.getCategoryName());
             dto.setProducts(new ArrayList<>());
-        if(category.getProducts().size() > 4) {
-            for (int i = 0; i < 4; i++) {
-                dto.getProducts().add(category.getProducts().get(i));
+            if (category.getProducts().size() > 4) {
+                for (int i = 0; i < 4; i++) {
+                    dto.getProducts().add(category.getProducts().get(i));
+                }
+            } else {
+                dto.setProducts(category.getProducts());
             }
-        }
-        else {dto.setProducts(category.getProducts());}
 
-
-
-
-
-        categoriesDto.add(dto);
+            categoriesDto.add(dto);
 
         }
 
@@ -100,5 +96,10 @@ public class CategoryServiceImp implements CategoryService
     @Override
     public void saveProductFromCategory(Product product) {
         productService.save(product);
+    }
+
+    @Override
+    public List<Category> findAllCategoriesWithOffers() {
+        return categoryRepository.findAllByIsHavingOfferTrue();
     }
 }

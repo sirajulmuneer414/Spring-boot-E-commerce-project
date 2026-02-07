@@ -88,6 +88,7 @@
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
     <div class="admin-header">
         <div class="container">
             <h1><i class='bx bx-edit me-2'></i>Edit Category</h1>
@@ -95,12 +96,13 @@
     </div>
     <div class="container pb-5">
         <div class="form-card">
-            <form th:action="@{/admin/category/edit}" method="post" th:object="${category}">
+            <form th:action="@{/admin/category/edit/{id}(id=${category.categoryId})}" method="post"
+                th:object="${category}">
                 <input type="hidden" th:field="*{categoryId}">
                 <div class="mb-3"><label class="form-label">Category Name</label><input type="text"
                         th:field="*{categoryName}" class="form-control" required></div>
-                <div class="mb-3"><label class="form-label">Description</label><textarea th:field="*{description}"
-                        class="form-control" rows="4"></textarea></div>
+                <div class="mb-3"><label class="form-label">Description</label><textarea
+                        th:field="*{categoryDescription}" class="form-control" rows="4"></textarea></div>
                 <button type="submit" class="btn-submit w-100"><i class='bx bx-save me-2'></i>Update Category</button>
             </form>
         </div>

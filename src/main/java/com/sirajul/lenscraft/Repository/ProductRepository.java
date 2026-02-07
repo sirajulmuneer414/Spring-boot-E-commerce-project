@@ -28,4 +28,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByProductNameContainingIgnoreCaseAndActiveStatus(String keyword, ActiveStatus activeStatus,
             Pageable pageable);
+
+    List<Product> findAllByIsHavingOfferTrue();
 }

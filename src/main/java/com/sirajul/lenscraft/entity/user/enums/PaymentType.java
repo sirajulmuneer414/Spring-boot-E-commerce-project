@@ -3,6 +3,8 @@ package com.sirajul.lenscraft.entity.user.enums;
 public enum PaymentType {
 
     CASH_ON_DELIVERY,
-    UPI_PAYMENT
+    UPI_PAYMENT,
+    WALLET,
+    WALLET_PLUS_UPI
 
 }

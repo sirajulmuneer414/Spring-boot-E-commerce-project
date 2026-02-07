@@ -132,30 +132,80 @@
     <div th:replace="~{fragment::navbar}"></div>
     <div class="payment-container">
         <h3><i class='bx bx-credit-card me-2'></i>Payment Method</h3>
-        <form th:action="@{/user/cart/buy/payment}" method="post" onsubmit="paymentStart(event)" id="orderForm">
-            <div class="payment-option">
-                <input class="form-check-input" type="radio" name="paymentType" id="cod" value="CASH ON DELIVERY"
-                    checked>
-                <label for="cod">
-                    <i class='bx bx-money me-2'></i>Cash on Delivery
+        <form th:action="@{/user/cart/buy/confirm}" method="get" onsubmit="paymentStart(event)" id="orderForm">
+
+            <div class="payment-option bg-white border-primary" style="background: #eff6ff !important;"
+                th:if="${walletBalance > 0}">
+                <input class="form-check-input" type="checkbox" name="useWallet" id="useWallet" value="true"
+                    onchange="toggleWallet();">
+                <label for="useWallet" class="d-flex align-items-center justify-content-between w-100">
+                    <div>
+                        <i class='bx bx-wallet me-2'></i>Use Wallet Balance
+                    </div>
+                    <strong>₹<span th:text="${walletBalance}">0</span></strong>
                 </label>
             </div>
-            <div class="payment-option">
-                <input class="form-check-input" type="radio" name="paymentType" id="upi" value="UPI PAYMENT">
-                <label for="upi">
-                    <i class='bx bx-qr me-2'></i>UPI Payment
-                </label>
+
+            <div id="paymentMethods">
+                <div class="payment-option">
+                    <input class="form-check-input" type="radio" name="paymentType" id="cod2" value="CASH ON DELIVERY"
+                        checked>
+                    <label for="cod2">
+                        <i class='bx bx-money me-2'></i>Cash on Delivery
+                    </label>
+                </div>
+                <div class="payment-option">
+                    <input class="form-check-input" type="radio" name="paymentType" id="upi" value="UPI PAYMENT">
+                    <label for="upi">
+                        <i class='bx bx-qr me-2'></i>UPI Payment
+                    </label>
+                </div>
             </div>
             <div class="amount-summary">
                 <h6>Total Payable Amount</h6>
-                <div class="amount" th:text="'₹' + ${totalAmount}">₹0</div>
+                <div class="amount" th:text="'₹' + ${totalAmount}" th:data-original-amount="${totalAmount}"
+                    id="displayAmount">₹0</div>
             </div>
+            <input type="hidden" name="finalPaymentType" id="finalPaymentType">
             <button type="submit" class="btn-confirm">
                 <i class='bx bx-check-circle me-2'></i>Confirm Order
             </button>
         </form>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const walletBalance = /*[[${walletBalance ?: 0}]]*/ 0;
+        /*]]>*/
+
+        function toggleWallet() {
+            const useWallet = document.getElementById('useWallet').checked;
+            const displayEl = document.getElementById('displayAmount');
+            const originalAmount = parseFloat(displayEl.getAttribute('data-original-amount'));
+            const paymentMethodsDiv = document.getElementById('paymentMethods');
+            const codRadio = document.getElementById('cod');
+
+            let finalAmount = originalAmount;
+
+            if (useWallet) {
+                if (walletBalance >= originalAmount) {
+                    finalAmount = 0;
+                    paymentMethodsDiv.style.display = 'none';
+                    // Disable radios so they don't submit
+                    document.getElementsByName('paymentType').forEach(el => el.disabled = true);
+                } else {
+                    finalAmount = originalAmount - walletBalance;
+                    paymentMethodsDiv.style.display = 'block';
+                    document.getElementsByName('paymentType').forEach(el => el.disabled = false);
+                }
+            } else {
+                paymentMethodsDiv.style.display = 'block';
+                document.getElementsByName('paymentType').forEach(el => el.disabled = false);
+            }
+
+            displayEl.innerText = '₹' + finalAmount;
+        }
+
+    </script>
     <script th:src="@{/js/script.js}"></script>
 </body>
 

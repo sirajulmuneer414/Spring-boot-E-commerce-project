@@ -92,7 +92,8 @@
 
     <!-- Admin Navbar -->
     <div th:fragment="admin-navbar">
-        <header class="header fixed-top bg-white border-bottom px-4 d-flex align-items-center justify-content-between"
+        <header id="header"
+            class="header fixed-top bg-white border-bottom px-4 d-flex align-items-center justify-content-between"
             style="height: 70px; z-index: 100;">
             <div class="d-flex align-items-center gap-3">
                 <i class='bx bx-menu fs-3 cursor-pointer' id="header-toggle"></i>
@@ -126,46 +127,52 @@
         <div style="height: 70px;"></div>
     </div>
 
+
     <!-- Admin Sidebar -->
     <div th:fragment="admin-sidebar">
-        <div class="l-navbar bg-dark h-100 position-fixed start-0 top-0 pt-5 mt-5 d-flex flex-column justify-content-between pb-4"
-            id="nav-bar" style="width: 250px; z-index: 90; transition: 0.5s;">
-            <nav class="nav d-flex flex-column h-100 px-3">
-                <div class="nav_list d-flex flex-column gap-2 mt-4">
+        <div class="l-navbar bg-white border-end h-100 position-fixed start-0 top-0 pt-5 mt-5 d-flex flex-column pb-4"
+            id="nav-bar" style="width: 200px; z-index: 90; transition: 0.3s; box-shadow: 2px 0 10px rgba(0,0,0,0.03);">
+            <nav class="nav d-flex flex-column h-100 px-2">
+                <div class="nav_list d-flex flex-column gap-1 mt-3">
                     <a th:href="@{/admin}"
-                        class="nav_link d-flex align-items-center gap-3 px-3 py-2 rounded-3 text-decoration-none">
-                        <i class='bx bx-grid-alt nav_icon'></i>
+                        class="nav_link d-flex align-items-center gap-2 px-3 py-2 rounded-2 text-decoration-none">
+                        <i class='bx bx-grid-alt nav_icon fs-5'></i>
                         <span class="nav_name">Dashboard</span>
                     </a>
                     <a th:href="@{/admin/products}"
-                        class="nav_link d-flex align-items-center gap-3 px-3 py-2 rounded-3 text-decoration-none">
-                        <i class='bx bx-box nav_icon'></i>
+                        class="nav_link d-flex align-items-center gap-2 px-3 py-2 rounded-2 text-decoration-none">
+                        <i class='bx bx-box nav_icon fs-5'></i>
                         <span class="nav_name">Products</span>
                     </a>
                     <a th:href="@{/admin/category}"
-                        class="nav_link d-flex align-items-center gap-3 px-3 py-2 rounded-3 text-decoration-none">
-                        <i class='bx bx-category nav_icon'></i>
+                        class="nav_link d-flex align-items-center gap-2 px-3 py-2 rounded-2 text-decoration-none">
+                        <i class='bx bx-category nav_icon fs-5'></i>
                         <span class="nav_name">Categories</span>
                     </a>
                     <a th:href="@{/admin/brand}"
-                        class="nav_link d-flex align-items-center gap-3 px-3 py-2 rounded-3 text-decoration-none">
-                        <i class='bx bx-purchase-tag nav_icon'></i>
+                        class="nav_link d-flex align-items-center gap-2 px-3 py-2 rounded-2 text-decoration-none">
+                        <i class='bx bx-purchase-tag nav_icon fs-5'></i>
                         <span class="nav_name">Brands</span>
                     </a>
                     <a th:href="@{/admin/order}"
-                        class="nav_link d-flex align-items-center gap-3 px-3 py-2 rounded-3 text-decoration-none">
-                        <i class='bx bx-receipt nav_icon'></i>
+                        class="nav_link d-flex align-items-center gap-2 px-3 py-2 rounded-2 text-decoration-none">
+                        <i class='bx bx-receipt nav_icon fs-5'></i>
                         <span class="nav_name">Orders</span>
                     </a>
                     <a th:href="@{/admin/customers}"
-                        class="nav_link d-flex align-items-center gap-3 px-3 py-2 rounded-3 text-decoration-none">
-                        <i class='bx bx-user nav_icon'></i>
+                        class="nav_link d-flex align-items-center gap-2 px-3 py-2 rounded-2 text-decoration-none">
+                        <i class='bx bx-user nav_icon fs-5'></i>
                         <span class="nav_name">Customers</span>
                     </a>
                     <a th:href="@{/admin/coupons}"
-                        class="nav_link d-flex align-items-center gap-3 px-3 py-2 rounded-3 text-decoration-none">
-                        <i class='bx bx-purchase-tag-alt nav_icon'></i>
+                        class="nav_link d-flex align-items-center gap-2 px-3 py-2 rounded-2 text-decoration-none">
+                        <i class='bx bx-purchase-tag-alt nav_icon fs-5'></i>
                         <span class="nav_name">Coupons</span>
+                    </a>
+                    <a th:href="@{/admin/offer}"
+                        class="nav_link d-flex align-items-center gap-2 px-3 py-2 rounded-2 text-decoration-none">
+                        <i class='bx bx-gift nav_icon fs-5'></i>
+                        <span class="nav_name">Offers</span>
                     </a>
                 </div>
             </nav>
@@ -206,22 +213,63 @@
             });
         </script>
         <style>
-            @media screen and (min-width: 768px) {
-                .body-pd {
-                    padding-left: calc(250px + 1rem);
-                }
+            :root {
+                --primary-color: #4F46E5;
+                --sidebar-width: 200px;
             }
 
             .l-navbar {
-                left: -250px;
+                left: calc(-1 * var(--sidebar-width));
+                transition: left 0.3s ease;
             }
 
             .show-menu {
-                left: 0;
+                left: 0 !important;
             }
 
             .body-pd {
-                padding-left: calc(250px + 1rem);
+                padding-left: var(--sidebar-width);
+            }
+
+            .nav_link {
+                color: #64748b;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.2s ease;
+            }
+
+            .nav_link:hover {
+                background-color: #f1f5f9;
+                color: var(--primary-color);
+            }
+
+            .nav_link.active {
+                background-color: #ede9fe;
+                color: var(--primary-color);
+                font-weight: 600;
+            }
+
+            .nav_icon {
+                color: inherit;
+            }
+
+            .nav_name {
+                font-size: 14px;
+            }
+
+            @media screen and (max-width: 768px) {
+                .body-pd {
+                    padding-left: 0;
+                }
+            }
+
+            #header-toggle {
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            #header-toggle:hover {
+                color: var(--primary-color);
             }
         </style>
     </div>

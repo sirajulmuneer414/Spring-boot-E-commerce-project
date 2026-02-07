@@ -88,6 +88,7 @@
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
     <div class="admin-header">
         <div class="container">
             <h1><i class='bx bx-edit me-2'></i>Edit Brand</h1>
@@ -95,7 +96,7 @@
     </div>
     <div class="container pb-5">
         <div class="form-card">
-            <form th:action="@{/admin/brand/edit}" method="post" th:object="${brand}">
+            <form th:action="@{/admin/brand/edit/{id}(id=${brand.brandId})}" method="post" th:object="${brand}">
                 <input type="hidden" th:field="*{brandId}">
                 <div class="mb-3"><label class="form-label">Brand Name</label><input type="text" th:field="*{brandName}"
                         class="form-control" required></div>

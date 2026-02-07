@@ -99,50 +99,94 @@
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
-    <div class="admin-header">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h1><i class='bx bx-gift me-2'></i>Offers</h1>
-            <div>
-                <a th:href="@{/admin/offers/add-category}" class="btn-add"><i class='bx bx-plus me-2'></i>Category
-                    Offer</a>
-                <a th:href="@{/admin/offers/add-product}" class="btn-add"><i class='bx bx-plus me-2'></i>Product
-                    Offer</a>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
+    <div class="body-pd" id="body-pd">
+        <div class="admin-header">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h1><i class='bx bx-gift me-2'></i>Active Offers</h1>
             </div>
         </div>
-    </div>
-    <div class="container pb-5">
-        <div class="table-card">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Discount %</th>
-                        <th>Valid Until</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="offer : ${offers}">
-                        <td th:text="${offer.offerId}">1</td>
-                        <td th:text="${offer.offerName}">Name</td>
-                        <td th:text="${offer.offerType}">Type</td>
-                        <td th:text="${offer.offerPercentage + '%'}">10%</td>
-                        <td th:text="${offer.expiryDate}">Date</td>
-                        <td>
-                            <a th:href="@{'/admin/offers/edit-' + ${offer.offerType.toLowerCase()} + '/' + ${offer.offerId}}"
-                                class="btn-action btn-edit">Edit</a>
-                            <form th:action="@{/admin/offers/delete/{id}(id=${offer.offerId})}" method="post"
-                                style="display:inline">
-                                <button type="submit" class="btn-action btn-delete">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="container pb-5">
+            <!-- Product Offers Section -->
+            <h4 class="mb-3 text-muted">Product Offers</h4>
+            <div class="table-card mb-5">
+                <div th:if="${#lists.isEmpty(productOffers)}" class="text-center py-4 text-muted">
+                    No active product offers found.
+                </div>
+                <table class="table" th:unless="${#lists.isEmpty(productOffers)}">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Description</th>
+                            <th>Discount</th>
+                            <th>Valid From</th>
+                            <th>Valid Until</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${productOffers}">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img th:src="${#strings.startsWith(product.variables[0].image1, 'http') ? product.variables[0].image1 : '/productImages/'+product.productId+'/'+product.variables[0].image1}"
+                                        style="width:40px;height:40px;border-radius:6px;object-fit:cover" alt="Product">
+                                    <span th:text="${product.productName}">Name</span>
+                                </div>
+                            </td>
+                            <td th:text="${product.offer.offerDescription}">Desc</td>
+                            <td th:text="${product.offer.offerPercentage + '%'}">10%</td>
+                            <td th:text="${product.offer.startDate}">Start</td>
+                            <td th:text="${product.offer.endDate}">End</td>
+                            <td>
+                                <a th:href="@{/admin/offer/product/edit/{id}(id=${product.productId})}"
+                                    class="btn-action btn-edit">Edit</a>
+                                <form th:action="@{/admin/offer/product/delete/{id}(id=${product.productId})}"
+                                    method="post" style="display:inline">
+                                    <button type="submit" class="btn-action btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Category Offers Section -->
+            <h4 class="mb-3 text-muted">Category Offers</h4>
+            <div class="table-card">
+                <div th:if="${#lists.isEmpty(categoryOffers)}" class="text-center py-4 text-muted">
+                    No active category offers found.
+                </div>
+                <table class="table" th:unless="${#lists.isEmpty(categoryOffers)}">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Discount</th>
+                            <th>Valid From</th>
+                            <th>Valid Until</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="category : ${categoryOffers}">
+                            <td th:text="${category.categoryName}">Name</td>
+                            <td th:text="${category.offer.offerDescription}">Desc</td>
+                            <td th:text="${category.offer.offerPercentage + '%'}">10%</td>
+                            <td th:text="${category.offer.startDate}">Start</td>
+                            <td th:text="${category.offer.endDate}">End</td>
+                            <td>
+                                <a th:href="@{/admin/offer/category/edit/{id}(id=${category.categoryId})}"
+                                    class="btn-action btn-edit">Edit</a>
+                                <form th:action="@{/admin/offer/category/delete/{id}(id=${category.categoryId})}"
+                                    method="post" style="display:inline">
+                                    <button type="submit" class="btn-action btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 </body>
 
 </html>

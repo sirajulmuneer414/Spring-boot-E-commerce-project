@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -77,6 +78,19 @@ public class AdminBrandController {
         return "admin/edit-brand";
     }
 
+    @PostMapping("/edit/{id}")
+    public String updateBrand(@PathVariable("id") Integer brandId,
+            @ModelAttribute Brand brandFromForm) {
+        Brand brand = brandService.findBrandById(brandId);
+
+        if (brandFromForm.getBrandName() != null && !brandFromForm.getBrandName().isEmpty()) {
+            brand.setBrandName(brandFromForm.getBrandName());
+        }
+
+        brandService.update(brand);
+        return "redirect:/admin/brand";
+    }
+
     @GetMapping("/block/{id}")
     public String blockBrand(
             @PathVariable("id") Integer brandId) {
@@ -122,11 +136,18 @@ public class AdminBrandController {
 
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteBrand(
-            @PathVariable("id") Integer brandId) {
-        brandService.deleteById(brandId);
+            @PathVariable("id") Integer brandId,
+            RedirectAttributes redirectAttributes) {
+        Brand brand = brandService.findBrandById(brandId);
 
+        if (brand.getProducts() != null && !brand.getProducts().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Cannot delete brand with existing products");
+            return "redirect:/admin/brand";
+        }
+
+        brandService.deleteById(brandId);
         return "redirect:/admin/brand";
     }
 

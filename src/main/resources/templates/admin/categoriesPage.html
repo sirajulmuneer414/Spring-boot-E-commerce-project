@@ -98,43 +98,60 @@
 
 <body>
     <div th:replace="~{fragment::admin-navbar}"></div>
-    <div class="admin-header">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h1><i class='bx bx-category me-2'></i>Categories</h1>
-            <a th:href="@{/admin/category/add}" class="btn-add"><i class='bx bx-plus me-2'></i>Add Category</a>
+    <div th:replace="~{fragment::admin-sidebar}"></div>
+    <div class="body-pd" id="body-pd">
+        <div class="admin-header">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h1><i class='bx bx-category me-2'></i>Categories</h1>
+                <a th:href="@{/admin/category/add}" class="btn-add"><i class='bx bx-plus me-2'></i>Add Category</a>
+            </div>
         </div>
-    </div>
-    <div class="container pb-5">
-        <div class="table-card">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="category : ${categories}">
-                        <td th:text="${category.categoryId}">1</td>
-                        <td th:text="${category.categoryName}">Name</td>
-                        <td th:text="${category.categoryDescription}">Description</td>
-                        <td><span
-                                th:text="${category.categoryStatus == T(com.sirajul.lenscraft.entity.product.enums.CategoryStatus).ACTIVE ? 'Active' : 'Blocked'}"></span>
-                        </td>
-                        <td>
-                            <a th:href="@{/admin/category/edit/{id}(id=${category.categoryId})}"
-                                class="btn-action btn-edit">Edit</a>
-                            <form th:action="@{/admin/category/delete/{id}(id=${category.categoryId})}" method="get"
-                                style="display:inline">
-                                <button type="submit" class="btn-action btn-delete">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="container pb-5">
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class='bx bx-error-circle me-2'></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div class="table-card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="category : ${categories}">
+                            <td th:text="${category.categoryId}">1</td>
+                            <td th:text="${category.categoryName}">Name</td>
+                            <td th:text="${category.categoryDescription}">Description</td>
+                            <td><span
+                                    th:text="${category.categoryStatus != null and category.categoryStatus.name() == 'ACTIVE' ? 'Active' : 'Blocked'}"></span>
+                            </td>
+                            <td>
+                                <a th:href="@{/admin/category/edit/{id}(id=${category.categoryId})}"
+                                    class="btn-action btn-edit">Edit</a>
+
+                                <!-- Offer Buttons -->
+                                <a th:if="${category.isHavingOffer}"
+                                    th:href="@{/admin/offer/category/edit/{id}(id=${category.categoryId})}"
+                                    class="btn-action" style="background: #f59e0b; text-decoration: none;">Edit
+                                    Offer</a>
+                                <a th:unless="${category.isHavingOffer}"
+                                    th:href="@{/admin/offer/category/add/{id}(id=${category.categoryId})}"
+                                    class="btn-action" style="background: #10b981; text-decoration: none;">Add Offer</a>
+
+                                <form th:action="@{/admin/category/delete/{id}(id=${category.categoryId})}" method="get"
+                                    style="display:inline">
+                                    <button type="submit" class="btn-action btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>

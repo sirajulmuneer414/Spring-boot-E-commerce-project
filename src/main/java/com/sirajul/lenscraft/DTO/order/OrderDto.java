@@ -28,4 +28,6 @@ public class OrderDto {
 
     UUID couponId;
 
+    boolean useWallet;
+
 }
