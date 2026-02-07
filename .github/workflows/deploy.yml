@@ -66,6 +66,7 @@ jobs:
           echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}" >> .env
           echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> .env
           echo "ADMIN_CODE=${{ secrets.ADMIN_CODE }}" >> .env
+          echo "DOCKER_IMAGE=${{ secrets.DOCKER_USERNAME }}/lenscraft" >> .env
           
           
           # Pull and Restart
