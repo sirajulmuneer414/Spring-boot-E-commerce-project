@@ -304,10 +304,19 @@ public class UserCheckoutController {
     }
 
     @GetMapping("/cart/buy/confirm")
-    public String confirmOrder(Model model, HttpSession session) {
+    public String confirmOrder(
+            @RequestParam(name = "paymentType", required = false) String requestPaymentType,
+            Model model, HttpSession session) {
         OrderDto orderDto = (OrderDto) session.getAttribute("order");
         if (orderDto == null) {
             return "redirect:/user/cart";
+        }
+
+        // Update payment type from request param if provided (e.g., WALLET payment from
+        // form)
+        if (orderDto.getPaymentType() == null) {
+            orderDto.setPaymentType(PaymentType.WALLET.name());
+            session.setAttribute("order", orderDto);
         }
 
         log.info("Confirming order - Address: {}, PaymentType: {}, TotalAmount: {}",

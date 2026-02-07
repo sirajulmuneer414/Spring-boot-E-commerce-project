@@ -45,4 +45,6 @@ public interface ProductService {
     Page<Product> findAllProductsInPageableActive(int pageNo, int pageSize);
 
     List<Product> findAllProductsWithOffers();
+
+    void restoreById(Long productId);
 }

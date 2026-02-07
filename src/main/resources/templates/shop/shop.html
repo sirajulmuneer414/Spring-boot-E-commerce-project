@@ -345,6 +345,8 @@
                                 <div class="badge-overlay">
                                     <span class="badge bg-danger"
                                         th:if="${product.stockStatus.name() == 'OUT_OF_STOCK'}">Sold Out</span>
+                                    <span class="badge bg-secondary"
+                                        th:if="${product.stockStatus.name() == 'DISCONTINUED'}">Discontinued</span>
                                 </div>
 
                                 <!-- Actions -->
@@ -354,7 +356,7 @@
                                         class="btn-action" title="View Details">
                                         <i class='bx bx-show'></i>
                                     </a>
-                                    <a th:if="${product.variables != null and product.variables.size() > 0}"
+                                    <a th:if="${product.variables != null and product.variables.size() > 0 and product.stockStatus.name() != 'DISCONTINUED' and product.stockStatus.name() != 'OUT_OF_STOCK'}"
                                         th:href="@{/user/cart/add/{id}/{varId}(id=${product.productId},varId=${product.variables[0].variableId})}"
                                         class="btn-action" title="Add to Cart">
                                         <i class='bx bx-cart-alt'></i>

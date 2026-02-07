@@ -6,10 +6,8 @@ import com.sirajul.lenscraft.Repository.CategoryRepository;
 import com.sirajul.lenscraft.Repository.ProductRepository;
 import com.sirajul.lenscraft.Repository.VariablesRepository;
 import com.sirajul.lenscraft.Service.interfaces.ProductService;
-import com.sirajul.lenscraft.entity.product.Brand;
 import com.sirajul.lenscraft.entity.product.Category;
 import com.sirajul.lenscraft.entity.product.Product;
-import com.sirajul.lenscraft.entity.product.Variables;
 import com.sirajul.lenscraft.entity.user.enums.ActiveStatus;
 import com.sirajul.lenscraft.mapping.ProductMapping;
 
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -66,26 +63,25 @@ public class ProductServiceImp implements ProductService {
     @Transactional
     public void deleteById(Long productId) {
         Product product = productRepository.findById(productId).get();
-        Brand brand = brandRepository.findById(product.getBrand().getBrandId()).get();
 
-        brand.getProducts().remove(product);
+        // Soft delete: Mark as DISCONTINUED instead of hard delete
+        // This preserves order history while preventing new orders
+        product.setStockStatus(com.sirajul.lenscraft.entity.product.enums.StockStatus.DISCONTINUED);
+        product.setActiveStatus(ActiveStatus.BLOCKED);
 
-        brandRepository.save(brand);
-
-        Category category = categoryRepository.findById(product.getCategory().getCategoryId()).get();
-
-        category.getProducts().remove(product);
-
-        categoryRepository.save(category);
-
-        for (Variables variables : product.getVariables()) {
-
-            variablesRepository.delete(variables);
-        }
-        product.setVariables(new ArrayList<>());
         productRepository.save(product);
+    }
 
-        productRepository.delete(product);
+    @Override
+    @Transactional
+    public void restoreById(Long productId) {
+        Product product = productRepository.findById(productId).get();
+
+        // Restore: Mark as IN_STOCK and ACTIVE
+        product.setStockStatus(com.sirajul.lenscraft.entity.product.enums.StockStatus.IN_STOCK);
+        product.setActiveStatus(ActiveStatus.ACTIVE);
+
+        productRepository.save(product);
     }
 
     @Override

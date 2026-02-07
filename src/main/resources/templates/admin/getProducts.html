@@ -145,9 +145,18 @@
                                     th:href="@{/admin/offer/product/add/{id}(id=${product.productId})}"
                                     class="btn-action" style="background: #10b981; text-decoration: none;">Add Offer</a>
 
-                                <form th:action="@{/admin/products/delete/{id}(id=${product.productId})}" method="post"
+                                <!-- Delete button for active products -->
+                                <form th:if="${product.stockStatus.name() != 'DISCONTINUED'}"
+                                    th:action="@{/admin/products/delete/{id}(id=${product.productId})}" method="post"
                                     style="display:inline">
                                     <button type="submit" class="btn-action btn-delete">Delete</button>
+                                </form>
+                                <!-- Restore button for discontinued products -->
+                                <form th:if="${product.stockStatus.name() == 'DISCONTINUED'}"
+                                    th:action="@{/admin/products/restore/{id}(id=${product.productId})}" method="post"
+                                    style="display:inline">
+                                    <button type="submit" class="btn-action"
+                                        style="background: #22c55e;">Restore</button>
                                 </form>
                             </td>
                         </tr>

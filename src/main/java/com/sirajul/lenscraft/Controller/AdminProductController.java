@@ -140,6 +140,12 @@ public class AdminProductController {
         return "redirect:/admin/products";
     }
 
+    @PostMapping("/restore/{id}")
+    public String restoreProduct(@PathVariable("id") Long productId) {
+        productService.restoreById(productId);
+        return "redirect:/admin/products";
+    }
+
     @GetMapping("/block/{id}")
     public String blockProduct(
             @PathVariable("id") Long productId) {

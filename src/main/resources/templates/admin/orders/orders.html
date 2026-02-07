@@ -344,7 +344,9 @@
                         <i class='bx bx-credit-card'></i>
                         <div>
                             <div class="detail-label">Payment</div>
-                            <div class="detail-value" th:text="${order.paymentDetails.paymentType}">COD</div>
+                            <div class="detail-value"
+                                th:text="${order.paymentDetails != null ? order.paymentDetails.paymentType : 'N/A'}">COD
+                            </div>
                         </div>
                     </div>
                     <div class="detail-item">

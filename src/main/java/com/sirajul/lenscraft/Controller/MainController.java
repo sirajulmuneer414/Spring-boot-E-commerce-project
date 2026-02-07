@@ -176,7 +176,7 @@ public class MainController {
             UserInformation user = userService.findByEmailId(username);
             if (user != null) {
                 userId = user.getUserId();
-                model.addAttribute("username", username); // Only add if authenticated
+                model.addAttribute("username", user.getFirstName()); // Use firstName for profile icon
             }
         }
 
@@ -191,5 +191,10 @@ public class MainController {
     @GetMapping("/dashboard")
     public String dashboardRedirect() {
         return "redirect:/admin/dashboard";
+    }
+
+    @GetMapping("/order")
+    public String redirectToUserOrders() {
+        return "redirect:/user/orders";
     }
 }
