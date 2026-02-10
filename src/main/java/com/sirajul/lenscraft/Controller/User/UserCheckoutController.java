@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -260,6 +261,18 @@ public class UserCheckoutController {
         session.setAttribute("walletDeduction", walletDeduction);
         session.setAttribute("order", dto);
 
+        // If wallet covers full amount, skip Razorpay and use direct wallet payment
+        if (amount == 0) {
+            dto.setPaymentType("WALLET");
+            session.setAttribute("order", dto);
+
+            JSONObject response = new JSONObject();
+            response.put("status", "fullWalletPayment");
+            response.put("walletDeduction", walletDeduction);
+            response.put("redirectUrl", "/user/cart/buy/confirm?paymentType=WALLET");
+            return new ResponseEntity<>(response.toString(), HttpStatus.OK);
+        }
+
         var client = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
         JSONObject orderRequest = new JSONObject();
         orderRequest.put("amount", amount * 100); // Razorpay expects amount in paise
@@ -304,17 +317,21 @@ public class UserCheckoutController {
     }
 
     @GetMapping("/cart/buy/confirm")
+    @Transactional
     public String confirmOrder(
             @RequestParam(name = "paymentType", required = false) String requestPaymentType,
-            Model model, HttpSession session) {
+            Model model, HttpSession session, RedirectAttributes redirectAttributes) {
         OrderDto orderDto = (OrderDto) session.getAttribute("order");
         if (orderDto == null) {
             return "redirect:/user/cart";
         }
 
-        // Update payment type from request param if provided (e.g., WALLET payment from
-        // form)
-        if (orderDto.getPaymentType() == null) {
+        // Update payment type from request param if provided
+        if (requestPaymentType != null && !requestPaymentType.isEmpty()) {
+            orderDto.setPaymentType(requestPaymentType);
+            session.setAttribute("order", orderDto);
+        } else if (orderDto.getPaymentType() == null) {
+            // Default to WALLET only if no request param and no existing payment type
             orderDto.setPaymentType(PaymentType.WALLET.name());
             session.setAttribute("order", orderDto);
         }
@@ -322,60 +339,77 @@ public class UserCheckoutController {
         log.info("Confirming order - Address: {}, PaymentType: {}, TotalAmount: {}",
                 orderDto.getAddressId(), orderDto.getPaymentType(), orderDto.getTotalAmount());
 
-        // Create the order first
-        Order order = orderService.saveAndReturn(orderDto);
+        try {
+            // Create the order first
+            Order order = orderService.saveAndReturn(orderDto);
 
-        // Handle payment based on type
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserInformation user = userService.findByEmailId(auth.getName());
+            // Handle payment based on type
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            UserInformation user = userService.findByEmailId(auth.getName());
 
-        String paymentType = orderDto.getPaymentType();
-        String razorpayPaymentId = (String) session.getAttribute("razorpay_payment_id");
-        String razorpayOrderId = (String) session.getAttribute("razorpay_order_id");
-        String razorpaySignature = (String) session.getAttribute("razorpay_signature");
-        Integer walletDeduction = (Integer) session.getAttribute("walletDeduction");
+            String paymentType = orderDto.getPaymentType();
+            String razorpayPaymentId = (String) session.getAttribute("razorpay_payment_id");
+            String razorpayOrderId = (String) session.getAttribute("razorpay_order_id");
+            String razorpaySignature = (String) session.getAttribute("razorpay_signature");
+            Integer walletDeduction = (Integer) session.getAttribute("walletDeduction");
 
-        if ("WALLET_PLUS_UPI".equals(paymentType) && walletDeduction != null && walletDeduction > 0) {
-            // Wallet + UPI payment
-            paymentService.processWalletPlusUpiPayment(order, user, walletDeduction,
-                    razorpayPaymentId, razorpayOrderId, razorpaySignature);
-            orderService.save(order);
-        } else if ("WALLET".equals(paymentType)) {
-            // Full wallet payment
-            paymentService.processFullWalletPayment(order, user);
-            orderService.save(order);
-        } else if ("UPI PAYMENT".equals(paymentType)) {
-            // UPI only payment
-            paymentService.processUpiPayment(order, razorpayPaymentId, razorpayOrderId, razorpaySignature);
-            orderService.save(order);
+            if ("WALLET_PLUS_UPI".equals(paymentType) && walletDeduction != null && walletDeduction > 0) {
+                // Wallet + UPI payment
+                paymentService.processWalletPlusUpiPayment(order, user, walletDeduction,
+                        razorpayPaymentId, razorpayOrderId, razorpaySignature);
+                orderService.save(order);
+            } else if ("WALLET".equals(paymentType)) {
+                // Full wallet payment
+                paymentService.processFullWalletPayment(order, user);
+                orderService.save(order);
+            } else if ("UPI PAYMENT".equals(paymentType)) {
+                // UPI only payment
+                paymentService.processUpiPayment(order, razorpayPaymentId, razorpayOrderId, razorpaySignature);
+                orderService.save(order);
+            }
+            // COD doesn't need special processing
+
+            // Add order to user and clear cart
+            user.getOrders().add(order);
+            Cart cart = user.getCart();
+
+            // Clear all carted items from the cart
+            List<CartedItems> cartedItems = new ArrayList<>(cart.getCartedItems());
+            cart.getCartedItems().clear(); // Detach from JPA relationship first
+            cartService.save(cart); // Persist the empty cart
+
+            for (CartedItems item : cartedItems) {
+                cartedItemsService.deleteCartedItem(item);
+            }
+
+            userService.save(user);
+
+            // Clear session attributes
+            session.removeAttribute("order");
+            session.removeAttribute("discount");
+            session.removeAttribute("couponId");
+            session.removeAttribute("razorpay_payment_id");
+            session.removeAttribute("razorpay_order_id");
+            session.removeAttribute("razorpay_signature");
+            session.removeAttribute("walletDeduction");
+
+            model.addAttribute("userId", user.getUserId());
+            model.addAttribute("username", auth.getName());
+
+            return "buy/order-confirmed";
+
+        } catch (IllegalStateException e) {
+            // Payment validation errors (e.g., insufficient wallet balance)
+            log.error("Payment validation failed: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            throw e; // Rethrow to ensure transaction rollback
+        } catch (Exception e) {
+            // Unexpected errors
+            log.error("Error confirming order: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error",
+                    "An error occurred while processing your order. Please try again.");
+            throw new RuntimeException("Order confirmation failed", e); // Rethrow to ensure transaction rollback
         }
-        // COD doesn't need special processing
-
-        // Add order to user and clear cart
-        user.getOrders().add(order);
-        Cart cart = user.getCart();
-
-        List<CartedItems> cartedItems = new ArrayList<>(cart.getCartedItems());
-        for (CartedItems item : cartedItems) {
-            cartedItemsService.deleteCartedItem(item);
-        }
-        cart.setCartedItems(new ArrayList<>());
-        user.setCart(cart);
-        userService.save(user);
-
-        // Clear session attributes
-        session.removeAttribute("order");
-        session.removeAttribute("discount");
-        session.removeAttribute("couponId");
-        session.removeAttribute("razorpay_payment_id");
-        session.removeAttribute("razorpay_order_id");
-        session.removeAttribute("razorpay_signature");
-        session.removeAttribute("walletDeduction");
-
-        model.addAttribute("userId", user.getUserId());
-        model.addAttribute("username", auth.getName());
-
-        return "buy/order-confirmed";
     }
 
     // ==================== WALLET + UPI CONFIRM ====================

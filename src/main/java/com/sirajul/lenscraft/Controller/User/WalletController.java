@@ -8,6 +8,10 @@ import com.sirajul.lenscraft.entity.wallet.Wallet;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,8 +19,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/wallet")
@@ -34,7 +40,9 @@ public class WalletController {
     @GetMapping
     public String getWallet(
             Model model,
-            @RequestParam("userId") UUID userId) {
+            @RequestParam("userId") UUID userId,
+            @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
 
         UserInformation user = userService.findById(userId);
 
@@ -47,14 +55,30 @@ public class WalletController {
             user.setWallet(wallet);
             userService.save(user);
         } else {
-            transactions = wallet.getTransactions();
+            // Get transactions and sort by transactionTime in descending order (latest
+            // first)
+            transactions = wallet.getTransactions().stream()
+                    .sorted(Comparator.comparing(Transactions::getTransactionTime).reversed())
+                    .collect(Collectors.toList());
+        }
+
+        // Implement pagination
+        Pageable pageRequest = PageRequest.of(pageNo - 1, pageSize);
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), transactions.size());
+
+        Page<Transactions> transactionPage;
+        if (start > transactions.size()) {
+            transactionPage = new PageImpl<>(new ArrayList<>(), pageRequest, transactions.size());
+        } else {
+            transactionPage = new PageImpl<>(transactions.subList(start, end), pageRequest, transactions.size());
         }
 
         model.addAttribute("user", user);
-
         model.addAttribute("wallet", wallet);
-
-        model.addAttribute("transactions", transactions);
+        model.addAttribute("transactions", transactionPage);
+        model.addAttribute("pageNo", pageNo);
+        model.addAttribute("totalPages", transactionPage.getTotalPages());
 
         return "user/wallet/get-wallet";
     }

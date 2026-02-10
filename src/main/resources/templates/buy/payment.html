@@ -182,7 +182,6 @@
             const displayEl = document.getElementById('displayAmount');
             const originalAmount = parseFloat(displayEl.getAttribute('data-original-amount'));
             const paymentMethodsDiv = document.getElementById('paymentMethods');
-            const codRadio = document.getElementById('cod');
 
             let finalAmount = originalAmount;
 
@@ -204,6 +203,37 @@
 
             displayEl.innerText = '₹' + finalAmount;
         }
+
+        // Handle payment method change to disable wallet for COD
+        function handlePaymentMethodChange() {
+            const codRadio = document.getElementById('cod2');
+            const useWalletCheckbox = document.getElementById('useWallet');
+            const displayEl = document.getElementById('displayAmount');
+            const originalAmount = parseFloat(displayEl.getAttribute('data-original-amount'));
+
+            if (codRadio && codRadio.checked) {
+                // COD selected - disable and uncheck wallet
+                if (useWalletCheckbox) {
+                    useWalletCheckbox.checked = false;
+                    useWalletCheckbox.disabled = true;
+                }
+                displayEl.innerText = '₹' + originalAmount;
+            } else {
+                // UPI selected - enable wallet
+                if (useWalletCheckbox) {
+                    useWalletCheckbox.disabled = false;
+                }
+            }
+        }
+
+        // Add event listeners when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementsByName('paymentType').forEach(radio => {
+                radio.addEventListener('change', handlePaymentMethodChange);
+            });
+            // Initialize state
+            handlePaymentMethodChange();
+        });
 
     </script>
     <script th:src="@{/js/script.js}"></script>

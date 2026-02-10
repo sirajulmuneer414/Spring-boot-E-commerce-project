@@ -14,6 +14,8 @@ import com.sirajul.lenscraft.entity.user.enums.FullOrderStatus;
 import com.sirajul.lenscraft.entity.user.enums.OrderStatus;
 import com.sirajul.lenscraft.entity.user.enums.PaymentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -130,6 +132,11 @@ public class OrderServiceImp implements OrderService {
     @Override
     public List<Order> findAllInOrder() {
         return orderRepository.findAll(Sort.by(Sort.Direction.ASC, "orderedTime"));
+    }
+
+    @Override
+    public Page<Order> findAllInOrder(Pageable pageable) {
+        return orderRepository.findAll(pageable);
     }
 
     @Override

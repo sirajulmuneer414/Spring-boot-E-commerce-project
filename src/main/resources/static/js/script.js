@@ -35,6 +35,13 @@ const paymentStart = (e) => {
                 xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             },
             success: function (response) {
+                // Check if wallet covers full amount
+                if (response.status === 'fullWalletPayment') {
+                    console.log("Full wallet payment - redirecting to confirmation");
+                    window.location.href = response.redirectUrl;
+                    return;
+                }
+
                 console.log("WALLET_PLUS_UPI payment - Razorpay order created");
                 console.log("Wallet deduction amount:", response.walletDeduction);
                 

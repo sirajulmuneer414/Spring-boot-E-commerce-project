@@ -7,11 +7,10 @@ import com.sirajul.lenscraft.entity.user.enums.Role;
 import com.sirajul.lenscraft.exception.InvalidOtpException;
 
 import com.sirajul.lenscraft.utils.OtpUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
@@ -21,6 +20,7 @@ import com.sirajul.lenscraft.entity.product.Category;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,7 +51,21 @@ public class MainController {
     ProductService productService;
 
     @GetMapping("/register")
-    public String getRegister(Model model) {
+    public String getRegister(Model model, RedirectAttributes redirectAttributes, HttpServletResponse response) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            redirectAttributes.addFlashAttribute("authMessage", "Please log out to access the registration page.");
+            if (AuthorityUtils.authorityListToSet(auth.getAuthorities()).contains(Role.ADMIN.name())) {
+                return "redirect:/admin/dashboard";
+            }
+            return "redirect:/";
+        }
+
+        // Prevent back-button from showing cached page after login
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
 
         boolean referIsThere = referralOfferService.isOfferAlreadyEstablished();
         SignupDto signupDto = new SignupDto();
@@ -157,7 +171,22 @@ public class MainController {
     }
 
     @GetMapping("/login")
-    public String getLogin() {
+    public String getLogin(RedirectAttributes redirectAttributes, HttpServletResponse response) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            redirectAttributes.addFlashAttribute("authMessage", "Please log out to access the login page.");
+            if (AuthorityUtils.authorityListToSet(auth.getAuthorities()).contains(Role.ADMIN.name())) {
+                return "redirect:/admin/dashboard";
+            }
+            return "redirect:/";
+        }
+
+        // Prevent back-button from showing cached page after login
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+
         return "login";
     }
 

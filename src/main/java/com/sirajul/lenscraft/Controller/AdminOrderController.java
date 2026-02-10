@@ -9,12 +9,15 @@ import com.sirajul.lenscraft.entity.user.UserInformation;
 import com.sirajul.lenscraft.entity.user.enums.FullOrderStatus;
 import com.sirajul.lenscraft.entity.user.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,13 +35,17 @@ public class AdminOrderController {
     UserService userService;
 
     @GetMapping
-    public String getOrders(Model model, @RequestParam(name = "keyword", required = false) String keyword) {
+    public String getOrders(
+            Model model,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
 
-        List<Order> orders = new ArrayList<>();
+        Pageable pageRequest = PageRequest.of(pageNo - 1, pageSize, Sort.by(Sort.Direction.DESC, "orderedTime"));
+        Page<Order> orderPage = orderService.findAllInOrder(pageRequest);
 
-        orders = orderService.findAllInOrder();
-
-        for (Order order : orders) {
+        // Update order statuses based on item statuses
+        for (Order order : orderPage.getContent()) {
             int countD = 0;
             int countC = 0;
             for (OrderItem item : order.getOrderItems()) {
@@ -61,7 +68,9 @@ public class AdminOrderController {
             }
         }
 
-        model.addAttribute("orders", orders);
+        model.addAttribute("orders", orderPage);
+        model.addAttribute("pageNo", pageNo);
+        model.addAttribute("totalPages", orderPage.getTotalPages());
 
         return "admin/orders/orders";
     }

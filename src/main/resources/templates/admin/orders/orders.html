@@ -317,7 +317,7 @@
 
         <!-- Orders List -->
         <div th:if="${orders != null and !orders.isEmpty()}">
-            <div th:each="order : ${orders}" class="order-card">
+            <div th:each="order : ${orders.content}" class="order-card">
                 <div class="order-header">
                     <div>
                         <div class="order-id">Order #<span
@@ -382,6 +382,26 @@
             <h4>No orders yet</h4>
             <p class="text-secondary">Orders will appear here once customers start placing them</p>
         </div>
+
+        <!-- Pagination -->
+        <nav th:if="${totalPages > 1}" aria-label="Orders pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li th:class="${pageNo == 1 ? 'page-item disabled' : 'page-item'}">
+                    <a class="page-link" th:href="@{/admin/order(pageNo=${pageNo - 1})}">
+                        <i class='bx bx-chevron-left'></i> Previous
+                    </a>
+                </li>
+                <li th:each="page : ${#numbers.sequence(1, totalPages)}"
+                    th:class="${page == pageNo ? 'page-item active' : 'page-item'}">
+                    <a class="page-link" th:href="@{/admin/order(pageNo=${page})}" th:text="${page}">1</a>
+                </li>
+                <li th:class="${pageNo == totalPages ? 'page-item disabled' : 'page-item'}">
+                    <a class="page-link" th:href="@{/admin/order(pageNo=${pageNo + 1})}">
+                        Next <i class='bx bx-chevron-right'></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 
     <script>
