@@ -7,10 +7,18 @@ import com.sirajul.lenscraft.entity.user.enums.Role;
 import com.sirajul.lenscraft.exception.InvalidOtpException;
 
 import com.sirajul.lenscraft.utils.OtpUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
@@ -19,9 +27,7 @@ import com.sirajul.lenscraft.Service.interfaces.ProductService;
 import com.sirajul.lenscraft.entity.product.Category;
 import com.sirajul.lenscraft.entity.user.UserInformation;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -49,6 +55,21 @@ public class MainController {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Value("${app.demo.customer.email}")
+    private String demoCustomerEmail;
+
+    @Value("${app.demo.customer.password}")
+    private String demoCustomerPassword;
+
+    @Value("${app.demo.admin.email}")
+    private String demoAdminEmail;
+
+    @Value("${app.demo.admin.password}")
+    private String demoAdminPassword;
 
     @GetMapping("/register")
     public String getRegister(Model model, RedirectAttributes redirectAttributes, HttpServletResponse response) {
@@ -225,5 +246,51 @@ public class MainController {
     @GetMapping("/order")
     public String redirectToUserOrders() {
         return "redirect:/user/orders";
+    }
+
+    // ── Demo Login ──────────────────────────────────────────────────────────────
+    /**
+     * Quick-login endpoint for the "For Testing" buttons on the login page.
+     * Programmatically authenticates as the demo customer or admin account
+     * and redirects to the appropriate landing page.
+     */
+    @GetMapping("/demo-login")
+    public String demoLogin(@RequestParam("role") String role,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        try {
+            String email;
+            String password;
+
+            if ("ADMIN".equalsIgnoreCase(role)) {
+                email = demoAdminEmail;
+                password = demoAdminPassword;
+            } else {
+                email = demoCustomerEmail;
+                password = demoCustomerPassword;
+            }
+
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password));
+
+            SecurityContext sc = SecurityContextHolder.createEmptyContext();
+            sc.setAuthentication(auth);
+            SecurityContextHolder.setContext(sc);
+
+            HttpSession session = request.getSession(true);
+            session.setAttribute(
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
+
+            log.info("Demo login successful for role: {}", role);
+
+            if (AuthorityUtils.authorityListToSet(auth.getAuthorities()).contains(Role.ADMIN.name())) {
+                return "redirect:/admin/dashboard";
+            }
+            return "redirect:/";
+
+        } catch (Exception e) {
+            log.error("Demo login failed: {}", e.getMessage());
+            return "redirect:/login?error";
+        }
     }
 }

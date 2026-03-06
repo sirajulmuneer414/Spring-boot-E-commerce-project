@@ -1,0 +1,93 @@
+/* ── For Testing / Demo Login Section ─────────────────────────────── */
+.demo-section {
+    margin-top: 1.75rem;
+    border: 2px dashed #f59e0b;
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    position: relative;
+}
+
+.demo-badge {
+    position: absolute;
+    top: -0.75rem;
+    left: 1rem;
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.75rem;
+    border-radius: 9999px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+}
+
+.demo-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #92400e;
+    margin-bottom: 0.25rem;
+}
+
+.demo-subtitle {
+    font-size: 0.75rem;
+    color: #b45309;
+    margin-bottom: 1rem;
+}
+
+.btn-demo-customer {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+}
+
+.btn-demo-customer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-demo-admin {
+    background: linear-gradient(135deg, #4F46E5, #4338ca);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+}
+
+.btn-demo-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}
+
+.demo-spinner {
+    display: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: demo-spin 0.6s linear infinite;
+}
+
+@keyframes demo-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
