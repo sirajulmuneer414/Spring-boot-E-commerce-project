@@ -52,3 +52,10 @@ cloudinary:
 
 app:
   admin-code: ${ADMIN_CODE}
+  demo:
+    customer:
+      email: democustomer@lenscraft.com
+      password: Demo@Customer1
+    admin:
+      email: demoadmin@lenscraft.com
+      password: Demo@Admin1
